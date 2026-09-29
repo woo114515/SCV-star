@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "status": "template",
+  "install_path": null,
+  "base_build": null,
+  "map_path": "data/raw/maps/AcropolisLE.SC2Map",
+  "map_sha256": null
+}

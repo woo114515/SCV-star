@@ -1,12 +1,13 @@
 # 项目目录结构
 
-本仓库采用 Python `src` 布局。当前源码文件只声明包职责，没有环境、模型或训练实现；目录名不代表对应能力已经完成。
+本仓库采用 Python `src` 布局。`envs/sc2_client.py` 与 `runtime/m0*.py` 已实现 M0 接口验收；模型、训练和联赛仍为占位，目录名不代表能力完成。
 
 ```text
 SCV-star/
 ├── README.md                    项目入口、状态与目标
 ├── AGENTS.md                    原始贡献指南，保留不改
-├── pyproject.toml               基础包与构建元数据，无训练依赖锁
+├── pyproject.toml               包元数据、M0 可选依赖与命令入口
+├── requirements/                M0 固定版本与下载哈希
 ├── .editorconfig                UTF-8、换行与缩进约定
 ├── .gitattributes               Git 文本换行约定
 ├── .gitignore                   生成物、本机配置和凭据排除规则
@@ -25,13 +26,13 @@ SCV-star/
 │   ├── local.example.json       本机信息模板
 │   ├── local/                  忽略实际机器配置，只保留说明
 │   └── experiments/            BC、RL 和评测设计模板
-├── scripts/                     未来命令入口，目前只有说明
+├── scripts/                     run_m0.ps1 与脚本说明
 ├── tests/
 │   ├── unit/                   无游戏环境的逻辑验证
 │   ├── integration/            游戏／GPU／录像集成验证
 │   └── fixtures/               未来人工构造的小型样例
 ├── data/                        本地数据，不提交实体内容
-│   ├── raw/                    原始录像
+│   ├── raw/                    原始录像与本地验收地图
 │   ├── interim/                中间处理结果
 │   ├── processed/              观测与动作分片
 │   └── manifests/              来源、版本、哈希与集合清单

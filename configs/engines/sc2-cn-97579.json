@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "status": "verified_cn_release",
+  "product": "s2c",
+  "region": "cn",
+  "published_version": "5.0.16.97579",
+  "build_config": "0601979c3d36b9ea4d66a250191d8df5",
+  "cdn_config": "d8aae9fce802373d9da50a2bec7b6040",
+  "verified_at": "2026-09-29T15:07:35.1381579Z",
+  "release_source": "https://cn.version.battlenet.com.cn/s2c/versions",
+  "game_version": "5.0.15.97579",
+  "data_version": "CA45995A39D1BC3967B2AB29FA1C0A73",
+  "data_build": 97579,
+  "base_build": 97579,
+  "binary_sha256": "c6207362b1ca8c5a7939d787a037b9460b93c7ed86413829fa0c7f6a0b91582d"
+}

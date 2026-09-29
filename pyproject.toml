@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=77.0.3"]
+requires = ["setuptools==84.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,11 +7,35 @@ name = "scv-star"
 version = "0.1.0.dev0"
 description = "A research scaffold for a full StarCraft II Terran-vs-Terran learning agent"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dependencies = []
 classifiers = ["Private :: Do Not Upload"]
+
+[project.optional-dependencies]
+dev = ["ruff==0.16.9"]
+m0 = [
+    "s2clientprotocol==5.0.16.97563.0",
+    "protobuf==3.20.3",
+    "websocket-client==1.9.2",
+    "psutil==7.2.2",
+]
+
+[project.scripts]
+scv-m0 = "scv_star.runtime.m0:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["scv_star*"]
 namespaces = false
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"

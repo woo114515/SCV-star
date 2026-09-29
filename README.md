@@ -4,7 +4,7 @@
 
 ## 当前状态
 
-已完成初步技术调研、许可要求整理、Git／GitHub 版本管理与基础目录搭建。现有 Python 包仅为职责占位，配置均为不可直接运行的模板；尚未部署环境、下载数据或模型、实现训练业务或运行训练。
+已完成初步技术调研、许可要求整理、Git／GitHub 管理与基础目录搭建。M0 已验证中国区当前正式 build 97579、基础动作和双向迷雾；真人改为房主后，用户确认操作正常并要求结束测试。修复后的完整10分钟长测未完成，保留该限制。已有隔离 Python 环境、固定通信依赖和可运行检查。模型、BC／RL 与联赛仍为占位，未安装 PyTorch、下载训练数据或运行训练。详见 [M0 验收说明](docs/M0_ACCEPTANCE.md)和[实测记录](docs/experiments/M0_2026-09-29.md)。
 
 ## 基本结构
 
@@ -12,13 +12,28 @@
 | --- | --- |
 | `src/scv_star/` | 数据、环境、观测、动作、模型、训练、联赛、评测与推理模块 |
 | `configs/` | 项目、机器和实验配置模板；真实本机配置不提交 |
-| `scripts/` | 后续诊断及任务入口约定，当前无执行脚本 |
-| `tests/` | 单元／集成测试与样例目录，目前无测试用例 |
+| `scripts/` | M0 本机运行入口与脚本约定 |
+| `tests/` | 版本、地图、协议异常和观测配置的单元测试；其他能力待实现 |
 | `data/` | 原始录像、中间结果、训练分片和清单，仅保留目录占位 |
 | `artifacts/` | 检查点、运行记录和评测输出，仅保留目录占位 |
 | `docs/` | 架构、开发、调研、许可、里程碑和实验记录 |
 
-完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 提供基础包元数据，没有安装依赖，也没有训练依赖锁或可运行的训练 CLI。
+完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0` 可选依赖及 `scv-m0` 入口；`requirements/` 保存 M0 依赖锁，尚无训练依赖锁或训练 CLI。
+
+## 本地命令
+
+本轮使用项目内 Python 3.11.16。首次安装固定依赖与项目的步骤见 [M0 部署说明](docs/M0_ACCEPTANCE.md)，Ruff 0.16.9 的安装见[开发说明](docs/DEVELOPMENT.md)。已有环境中执行：
+
+```powershell
+.\.venv\Scripts\scv-m0.exe --help
+.\.venv\Scripts\python.exe -m unittest discover -s tests/unit -v
+.\.venv\Scripts\ruff.exe format --check src tests
+.\.venv\Scripts\ruff.exe check src tests
+# 构建本地 Python wheel（M0 运行仍使用仓库内的 editable 安装）
+.\downloads\uv-0.12.20\uv.exe build --wheel --no-build-isolation --python .venv/Scripts/python.exe --out-dir artifacts/builds
+# 启动真实游戏，要求本机配置和固定地图；每次使用新的 RunId
+.\scripts\run_m0.ps1 -Mode smoke -RunId m0-smoke-next
+```
 
 ## 目标与约束
 
@@ -27,7 +42,7 @@
 - 策略使用己方合法观测，保留战争迷雾；额外价值信息与执行策略隔离。
 - 从随机初始化网络自行训练；旧录像按对应版本解码，不伪造新版轨迹。
 - 项目新增存储占用不超过 100 GB，额外空间须事先征得用户同意。
-- 可使用已有 Windows／Ubuntu 双系统；训练、安装及下载仍需后续明确授权。
+- 可使用已有 Windows／Ubuntu 双系统；当前实施授权覆盖 M0 环境和接口验收，训练及后续阶段另行安排。
 
 ## 文档
 

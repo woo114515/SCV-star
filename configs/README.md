@@ -1,6 +1,6 @@
 # 配置模板
 
-当前文件都是可阅读的设计模板，尚无加载器、字段验证器或训练入口。`status: template`、空地图列表和必填项 `null` 表示不可直接运行，不能把示例当作已验证实验配置。
+`*.example.json` 都是设计模板；`status: template`、空地图列表和必填项 `null` 表示不可直接运行。M0 命令只读取其专用本机配置并校验引擎和地图身份；尚无通用项目配置加载器或训练入口。
 
 | 文件 | 用途 |
 | --- | --- |
@@ -10,6 +10,12 @@
 | `experiments/bc.example.json` | 随机初始化行为克隆与数据清单引用 |
 | `experiments/rl.example.json` | 新版胜负 RL 基线及引擎固定信息 |
 | `experiments/evaluation.example.json` | 冻结模型、评测条件和样本预算 |
+| `m0.example.json` | M0 脚本所需安装路径、build、地图路径与哈希 |
+| `engine.example.json` | 实测 API 身份字段及游戏二进制哈希 |
+
+M0 实际文件为 `configs/local/m0.json` 和 `configs/local/engine-m0.json`，均不提交；见 [M0 说明](../docs/M0_ACCEPTANCE.md)。以下多层配置合并仍是后续设计，不代表 M0 已实现。
+
+`engines/sc2-cn-97579.json` 是已核对的、可提交的国服发行身份清单，包含官方产品/地区、发行名称、API 返回值和哈希，不包含本机路径。它不是对未来自动更新的授权；新的正式 build 应建立新清单。
 
 ## 约定
 

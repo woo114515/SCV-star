@@ -8,6 +8,8 @@
 | [架构与数据契约](ARCHITECTURE.md) | 理解模块职责、信息边界和数据传递 |
 | [开发说明](DEVELOPMENT.md) | 了解当前能做什么、后续环境验证顺序与代码约定 |
 | [里程碑](MILESTONES.md) | 查看完成状态和下一阶段验收标准 |
+| [M0 接口验收](M0_ACCEPTANCE.md) | 环境、固定版本、本机命令和真人连接 |
+| [M0 实测记录](experiments/M0_2026-09-29.md) | 中国区 build、动作、迷雾及真人运行证据 |
 | [实验记录约定](experiments/README.md) | 记录版本、预算、结果与可复现证据 |
 | [配置模板说明](../configs/README.md) | 区分项目默认值、实验配置和本机配置 |
 | [测试规划](../tests/README.md) | 区分单元、集成与需要实际环境的验证 |
