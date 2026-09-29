@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "status": "template",
+  "kind": "behavior_cloning",
+  "experiment_id": null,
+  "project_config": "configs/project.example.json",
+  "local_config": "configs/local/machine.json",
+  "dataset_manifest": null,
+  "split_manifest": null,
+  "feature_schema_version": null,
+  "action_schema_version": null,
+  "dependency_lock_sha256": null,
+  "initialization": "random",
+  "seed": 0,
+  "batch_size": 2,
+  "sequence_length": 32,
+  "training_budget_seconds": 7200,
+  "z_conditioning": "disabled"
+}

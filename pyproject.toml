@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=77.0.3"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scv-star"
+version = "0.1.0.dev0"
+description = "A research scaffold for a full StarCraft II Terran-vs-Terran learning agent"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+classifiers = ["Private :: Do Not Upload"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["scv_star*"]
+namespaces = false

@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "status": "template",
+  "platform": "windows",
+  "sc2_install_path": "C:\\Program Files (x86)\\america\\StarCraft II",
+  "python_executable": null,
+  "historical_sc2_installations": [],
+  "notes": "User-provided game path; engine build and runtime compatibility are not verified."
+}

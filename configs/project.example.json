@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "status": "template",
+  "project": "SCV-star",
+  "matchup": "TvT",
+  "target_release": "latest_stable_at_verification",
+  "observation": {
+    "interface": "raw",
+    "disable_fog": false,
+    "use_privileged_value": false
+  },
+  "storage": {
+    "max_project_bytes": 100000000000,
+    "planned_project_bytes": 80000000000,
+    "reserve_bytes": 20000000000,
+    "count_external_project_storage": true
+  },
+  "paths": {
+    "raw_replays": "data/raw",
+    "intermediate": "data/interim",
+    "processed": "data/processed",
+    "manifests": "data/manifests",
+    "checkpoints": "artifacts/checkpoints",
+    "runs": "artifacts/runs",
+    "evaluations": "artifacts/evaluations"
+  }
+}

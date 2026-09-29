@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "template",
+  "kind": "evaluation",
+  "evaluation_id": null,
+  "project_config": "configs/project.example.json",
+  "local_config": "configs/local/machine.json",
+  "frozen_conditions_manifest": null,
+  "checkpoint_sha256": null,
+  "seed_schedule_manifest": null,
+  "opponent_manifest": null,
+  "decision_timing_manifest": null,
+  "minimum_games": 100,
+  "confidence_level": 0.95,
+  "win_rate_interval": "wilson",
+  "report_draws_and_failures_separately": true
+}

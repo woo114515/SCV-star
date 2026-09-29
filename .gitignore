@@ -6,7 +6,8 @@
 *.pem
 *.key
 /config.local.*
-/configs/local/
+/configs/local/*
+!/configs/local/README.md
 /.codex/
 /.agents/
 
@@ -33,13 +34,20 @@ dist/
 /Battle.net/
 /Versions/
 /Maps/
-/data/
+/data/**
+!/data/**/
+!/data/**/.gitkeep
+!/data/README.md
 /replays/
 *.SC2Replay
 *.SC2Map
 *.SC2Mod
 
 # Training data, weights and generated results
+/artifacts/**
+!/artifacts/**/
+!/artifacts/**/.gitkeep
+!/artifacts/README.md
 /datasets/
 /models/
 /weights/

@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "status": "template",
+  "kind": "reinforcement_learning",
+  "experiment_id": null,
+  "project_config": "configs/project.example.json",
+  "local_config": "configs/local/machine.json",
+  "engine": {
+    "game_version": null,
+    "base_build": null,
+    "data_build": null,
+    "data_version": null,
+    "binary_sha256": null,
+    "verified_at": null
+  },
+  "maps": [],
+  "dependency_lock_sha256": null,
+  "feature_schema_version": null,
+  "action_schema_version": null,
+  "initial_policy_checkpoint": null,
+  "teacher_checkpoint": null,
+  "algorithm": "distar_vtrace_upgo",
+  "reward": "win_loss_draw",
+  "seed": 0,
+  "parallel_matches": 1,
+  "realtime": false,
+  "training_budget_seconds": 7200,
+  "opponents": {
+    "mode": "builtin_bot",
+    "race": "Terran",
+    "difficulty": "Medium",
+    "ai_build": "RandomBuild"
+  }
+}
