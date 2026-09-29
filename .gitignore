@@ -1,0 +1,80 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+/config.local.*
+/configs/local/
+/.codex/
+/.agents/
+
+# Python environments, caches and build artifacts
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# SC2 clients, maps and replay data
+/StarCraft II/
+/SC2/
+/SC2Data/
+/Battle.net/
+/Versions/
+/Maps/
+/data/
+/replays/
+*.SC2Replay
+*.SC2Map
+*.SC2Mod
+
+# Training data, weights and generated results
+/datasets/
+/models/
+/weights/
+/checkpoints/
+/experiments/
+/runs/
+/outputs/
+/logs/
+/cache/
+/tmp/
+/temp/
+*.pt
+*.pth
+*.pth.tar
+*.ckpt
+*.safetensors
+*.onnx
+*.log
+events.out.tfevents.*
+
+# Large downloads and local tooling
+/downloads/
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.tgz
+*.exe
+*.msi
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
