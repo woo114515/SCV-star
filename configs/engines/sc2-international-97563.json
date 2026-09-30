@@ -1,0 +1,17 @@
+{
+  "game_version": "5.0.16.97563",
+  "base_build": 97563,
+  "data_build": 97563,
+  "data_version": "F364D7C8BB1A0444ABC9BEE547B3FBB3",
+  "binary_sha256": "c86a6dd6a9295f300709d84ce0aa15375f8a345e7f7b36493017d78bd32fe01a",
+  "status": "verified_replay_samples",
+  "schema_version": 1,
+  "product": "s2",
+  "region": "international",
+  "official_build_config": "5bc8dcc1fade3a320c12936586b7c0ed",
+  "official_encoded_key": "50bfe00c0c061d32848d9e02b53ca5b0",
+  "official_content_md5": "b16a1b9203fcc656dd283b41d13c5571",
+  "download_bytes": 52694264,
+  "binary_bytes": 65003728,
+  "official_source": "https://us.cdn.blizzard.com/tpr/sc2/data/50/bf/50bfe00c0c061d32848d9e02b53ca5b0"
+}

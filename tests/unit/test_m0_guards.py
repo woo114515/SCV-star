@@ -36,6 +36,40 @@ class VersionGuards(unittest.TestCase):
         validate_version(self.version, self.version)
 
 
+class IndependentEngineGuards(unittest.TestCase):
+    def test_external_binary_does_not_change_data_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            binary = root / "isolated" / "SC2_x64.exe"
+            binary.parent.mkdir()
+            binary.write_bytes(b"synthetic binary fixture; never executed")
+            expected = dict(
+                game_version="test",
+                base_build=1,
+                data_build=1,
+                data_version="A",
+                binary_sha256=sha256(binary),
+            )
+            client = Client(root / "existing", 1, root / "output", expected, binary=binary)
+            self.assertEqual(client.binary, binary.resolve())
+            self.assertEqual(client.install, (root / "existing").resolve())
+
+    def test_external_binary_cannot_bypass_pinned_hash(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            binary = root / "SC2_x64.exe"
+            binary.write_bytes(b"changed fixture")
+            expected = dict(
+                game_version="test",
+                base_build=1,
+                data_build=1,
+                data_version="A",
+                binary_sha256="wrong",
+            )
+            with self.assertRaisesRegex(ValueError, "binary SHA-256 mismatch"):
+                Client(root / "existing", 1, root / "output", expected, binary=binary)
+
+
 class MapGuards(unittest.TestCase):
     def test_changed_map_rejected(self):
         with tempfile.TemporaryDirectory() as directory:

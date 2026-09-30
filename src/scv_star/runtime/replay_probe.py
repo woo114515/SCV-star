@@ -138,6 +138,11 @@ def main() -> None:
     parser.add_argument("--engine", type=Path, default=Path("configs/engines/sc2-cn-97579.json"))
     parser.add_argument("--local", type=Path, default=Path("configs/local/m0.json"))
     parser.add_argument("--info-only", action="store_true")
+    parser.add_argument(
+        "--download-replay-data",
+        action="store_true",
+        help="Allow SC2 to fetch missing replay binary/data into the selected installation",
+    )
     parser.add_argument("--step", type=int, default=112)
     args = parser.parse_args()
     if not 1 <= args.step <= 224:
@@ -153,6 +158,7 @@ def main() -> None:
     report = {
         "engine": expected,
         "step": args.step,
+        "download_replay_data": args.download_replay_data,
         "replays": [],
         "status": "running",
         "started_at": datetime.now(timezone.utc).isoformat(),
@@ -194,8 +200,18 @@ def main() -> None:
         if usage >= 80_000_000_000 or free < 20_000_000_000:
             raise RuntimeError("Storage guard: project >=80 GB or volume free <20 GB")
         with Client(
-            Path(local["install_path"]), expected["base_build"], args.output / "client", expected
+            Path(local["install_path"]),
+            expected["base_build"],
+            args.output / "client",
+            expected,
+            binary=Path(local["engine_binary"]) if local.get("engine_binary") else None,
         ) as client:
+            report["launch"] = {
+                "binary": str(client.binary),
+                "data_directory": str(client.install),
+                "command": client.command,
+                "ping": client.version,
+            }
             for path in paths:
                 row = {"path": str(path), "sha256": sha256(path), "perspectives": []}
                 report["replays"].append(row)
@@ -207,7 +223,7 @@ def main() -> None:
                             "replay_info",
                             sc.RequestReplayInfo(
                                 replay_path=str(path.resolve()),
-                                download_data=False,
+                                download_data=args.download_replay_data,
                             ),
                         )
                     )

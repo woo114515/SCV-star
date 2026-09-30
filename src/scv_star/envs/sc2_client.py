@@ -37,10 +37,24 @@ class Client:
     """Own one process and socket. Never terminate unrelated game processes."""
 
     def __init__(
-        self, install: Path, build: int, output: Path, expected=None, visible=False, display_mode=0
+        self,
+        install: Path,
+        build: int,
+        output: Path,
+        expected=None,
+        visible=False,
+        display_mode=0,
+        *,
+        binary: Path | None = None,
     ):
         self.install = install.resolve()
-        self.binary = self.install / "Versions" / f"Base{build}" / "SC2_x64.exe"
+        # An independently acquired engine may reuse an existing data/support directory.
+        # It still has to pass the same pinned hash and API identity checks.
+        self.binary = (
+            binary.resolve()
+            if binary is not None
+            else self.install / "Versions" / f"Base{build}" / "SC2_x64.exe"
+        )
         if not self.binary.is_file():
             raise FileNotFoundError(self.binary)
         self.binary_hash = sha256(self.binary)
