@@ -1491,5 +1491,15 @@
   "tvt_precise_engine_groups": 56,
   "tvt_identity_review": 40,
   "active_tvt_known_engine_identity": 22,
-  "active_tvt_at_most_two_minutes": 32
+  "active_tvt_at_most_two_minutes": 32,
+  "historical_full_source_scan": true,
+  "current_curated_dataset": {
+    "replay_files": 2126,
+    "identified_tvt": 2126,
+    "active_candidates": 1957,
+    "paused_91115": 129,
+    "identity_review": 40,
+    "training_ready": 0,
+    "curated_bytes": 375079518
+  }
 }

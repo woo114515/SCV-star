@@ -1,6 +1,6 @@
 # 公开录像下载与引擎需求统计
 
-公开与本机的最新联合口径见[数据集总览](DATASET_OVERVIEW.md)。本页仅统计公开来源。
+本页记录清理前的公开来源扫描与下载范围；当前 TvT 专用目录和清理结果见[数据集总览](DATASET_OVERVIEW.md)。
 
 ## 范围与口径
 
@@ -35,7 +35,7 @@ TvT候选要求恰好两个玩家实际种族为Terran，包含Random最终成�
 
 `artifacts/runs/m2-public-001/`保存发布清单、下载结果、目录快照、来源映射、SQLite逐文件清单和失败记录；这些可能含玩家信息及本机路径，继续由Git忽略。脱敏后的最终统计与引擎清单另列于本页及配套JSON，不将采集数量当作训练能力验收。
 
-另保存[可迁移下载清单](experiments/M2_PUBLIC_DOWNLOAD_MANIFEST_2026-09-30.json)，仅含公开文件名、静态来源URL、大小及校验值，没有本机路径或玩家名称。`checksum_source`区分发布方MD5与本轮首次获取后记录的校验值。新机器可将此JSON作为下载工具的`--manifest`；本机继续用原分组清单和目录续传，避免重复占用空间。清单不包含之前的三场Spawning Tool逐场样本。
+另保存[可迁移下载清单](experiments/M2_PUBLIC_DOWNLOAD_MANIFEST_2026-09-30.json)，仅含公开文件名、静态来源URL、大小及校验值，没有本机路径或玩家名称。`checksum_source`区分发布方MD5与本轮首次获取后记录的校验值。之前单独下载的三场Spawning Tool录像未列入该下载清单；它们均已校验为TvT并纳入项目统一副本，原散件已删除。
 
 ## 最终统计（本轮选定清单已完成）
 

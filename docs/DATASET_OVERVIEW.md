@@ -1,18 +1,18 @@
 # 数据集总览与统一清单
 
-更新：2026-09-30。已将公开数据、本机账号录像和既有解压样本按 SHA-256 归并为统一索引，保留全部来源位置。原始 ZIP 和本机录像保持原位，不重复解压或搬运。以下“可读录像”仅表示录像头可解析，不表示匹配引擎已能重放，更不表示可以直接训练。
+更新：2026-09-30。全量来源扫描曾识别公开和本机共 26,811 个可读录像，其中 2,126 个种族信息明确为 TvT。之后已将这 2,126 个文件复制到项目内统一目录，并将当前清单收窄为 TvT；其他种族和种族不明条目已从当前项目样本清单移除。公开 ZIP 作为原始来源档案保留（其中包含混合种族），本机游戏目录也保留原始录像。以下历史统计描述来源扫描结果，当前工作集只包含 TvT。
 
 ## 来源与数量
 
-| 来源 | 去重后可读录像 | 已识别 TvT 候选 | 定位 |
+| 来源扫描范围 | 去重后可读录像 | 已识别 TvT | 定位 |
 | --- | ---: | ---: | --- |
 | 公开来源联合去重 | 25,814 | 1,848 | SC2ReSet 2.0、补充赛事包及此前公开样本 |
 | 本机账号录像 | 997 | 278 | 用户黄金水平录像，包含各族及非标准人数对局 |
 | 合计 | **26,811** | **2,126** | 公开与本机之间未发现相同字节的录像 |
 
-已解压的 10 个 IEM 2024 样本全部存在于公开包中，只增加位置引用，不再增加数量。SC2ReSet 单独去重为 23,675 个录像／1,749 个 TvT；Spawning 补充来源为 2,586／126。两者重叠 447 个录像／27 个 TvT，不能直接相加。公开下载范围、校验和来源链接见[公开采集记录](M2_PUBLIC_DATA.md)；Spawning 的 6,876 个目录 ID 仍不代表全部原始录像已下载。
+清理前解压的 10 个 IEM 2024 样本以及 3 个 Spawning 单场样本都已核实为 TvT，并归入统一副本；这 13 份重复散件随后删除，不增加独立录像数。SC2ReSet 单独去重为 23,675 个录像／1,749 个 TvT；Spawning 补充来源为 2,586／126。两者重叠 447 个录像／27 个 TvT，不能直接相加。公开下载范围、校验和来源链接见[公开采集记录](M2_PUBLIC_DATA.md)；Spawning 的 6,876 个目录 ID 仍不代表全部原始录像已下载。
 
-| 对抗分类 | 公开 | 本机 | 合计 |
+| 对抗分类（清理前来源扫描） | 公开 | 本机 | 合计 |
 | --- | ---: | ---: | ---: |
 | PvP | 3,520 | 4 | 3,524 |
 | PvT | 5,582 | 172 | 5,754 |
@@ -23,7 +23,7 @@
 | 种族信息不足 | 574 | 0 | 574 |
 | 非标准玩家人数 | 13 | 282 | 295 |
 
-574 个未分类文件中，514 个属于 BaseBuild 39576，60 个属于 44401；现有元数据不能给出双方种族，且缺少对应精确协议。**1,848 是公开数据已识别的 TvT 数量，不能把这 574 个全部判为非 TvT。** 数量口径是去重文件，比赛级去重尚待完成。
+整理前的公开来源扫描中，574 个文件无法确定双方种族（BaseBuild 39576 有 514 个，44401 有 60 个）；这些文件已从当前 TvT 工作集和清单移除。原始公开 ZIP 仍保留这批成员，供来源审计与日后重新筛选。**1,848 是公开来源已识别的 TvT 数量，不能把未分类文件判为非 TvT。** 数量口径是去重文件，比赛级去重尚待完成。
 
 ## TvT 的处理队列
 
@@ -55,28 +55,15 @@
 
 ## 本地统一入口
 
-`data/manifests/current.json` 指向 `unified-2026-09-30-001/`。目录包含：
+项目目录 `data/raw/replays/tvt-curated/` 当前仅含 2,126 个按 SHA-256 命名的 TvT 文件，约 375 MB；副本已逐个与来源字节校验。`data/manifests/current.json` 指向 `unified-tvt-2026-09-30-001/`。旧的全种族派生清单已删除。目录包含：
 
 - `catalog.sqlite`：按内容哈希归并的元数据、来源位置和来源类别。
-- `catalog.jsonl`：逐文件完整索引，附处理队列、历史重放证据和训练就绪标记。
-- `tvt_candidates.jsonl`、`tvt_91115_paused.jsonl`、`identity_review.jsonl`：候选、暂缓及版本复核队列；最后一项包含所有种族的 164 个文件。
-- `unclassified_race.jsonl`、`nonstandard_player_count.jsonl`、`other_matchups.jsonl`、`non_replay_metadata.jsonl`：其余互斥队列。非标准人数队列为 250 个，另有 45 个已优先归入版本复核，故分类总数为 295。
-- `summary.json`、`provenance.json`、`same_match_review.json`：汇总、输入哈希与证据来源、同场比赛复核线索。
+- `catalog.jsonl`：2,126 个 TvT 文件索引，附处理队列、历史重放证据和训练就绪标记。
+- `tvt_candidates.jsonl`、`tvt_91115_paused.jsonl`、`identity_review.jsonl`：当前候选、暂缓及版本文本复核队列，数量分别为 1,957、129、40。
+- `summary.json`、`current.json`：当前 TvT 工作集统计与入口。
 
-清单含本机路径或玩家信息，由 Git 忽略；GitHub 仅保存代码、文档和脱敏汇总。原始公共索引哈希保持不变，本机 997 个录像与此前扫描哈希一致。本次新增约 67.7 MB 派生索引，项目合计约 39.52 GB（十进制），低于 100 GB 上限，未生成训练张量。
+清单含本机路径或玩家信息，由 Git 忽略；GitHub 仅保存代码、文档和脱敏汇总。本机账号原始录像与公开 ZIP 均作为来源档案保留；旧全种族派生清单已删除，当前 TvT 副本和索引约 375 MB。项目总占用约 39.83 GB（十进制），低于 100 GB 上限，未生成训练张量。
 
-需要重建时使用新输出目录，避免覆盖快照：
+清理前的全量公开扫描索引留在忽略的 `artifacts/runs/m2-public-001/`，用于从 ZIP 来源重新筛选；它是审计索引，不是当前训练工作集。不要将全量扫描直接设为 `current.json`。本轮不下载其他引擎、不启动游戏或训练，M2 整体尚未验收。
 
-```powershell
-.\.venv\Scripts\python.exe -m scv_star.data.consolidate `
-  --public-database artifacts/runs/m2-public-001/inventory.sqlite `
-  --local-inventory artifacts/runs/m2-sources-001/local-inventory.json `
-  --extracted data/raw/replays/sc2reset-iem2024-sample `
-  --evidence artifacts/runs/m2-sources-001/local-results-check/report.json `
-  --evidence artifacts/runs/m2-international-91115-001/97563-regression/report.json `
-  --output data/manifests/unified-next
-```
-
-重建命令只生成新快照；核对统计后再更新 `current.json`。本轮不下载其他引擎、不启动游戏或训练，M2 整体尚未验收。
-
-本轮 41 项单元测试、Ruff 格式及静态检查通过；汇总数量、来源位置、样本重复关系与文档链接检查通过。`AGENTS.md` 保持原哈希。验证记录保存在 `artifacts/runs/m2-public-001/consolidation-verification.json`。
+本轮复制后按 SHA-256 逐个校验 2,126 个录像；检查当前清单与 SQLite 均只含 TvT，且旧的全种族派生目录已删除。`AGENTS.md` 保持原哈希。验证记录保存在 `artifacts/runs/m2-public-001/tvt-curation-verification.json`。
