@@ -13,6 +13,7 @@ classifiers = ["Private :: Do Not Upload"]
 
 [project.optional-dependencies]
 dev = ["ruff==0.16.9"]
+m2 = ["s2protocol==5.0.16.97563.0", "mpyq==0.2.5"]
 m1 = ["torch==2.13.0+cu130", "setuptools==84.0.0"]
 m0 = [
     "s2clientprotocol==5.0.16.97563.0",

@@ -2,7 +2,7 @@
 
 ## 当前可用范围
 
-当前提供 M0 SC2 启动与通信、基础动作/迷雾/真人检查，以及 M1 GPU 合成数据前后向和恢复检查。数据处理器、正式策略模型、BC／RL 和联赛仍为占位；不提供尚不存在的 `train`／`play` 命令。
+当前提供M0 SC2启动与通信、基础动作/迷雾/真人检查，M1 GPU合成数据前后向和恢复检查，以及[M2录像元数据扫描和小样本重放](M2_REPLAY_SOURCES.md)。正式训练轨迹导出器、策略模型、BC／RL和联赛仍为占位；不提供尚不存在的`train`／`play`命令。
 
 M0/M1 使用项目内 `.venv/Scripts/python.exe`（Python 3.11.16），通信、GPU 和开发工具依赖分别保存哈希锁。未修改系统 PATH；未找到可复用 pyenv，用户表示可能不存在。M1 已安装 PyTorch 2.13.0+cu130 并在 NVIDIA GPU 上通过小型验证，未运行正式训练。详见 [M0 部署与命令](M0_ACCEPTANCE.md)和[M1 验证命令](M1_ACCEPTANCE.md)。
 
@@ -69,4 +69,4 @@ Get-ChildItem configs -Recurse -Filter '*.example.json' | ForEach-Object {
 
 检查改动范围、文档链接与配置语法；若影响真实行为，执行相应测试并说明未满足的环境条件。确认没有凭据、录像、模型或游戏资源被跟踪，再提交和同步私有仓库。
 
-用户已授权并完成 M0 接口与 M1 GPU 验证；后续录像解码与正式训练仍按[里程碑](MILESTONES.md)分阶段开展。
+用户已授权并完成M0接口、M1 GPU验证及M2三来源小样本验证。M2解析依赖固定在`requirements/m2-replays.txt`，原生重放还需要M0依赖；不需要GPU。后续精确对齐、扩大数据与正式训练仍按[里程碑](MILESTONES.md)分阶段开展。
