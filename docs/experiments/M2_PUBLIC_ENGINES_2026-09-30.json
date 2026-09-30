@@ -27,6 +27,8 @@
       "unique_files": 25847,
       "unique_replay_files": 25814,
       "valid_replay_files": 25814,
+      "unclassified_race": 574,
+      "nonstandard_player_count": 13,
       "tvt_candidates": 1848,
       "identity_conflicts": 0,
       "non_replay_files": 33
@@ -48,7 +50,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 53
         },
         "game_versions": [
           "3.1.0.39576"
@@ -68,7 +71,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 120
         },
         "game_versions": [
           "3.1.1.39948"
@@ -88,7 +92,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 241
         },
         "game_versions": [
           "3.1.2.40384"
@@ -108,7 +113,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 58
         },
         "game_versions": [
           "3.1.3.41128"
@@ -128,7 +134,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 42
         },
         "game_versions": [
           "3.1.4.41219"
@@ -148,7 +155,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 60
         },
         "game_versions": [
           "3.4.0.44401"
@@ -168,7 +176,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 53,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "3.10.1.49957"
@@ -188,7 +197,8 @@
           "human_tvt": 21,
           "tvt_over_2min": 21,
           "identity_conflicts": 0,
-          "exact_details": 406
+          "exact_details": 406,
+          "unclassified_race": 0
         },
         "game_versions": [
           "3.12.0.51702"
@@ -208,7 +218,8 @@
           "human_tvt": 16,
           "tvt_over_2min": 16,
           "identity_conflicts": 0,
-          "exact_details": 328
+          "exact_details": 328,
+          "unclassified_race": 0
         },
         "game_versions": [
           "3.14.0.53644"
@@ -228,7 +239,8 @@
           "human_tvt": 8,
           "tvt_over_2min": 8,
           "identity_conflicts": 0,
-          "exact_details": 188
+          "exact_details": 188,
+          "unclassified_race": 0
         },
         "game_versions": [
           "3.16.0.55505"
@@ -248,7 +260,8 @@
           "human_tvt": 20,
           "tvt_over_2min": 20,
           "identity_conflicts": 0,
-          "exact_details": 388
+          "exact_details": 388,
+          "unclassified_race": 0
         },
         "game_versions": [
           "3.17.1.57218"
@@ -268,7 +281,8 @@
           "human_tvt": 13,
           "tvt_over_2min": 14,
           "identity_conflicts": 0,
-          "exact_details": 331
+          "exact_details": 331,
+          "unclassified_race": 0
         },
         "game_versions": [
           "3.19.1.58600"
@@ -288,7 +302,8 @@
           "human_tvt": 2,
           "tvt_over_2min": 2,
           "identity_conflicts": 0,
-          "exact_details": 135
+          "exact_details": 135,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.0.2.59877"
@@ -308,7 +323,8 @@
           "human_tvt": 24,
           "tvt_over_2min": 24,
           "identity_conflicts": 0,
-          "exact_details": 482
+          "exact_details": 482,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.1.4.61545"
@@ -328,7 +344,8 @@
           "human_tvt": 40,
           "tvt_over_2min": 40,
           "identity_conflicts": 0,
-          "exact_details": 444
+          "exact_details": 444,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.2.0.62347"
@@ -348,7 +365,8 @@
           "human_tvt": 2,
           "tvt_over_2min": 2,
           "identity_conflicts": 0,
-          "exact_details": 165
+          "exact_details": 165,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.2.1.62848"
@@ -368,7 +386,8 @@
           "human_tvt": 6,
           "tvt_over_2min": 6,
           "identity_conflicts": 0,
-          "exact_details": 83
+          "exact_details": 83,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.2.3.63785"
@@ -388,7 +407,8 @@
           "human_tvt": 21,
           "tvt_over_2min": 20,
           "identity_conflicts": 0,
-          "exact_details": 404
+          "exact_details": 404,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.3.2.65384"
@@ -408,7 +428,8 @@
           "human_tvt": 40,
           "tvt_over_2min": 40,
           "identity_conflicts": 0,
-          "exact_details": 753
+          "exact_details": 753,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.4.0.65895"
@@ -428,7 +449,8 @@
           "human_tvt": 24,
           "tvt_over_2min": 24,
           "identity_conflicts": 0,
-          "exact_details": 442
+          "exact_details": 442,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.6.0.67926"
@@ -448,7 +470,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 72
+          "exact_details": 72,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.6.2.69232"
@@ -468,7 +491,8 @@
           "human_tvt": 42,
           "tvt_over_2min": 41,
           "identity_conflicts": 0,
-          "exact_details": 416
+          "exact_details": 416,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.7.1.70326"
@@ -488,7 +512,8 @@
           "human_tvt": 17,
           "tvt_over_2min": 17,
           "identity_conflicts": 0,
-          "exact_details": 289
+          "exact_details": 289,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.8.2.71663"
@@ -508,7 +533,8 @@
           "human_tvt": 47,
           "tvt_over_2min": 47,
           "identity_conflicts": 0,
-          "exact_details": 932
+          "exact_details": 932,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.8.3.72282"
@@ -528,7 +554,8 @@
           "human_tvt": 47,
           "tvt_over_2min": 47,
           "identity_conflicts": 0,
-          "exact_details": 540
+          "exact_details": 540,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.8.6.73620"
@@ -548,7 +575,8 @@
           "human_tvt": 14,
           "tvt_over_2min": 14,
           "identity_conflicts": 0,
-          "exact_details": 330
+          "exact_details": 330,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.9.2.74741"
@@ -568,7 +596,8 @@
           "human_tvt": 56,
           "tvt_over_2min": 56,
           "identity_conflicts": 0,
-          "exact_details": 765
+          "exact_details": 765,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.9.3.75025"
@@ -588,7 +617,8 @@
           "human_tvt": 13,
           "tvt_over_2min": 13,
           "identity_conflicts": 0,
-          "exact_details": 596
+          "exact_details": 596,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.10.2.76052"
@@ -608,7 +638,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 44,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.10.4.76811"
@@ -628,7 +659,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 18
+          "exact_details": 18,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.11.1.77474"
@@ -648,7 +680,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 22
+          "exact_details": 22,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.11.2.77535"
@@ -668,7 +701,8 @@
           "human_tvt": 50,
           "tvt_over_2min": 50,
           "identity_conflicts": 0,
-          "exact_details": 791
+          "exact_details": 791,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.11.4.78285"
@@ -688,7 +722,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 22,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.12.0.79998"
@@ -708,7 +743,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 62,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "4.12.0.80188"
@@ -728,7 +764,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 117,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.2.81433"
@@ -748,7 +785,8 @@
           "human_tvt": 22,
           "tvt_over_2min": 22,
           "identity_conflicts": 0,
-          "exact_details": 297
+          "exact_details": 297,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.4.82457"
@@ -768,7 +806,8 @@
           "human_tvt": 33,
           "tvt_over_2min": 33,
           "identity_conflicts": 0,
-          "exact_details": 281
+          "exact_details": 281,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.5.82893"
@@ -788,7 +827,8 @@
           "human_tvt": 44,
           "tvt_over_2min": 44,
           "identity_conflicts": 0,
-          "exact_details": 444
+          "exact_details": 444,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.6.83830"
@@ -808,7 +848,8 @@
           "human_tvt": 205,
           "tvt_over_2min": 205,
           "identity_conflicts": 0,
-          "exact_details": 2510
+          "exact_details": 2510,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.7.84643"
@@ -828,7 +869,8 @@
           "human_tvt": 101,
           "tvt_over_2min": 101,
           "identity_conflicts": 0,
-          "exact_details": 1071
+          "exact_details": 1071,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.8.86383"
@@ -848,7 +890,8 @@
           "human_tvt": 88,
           "tvt_over_2min": 88,
           "identity_conflicts": 0,
-          "exact_details": 1094
+          "exact_details": 1094,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.9.87702"
@@ -868,7 +911,8 @@
           "human_tvt": 47,
           "tvt_over_2min": 47,
           "identity_conflicts": 0,
-          "exact_details": 988
+          "exact_details": 988,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.10.88500"
@@ -888,7 +932,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 55,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.10.89165"
@@ -908,7 +953,8 @@
           "human_tvt": 40,
           "tvt_over_2min": 40,
           "identity_conflicts": 0,
-          "exact_details": 260
+          "exact_details": 260,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.11.89720"
@@ -928,7 +974,8 @@
           "human_tvt": 84,
           "tvt_over_2min": 84,
           "identity_conflicts": 0,
-          "exact_details": 981
+          "exact_details": 981,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.11.90136"
@@ -948,7 +995,8 @@
           "human_tvt": 129,
           "tvt_over_2min": 129,
           "identity_conflicts": 0,
-          "exact_details": 1396
+          "exact_details": 1396,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.12.91115"
@@ -968,7 +1016,8 @@
           "human_tvt": 23,
           "tvt_over_2min": 23,
           "identity_conflicts": 0,
-          "exact_details": 317
+          "exact_details": 317,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.13.92028"
@@ -988,7 +1037,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 1,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.13.92138"
@@ -1008,7 +1058,8 @@
           "human_tvt": 54,
           "tvt_over_2min": 54,
           "identity_conflicts": 0,
-          "exact_details": 628
+          "exact_details": 628,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.13.92174"
@@ -1028,7 +1079,8 @@
           "human_tvt": 48,
           "tvt_over_2min": 48,
           "identity_conflicts": 0,
-          "exact_details": 249
+          "exact_details": 249,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.13.92440"
@@ -1048,7 +1100,8 @@
           "human_tvt": 33,
           "tvt_over_2min": 33,
           "identity_conflicts": 0,
-          "exact_details": 171
+          "exact_details": 171,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.14.93272"
@@ -1068,7 +1121,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 64
+          "exact_details": 64,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.14.93333"
@@ -1088,7 +1142,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 14,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.14.94137"
@@ -1108,7 +1163,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 2,
           "identity_conflicts": 0,
-          "exact_details": 0
+          "exact_details": 0,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.15.95841"
@@ -1128,7 +1184,8 @@
           "human_tvt": 1,
           "tvt_over_2min": 1,
           "identity_conflicts": 0,
-          "exact_details": 1
+          "exact_details": 1,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.16.97364"
@@ -1148,7 +1205,8 @@
           "human_tvt": 0,
           "tvt_over_2min": 0,
           "identity_conflicts": 0,
-          "exact_details": 173
+          "exact_details": 173,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.16.97425"
@@ -1168,7 +1226,8 @@
           "human_tvt": 2,
           "tvt_over_2min": 2,
           "identity_conflicts": 0,
-          "exact_details": 2
+          "exact_details": 2,
+          "unclassified_race": 0
         },
         "game_versions": [
           "5.0.16.97563"
@@ -1178,7 +1237,17 @@
     ],
     "deduplication": "SHA-256 only; same-match variants not certified",
     "engine_replay_verified": false,
-    "training_alignment_verified": false
+    "training_alignment_verified": false,
+    "matchups": {
+      "PvP": 3520,
+      "PvT": 5582,
+      "PvZ": 6295,
+      "TvT": 1848,
+      "TvZ": 5133,
+      "ZvZ": 2849,
+      "nonstandard_player_count": 13,
+      "unclassified_race": 574
+    }
   },
   "by_source": {
     "sc2reset": {
@@ -1204,5 +1273,6 @@
   "paused_91115_tvt": 129,
   "init_hash_groups_with_multiple_tvt_files": 2,
   "game_level_deduplication_verified": false,
-  "raw_replay_statistics_only": true
+  "raw_replay_statistics_only": true,
+  "classification_note": "1848 identified TvT; 574 unknown race and 13 nonstandard player count; readable headers do not certify training readiness"
 }

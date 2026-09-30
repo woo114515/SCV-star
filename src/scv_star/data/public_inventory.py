@@ -17,6 +17,19 @@ from s2protocol import versions
 MAX_REPLAY_BYTES = 10_000_000
 
 
+def matchup(row: dict) -> str:
+    """Missing race information is unknown, not evidence of a non-TvT game."""
+    races = row.get("races") or []
+    if not races:
+        return "unclassified_race"
+    if len(races) != 2:
+        return "nonstandard_player_count"
+    aliases = {"Terr": "T", "Terran": "T", "Prot": "P", "Protoss": "P", "Zerg": "Z"}
+    if any(race not in aliases for race in races):
+        return "unclassified_race"
+    return "v".join(sorted(aliases[race] for race in races))
+
+
 def identity(metadata: dict, header: dict) -> tuple[dict, list[str]]:
     version = header["m_version"]
     root = header.get("m_ngdpRootKey", {}).get("m_data", b"").hex().upper()
@@ -53,6 +66,11 @@ def inspect(raw: bytes) -> dict:
         metadata_raw = archive.read_file("replay.gamemetadata.json")
         metadata = json.loads(metadata_raw) if metadata_raw else {}
         result["identity"], result["identity_mismatches"] = identity(metadata, header)
+        result["metadata_identity"] = {
+            key: metadata[key]
+            for key in ["GameVersion", "BaseBuild", "DataBuild", "DataVersion"]
+            if key in metadata
+        }
         result["game_loops"] = header["m_elapsedGameLoops"]
         result["races"] = [p.get("AssignedRace") for p in metadata.get("Players", [])]
         result["metadata_present"] = bool(metadata)
@@ -146,6 +164,7 @@ def record(db: sqlite3.Connection, source: str, member: str, raw: bytes) -> None
 
 def summarize(db: sqlite3.Connection) -> dict:
     counts = Counter()
+    matchups = Counter()
     groups = {}
     for (encoded,) in db.execute("SELECT info FROM replays"):
         row = json.loads(encoded)
@@ -158,6 +177,10 @@ def summarize(db: sqlite3.Connection) -> dict:
             counts["parse_errors"] += 1
             continue
         counts["valid_replay_files"] += 1
+        kind = matchup(row)
+        matchups[kind] += 1
+        counts["unclassified_race"] += kind == "unclassified_race"
+        counts["nonstandard_player_count"] += kind == "nonstandard_player_count"
         counts["tvt_candidates"] += bool(row.get("tvt_candidate"))
         counts["identity_conflicts"] += bool(row["identity_mismatches"])
         ident = row["identity"]
@@ -165,6 +188,7 @@ def summarize(db: sqlite3.Connection) -> dict:
         group = groups.setdefault(key, {"identity": ident, "counts": Counter(), "versions": set()})
         group["versions"].add(ident["game_version"])
         group["counts"]["all_races"] += 1
+        group["counts"]["unclassified_race"] += kind == "unclassified_race"
         group["counts"]["tvt_candidates"] += bool(row.get("tvt_candidate"))
         group["counts"]["human_tvt"] += bool(row.get("tvt_candidate") and row.get("human_1v1"))
         group["counts"]["tvt_over_2min"] += bool(
@@ -175,6 +199,7 @@ def summarize(db: sqlite3.Connection) -> dict:
     occurrences = db.execute("SELECT COUNT(*) FROM locations").fetchone()[0]
     return {
         "counts": dict(counts),
+        "matchups": dict(sorted(matchups.items())),
         "source_occurrences": occurrences,
         "byte_identical_duplicates": occurrences - counts["unique_files"],
         "sources": db.execute("SELECT COUNT(*) FROM sources").fetchone()[0],
