@@ -1,0 +1,1208 @@
+{
+  "date": "2026-09-30",
+  "scope": "SC2ReSet 2.0 full release plus selected reachable Spawning Tool organizer packs/folders and three prior public samples",
+  "spawning_catalog_ids": 6876,
+  "spawning_catalog_all_downloaded": false,
+  "downloads": {
+    "zenodo-downloads": {
+      "files": 73,
+      "bytes": 4450856337
+    },
+    "recent-packs-downloads": {
+      "files": 3,
+      "bytes": 51994401
+    },
+    "extra-packs-downloads": {
+      "files": 4,
+      "bytes": 432847971
+    },
+    "drive-downloads": {
+      "files": 726,
+      "bytes": 124737442
+    }
+  },
+  "reused_sc2reset_zip_bytes": 88978891,
+  "inventory": {
+    "counts": {
+      "unique_files": 25847,
+      "unique_replay_files": 25814,
+      "valid_replay_files": 25814,
+      "tvt_candidates": 1848,
+      "identity_conflicts": 0,
+      "non_replay_files": 33
+    },
+    "source_occurrences": 26644,
+    "byte_identical_duplicates": 797,
+    "sources": 807,
+    "engine_groups": [
+      {
+        "identity": {
+          "base_build": 39576,
+          "data_build": 39576,
+          "data_version": "02E9A9C724F2EC0C0B11552D1E3B1171",
+          "game_version": "3.1.0.39576"
+        },
+        "counts": {
+          "all_races": 53,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "3.1.0.39576"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 39576,
+          "data_build": 39948,
+          "data_version": "5BED01D7C9610BD0684B775D5BDE4F75",
+          "game_version": "3.1.1.39948"
+        },
+        "counts": {
+          "all_races": 120,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "3.1.1.39948"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 39576,
+          "data_build": 40384,
+          "data_version": "D992D194378AD153E80BF8B385EB3F21",
+          "game_version": "3.1.2.40384"
+        },
+        "counts": {
+          "all_races": 241,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "3.1.2.40384"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 39576,
+          "data_build": 41128,
+          "data_version": "D21A2711CFC6DB458142B50C77D66C74",
+          "game_version": "3.1.3.41128"
+        },
+        "counts": {
+          "all_races": 58,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "3.1.3.41128"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 39576,
+          "data_build": 41219,
+          "data_version": "9C4D93DFD8879405CF9E2B6AD1F4338F",
+          "game_version": "3.1.4.41219"
+        },
+        "counts": {
+          "all_races": 42,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "3.1.4.41219"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 44401,
+          "data_build": 44401,
+          "data_version": "39CCB481951B6D8FBC31893E00E9C6C7",
+          "game_version": "3.4.0.44401"
+        },
+        "counts": {
+          "all_races": 60,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "3.4.0.44401"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 49716,
+          "data_build": 49957,
+          "data_version": "77A80D17030F8CBE08D581ED8FAB23E4",
+          "game_version": "3.10.1.49957"
+        },
+        "counts": {
+          "all_races": 421,
+          "tvt_candidates": 53,
+          "human_tvt": 0,
+          "tvt_over_2min": 53,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "3.10.1.49957"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 51702,
+          "data_build": 51702,
+          "data_version": "C610D0D7A40CED89B46CE5030A017095",
+          "game_version": "3.12.0.51702"
+        },
+        "counts": {
+          "all_races": 406,
+          "tvt_candidates": 21,
+          "human_tvt": 21,
+          "tvt_over_2min": 21,
+          "identity_conflicts": 0,
+          "exact_details": 406
+        },
+        "game_versions": [
+          "3.12.0.51702"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 53644,
+          "data_build": 53644,
+          "data_version": "CA275C4D6E213ED30F80BACCDFEDB1F5",
+          "game_version": "3.14.0.53644"
+        },
+        "counts": {
+          "all_races": 328,
+          "tvt_candidates": 16,
+          "human_tvt": 16,
+          "tvt_over_2min": 16,
+          "identity_conflicts": 0,
+          "exact_details": 328
+        },
+        "game_versions": [
+          "3.14.0.53644"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 55505,
+          "data_build": 55505,
+          "data_version": "60718A7CA50D0DF42987A30CF87BCB80",
+          "game_version": "3.16.0.55505"
+        },
+        "counts": {
+          "all_races": 188,
+          "tvt_candidates": 8,
+          "human_tvt": 8,
+          "tvt_over_2min": 8,
+          "identity_conflicts": 0,
+          "exact_details": 188
+        },
+        "game_versions": [
+          "3.16.0.55505"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 56787,
+          "data_build": 57218,
+          "data_version": "3F2FCED08798D83B873B5543BEFA6C4B",
+          "game_version": "3.17.1.57218"
+        },
+        "counts": {
+          "all_races": 388,
+          "tvt_candidates": 20,
+          "human_tvt": 20,
+          "tvt_over_2min": 20,
+          "identity_conflicts": 0,
+          "exact_details": 388
+        },
+        "game_versions": [
+          "3.17.1.57218"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 58400,
+          "data_build": 58600,
+          "data_version": "D9B568472880CC4719D1B698C0D86984",
+          "game_version": "3.19.1.58600"
+        },
+        "counts": {
+          "all_races": 331,
+          "tvt_candidates": 14,
+          "human_tvt": 13,
+          "tvt_over_2min": 14,
+          "identity_conflicts": 0,
+          "exact_details": 331
+        },
+        "game_versions": [
+          "3.19.1.58600"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 59587,
+          "data_build": 59877,
+          "data_version": "B43D9EE00A363DAFAD46914E3E4AF362",
+          "game_version": "4.0.2.59877"
+        },
+        "counts": {
+          "all_races": 135,
+          "tvt_candidates": 2,
+          "human_tvt": 2,
+          "tvt_over_2min": 2,
+          "identity_conflicts": 0,
+          "exact_details": 135
+        },
+        "game_versions": [
+          "4.0.2.59877"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 60321,
+          "data_build": 61545,
+          "data_version": "2E2A3F6E0BAFE5AC659C4D39F13A938C",
+          "game_version": "4.1.4.61545"
+        },
+        "counts": {
+          "all_races": 482,
+          "tvt_candidates": 24,
+          "human_tvt": 24,
+          "tvt_over_2min": 24,
+          "identity_conflicts": 0,
+          "exact_details": 482
+        },
+        "game_versions": [
+          "4.1.4.61545"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 62347,
+          "data_build": 62347,
+          "data_version": "C0C0E9D37FCDBC437CE386C6BE2D1F93",
+          "game_version": "4.2.0.62347"
+        },
+        "counts": {
+          "all_races": 444,
+          "tvt_candidates": 40,
+          "human_tvt": 40,
+          "tvt_over_2min": 40,
+          "identity_conflicts": 0,
+          "exact_details": 444
+        },
+        "game_versions": [
+          "4.2.0.62347"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 62848,
+          "data_build": 62848,
+          "data_version": "29BBAC5AFF364B6101B661DB468E3A37",
+          "game_version": "4.2.1.62848"
+        },
+        "counts": {
+          "all_races": 165,
+          "tvt_candidates": 2,
+          "human_tvt": 2,
+          "tvt_over_2min": 2,
+          "identity_conflicts": 0,
+          "exact_details": 165
+        },
+        "game_versions": [
+          "4.2.1.62848"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 63454,
+          "data_build": 63785,
+          "data_version": "5E3A8B21E41B987E05EE4917AAD68C69",
+          "game_version": "4.2.3.63785"
+        },
+        "counts": {
+          "all_races": 83,
+          "tvt_candidates": 6,
+          "human_tvt": 6,
+          "tvt_over_2min": 6,
+          "identity_conflicts": 0,
+          "exact_details": 83
+        },
+        "game_versions": [
+          "4.2.3.63785"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 65384,
+          "data_build": 65384,
+          "data_version": "B6D73C85DFB70F5D01DEABB2517BF11C",
+          "game_version": "4.3.2.65384"
+        },
+        "counts": {
+          "all_races": 404,
+          "tvt_candidates": 21,
+          "human_tvt": 21,
+          "tvt_over_2min": 20,
+          "identity_conflicts": 0,
+          "exact_details": 404
+        },
+        "game_versions": [
+          "4.3.2.65384"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 65895,
+          "data_build": 65895,
+          "data_version": "BF41339C22AE2EDEBEEADC8C75028F7D",
+          "game_version": "4.4.0.65895"
+        },
+        "counts": {
+          "all_races": 753,
+          "tvt_candidates": 40,
+          "human_tvt": 40,
+          "tvt_over_2min": 40,
+          "identity_conflicts": 0,
+          "exact_details": 753
+        },
+        "game_versions": [
+          "4.4.0.65895"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 67926,
+          "data_build": 67926,
+          "data_version": "7DE59231CBF06F1ECE9A25A27964D4AE",
+          "game_version": "4.6.0.67926"
+        },
+        "counts": {
+          "all_races": 442,
+          "tvt_candidates": 24,
+          "human_tvt": 24,
+          "tvt_over_2min": 24,
+          "identity_conflicts": 0,
+          "exact_details": 442
+        },
+        "game_versions": [
+          "4.6.0.67926"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 69232,
+          "data_build": 69232,
+          "data_version": "B3E14058F1083913B80C20993AC965DB",
+          "game_version": "4.6.2.69232"
+        },
+        "counts": {
+          "all_races": 72,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 72
+        },
+        "game_versions": [
+          "4.6.2.69232"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 70154,
+          "data_build": 70326,
+          "data_version": "94596A85191583AD2EBFAE28C5D532DB",
+          "game_version": "4.7.1.70326"
+        },
+        "counts": {
+          "all_races": 416,
+          "tvt_candidates": 42,
+          "human_tvt": 42,
+          "tvt_over_2min": 41,
+          "identity_conflicts": 0,
+          "exact_details": 416
+        },
+        "game_versions": [
+          "4.7.1.70326"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 71663,
+          "data_build": 71663,
+          "data_version": "FE90C92716FC6F8F04B74268EC369FA5",
+          "game_version": "4.8.2.71663"
+        },
+        "counts": {
+          "all_races": 289,
+          "tvt_candidates": 17,
+          "human_tvt": 17,
+          "tvt_over_2min": 17,
+          "identity_conflicts": 0,
+          "exact_details": 289
+        },
+        "game_versions": [
+          "4.8.2.71663"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 72282,
+          "data_build": 72282,
+          "data_version": "0F14399BBD0BA528355FF4A8211F845B",
+          "game_version": "4.8.3.72282"
+        },
+        "counts": {
+          "all_races": 932,
+          "tvt_candidates": 47,
+          "human_tvt": 47,
+          "tvt_over_2min": 47,
+          "identity_conflicts": 0,
+          "exact_details": 932
+        },
+        "game_versions": [
+          "4.8.3.72282"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 73620,
+          "data_build": 73620,
+          "data_version": "AA18FEAD6573C79EF707DF44ABF1BE61",
+          "game_version": "4.8.6.73620"
+        },
+        "counts": {
+          "all_races": 540,
+          "tvt_candidates": 47,
+          "human_tvt": 47,
+          "tvt_over_2min": 47,
+          "identity_conflicts": 0,
+          "exact_details": 540
+        },
+        "game_versions": [
+          "4.8.6.73620"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 74741,
+          "data_build": 74741,
+          "data_version": "614480EF79264B5BD084E57F912172FF",
+          "game_version": "4.9.2.74741"
+        },
+        "counts": {
+          "all_races": 330,
+          "tvt_candidates": 14,
+          "human_tvt": 14,
+          "tvt_over_2min": 14,
+          "identity_conflicts": 0,
+          "exact_details": 330
+        },
+        "game_versions": [
+          "4.9.2.74741"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 75025,
+          "data_build": 75025,
+          "data_version": "C305368C63621480462F8F516FB64374",
+          "game_version": "4.9.3.75025"
+        },
+        "counts": {
+          "all_races": 765,
+          "tvt_candidates": 56,
+          "human_tvt": 56,
+          "tvt_over_2min": 56,
+          "identity_conflicts": 0,
+          "exact_details": 765
+        },
+        "game_versions": [
+          "4.9.3.75025"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 76052,
+          "data_build": 76052,
+          "data_version": "D0F1A68AA88BA90369A84CD1439AA1C3",
+          "game_version": "4.10.2.76052"
+        },
+        "counts": {
+          "all_races": 596,
+          "tvt_candidates": 13,
+          "human_tvt": 13,
+          "tvt_over_2min": 13,
+          "identity_conflicts": 0,
+          "exact_details": 596
+        },
+        "game_versions": [
+          "4.10.2.76052"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 76811,
+          "data_build": 76811,
+          "data_version": "FF9FA4EACEC5F06DEB27BD297D73ED67",
+          "game_version": "4.10.4.76811"
+        },
+        "counts": {
+          "all_races": 428,
+          "tvt_candidates": 44,
+          "human_tvt": 0,
+          "tvt_over_2min": 44,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "4.10.4.76811"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 77379,
+          "data_build": 77474,
+          "data_version": "F92D1127A291722120AC816F09B2E583",
+          "game_version": "4.11.1.77474"
+        },
+        "counts": {
+          "all_races": 18,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 18
+        },
+        "game_versions": [
+          "4.11.1.77474"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 77535,
+          "data_build": 77535,
+          "data_version": "FC43E0897FCC93E4632AC57CBC5A2137",
+          "game_version": "4.11.2.77535"
+        },
+        "counts": {
+          "all_races": 22,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 22
+        },
+        "game_versions": [
+          "4.11.2.77535"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 78285,
+          "data_build": 78285,
+          "data_version": "69493AFAB5C7B45DDB2F3442FD60F0CF",
+          "game_version": "4.11.4.78285"
+        },
+        "counts": {
+          "all_races": 791,
+          "tvt_candidates": 50,
+          "human_tvt": 50,
+          "tvt_over_2min": 50,
+          "identity_conflicts": 0,
+          "exact_details": 791
+        },
+        "game_versions": [
+          "4.11.4.78285"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 79998,
+          "data_build": 79998,
+          "data_version": "B47567DEE5DC23373BFF57194538DFD3",
+          "game_version": "4.12.0.79998"
+        },
+        "counts": {
+          "all_races": 237,
+          "tvt_candidates": 22,
+          "human_tvt": 0,
+          "tvt_over_2min": 22,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "4.12.0.79998"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 80188,
+          "data_build": 80188,
+          "data_version": "44DED5AED024D23177C742FC227C615A",
+          "game_version": "4.12.0.80188"
+        },
+        "counts": {
+          "all_races": 774,
+          "tvt_candidates": 62,
+          "human_tvt": 0,
+          "tvt_over_2min": 62,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "4.12.0.80188"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 81433,
+          "data_build": 81433,
+          "data_version": "5FD8D4B6B52723B44862DF29F232CF31",
+          "game_version": "5.0.2.81433"
+        },
+        "counts": {
+          "all_races": 1693,
+          "tvt_candidates": 117,
+          "human_tvt": 0,
+          "tvt_over_2min": 117,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "5.0.2.81433"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 82457,
+          "data_build": 82457,
+          "data_version": "D2707E265785612D12B381AF6ED9DBF4",
+          "game_version": "5.0.4.82457"
+        },
+        "counts": {
+          "all_races": 297,
+          "tvt_candidates": 22,
+          "human_tvt": 22,
+          "tvt_over_2min": 22,
+          "identity_conflicts": 0,
+          "exact_details": 297
+        },
+        "game_versions": [
+          "5.0.4.82457"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 82893,
+          "data_build": 82893,
+          "data_version": "D795328C01B8A711947CC62AA9750445",
+          "game_version": "5.0.5.82893"
+        },
+        "counts": {
+          "all_races": 281,
+          "tvt_candidates": 33,
+          "human_tvt": 33,
+          "tvt_over_2min": 33,
+          "identity_conflicts": 0,
+          "exact_details": 281
+        },
+        "game_versions": [
+          "5.0.5.82893"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 83830,
+          "data_build": 83830,
+          "data_version": "B4745D6A4F982A3143C183D8ACB6C3E3",
+          "game_version": "5.0.6.83830"
+        },
+        "counts": {
+          "all_races": 444,
+          "tvt_candidates": 44,
+          "human_tvt": 44,
+          "tvt_over_2min": 44,
+          "identity_conflicts": 0,
+          "exact_details": 444
+        },
+        "game_versions": [
+          "5.0.6.83830"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 84643,
+          "data_build": 84643,
+          "data_version": "A389D1F7DF9DD792FBE980533B7119FF",
+          "game_version": "5.0.7.84643"
+        },
+        "counts": {
+          "all_races": 2510,
+          "tvt_candidates": 205,
+          "human_tvt": 205,
+          "tvt_over_2min": 205,
+          "identity_conflicts": 0,
+          "exact_details": 2510
+        },
+        "game_versions": [
+          "5.0.7.84643"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 86383,
+          "data_build": 86383,
+          "data_version": "22EAC562CD0C6A31FB2C2C21E3AA3680",
+          "game_version": "5.0.8.86383"
+        },
+        "counts": {
+          "all_races": 1071,
+          "tvt_candidates": 101,
+          "human_tvt": 101,
+          "tvt_over_2min": 101,
+          "identity_conflicts": 0,
+          "exact_details": 1071
+        },
+        "game_versions": [
+          "5.0.8.86383"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 87702,
+          "data_build": 87702,
+          "data_version": "F799E093428D419FD634CCE9B925218C",
+          "game_version": "5.0.9.87702"
+        },
+        "counts": {
+          "all_races": 1094,
+          "tvt_candidates": 88,
+          "human_tvt": 88,
+          "tvt_over_2min": 88,
+          "identity_conflicts": 0,
+          "exact_details": 1094
+        },
+        "game_versions": [
+          "5.0.9.87702"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 88500,
+          "data_build": 88500,
+          "data_version": "F38043A301B034A78AD13F558257DCF8",
+          "game_version": "5.0.10.88500"
+        },
+        "counts": {
+          "all_races": 988,
+          "tvt_candidates": 47,
+          "human_tvt": 47,
+          "tvt_over_2min": 47,
+          "identity_conflicts": 0,
+          "exact_details": 988
+        },
+        "game_versions": [
+          "5.0.10.88500"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 89165,
+          "data_build": 89165,
+          "data_version": "36A9F8C9AECF5C1D6CA261B3CD0DBA2D",
+          "game_version": "5.0.10.89165"
+        },
+        "counts": {
+          "all_races": 867,
+          "tvt_candidates": 55,
+          "human_tvt": 0,
+          "tvt_over_2min": 55,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "5.0.10.89165"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 89720,
+          "data_build": 89720,
+          "data_version": "D371D4D7D1E6C131B24A09FC0E758547",
+          "game_version": "5.0.11.89720"
+        },
+        "counts": {
+          "all_races": 260,
+          "tvt_candidates": 40,
+          "human_tvt": 40,
+          "tvt_over_2min": 40,
+          "identity_conflicts": 0,
+          "exact_details": 260
+        },
+        "game_versions": [
+          "5.0.11.89720"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 90136,
+          "data_build": 90136,
+          "data_version": "207F9DD45D02C9E6D19F868E0239E72D",
+          "game_version": "5.0.11.90136"
+        },
+        "counts": {
+          "all_races": 981,
+          "tvt_candidates": 84,
+          "human_tvt": 84,
+          "tvt_over_2min": 84,
+          "identity_conflicts": 0,
+          "exact_details": 981
+        },
+        "game_versions": [
+          "5.0.11.90136"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 91115,
+          "data_build": 91115,
+          "data_version": "7857A76754FEB47C823D18993C476BF0",
+          "game_version": "5.0.12.91115"
+        },
+        "counts": {
+          "all_races": 1396,
+          "tvt_candidates": 129,
+          "human_tvt": 129,
+          "tvt_over_2min": 129,
+          "identity_conflicts": 0,
+          "exact_details": 1396
+        },
+        "game_versions": [
+          "5.0.12.91115"
+        ],
+        "environment_status": "acquisition_paused_by_user; previously_runtime_blocked"
+      },
+      {
+        "identity": {
+          "base_build": 92028,
+          "data_build": 92028,
+          "data_version": "2B7746A6706F919775EF1BADFC95EA1C",
+          "game_version": "5.0.13.92028"
+        },
+        "counts": {
+          "all_races": 317,
+          "tvt_candidates": 23,
+          "human_tvt": 23,
+          "tvt_over_2min": 23,
+          "identity_conflicts": 0,
+          "exact_details": 317
+        },
+        "game_versions": [
+          "5.0.13.92028"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 92138,
+          "data_build": 92138,
+          "data_version": "D6B5BB5033A820B05C39CC615AE6F77B",
+          "game_version": "5.0.13.92138"
+        },
+        "counts": {
+          "all_races": 31,
+          "tvt_candidates": 1,
+          "human_tvt": 0,
+          "tvt_over_2min": 1,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "5.0.13.92138"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 92174,
+          "data_build": 92174,
+          "data_version": "D44E66924A56B2D4BC94786D8A7EB5B8",
+          "game_version": "5.0.13.92174"
+        },
+        "counts": {
+          "all_races": 628,
+          "tvt_candidates": 54,
+          "human_tvt": 54,
+          "tvt_over_2min": 54,
+          "identity_conflicts": 0,
+          "exact_details": 628
+        },
+        "game_versions": [
+          "5.0.13.92174"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 92440,
+          "data_build": 92440,
+          "data_version": "79F6D78E27ED069D2D84FB14288B88B9",
+          "game_version": "5.0.13.92440"
+        },
+        "counts": {
+          "all_races": 249,
+          "tvt_candidates": 48,
+          "human_tvt": 48,
+          "tvt_over_2min": 48,
+          "identity_conflicts": 0,
+          "exact_details": 249
+        },
+        "game_versions": [
+          "5.0.13.92440"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 93272,
+          "data_build": 93272,
+          "data_version": "52920A9D89C7F63235945D10F3C73C64",
+          "game_version": "5.0.14.93272"
+        },
+        "counts": {
+          "all_races": 171,
+          "tvt_candidates": 33,
+          "human_tvt": 33,
+          "tvt_over_2min": 33,
+          "identity_conflicts": 0,
+          "exact_details": 171
+        },
+        "game_versions": [
+          "5.0.14.93272"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 93333,
+          "data_build": 93333,
+          "data_version": "446907060311FB1CC29EB31E547BB9FD",
+          "game_version": "5.0.14.93333"
+        },
+        "counts": {
+          "all_races": 64,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 64
+        },
+        "game_versions": [
+          "5.0.14.93333"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 94137,
+          "data_build": 94137,
+          "data_version": "519EE8D06E384469C652DD58FC6016AC",
+          "game_version": "5.0.14.94137"
+        },
+        "counts": {
+          "all_races": 366,
+          "tvt_candidates": 14,
+          "human_tvt": 0,
+          "tvt_over_2min": 14,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "5.0.14.94137"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 95841,
+          "data_build": 95841,
+          "data_version": "536442325AEC578B31B2482F733396D5",
+          "game_version": "5.0.15.95841"
+        },
+        "counts": {
+          "all_races": 176,
+          "tvt_candidates": 2,
+          "human_tvt": 0,
+          "tvt_over_2min": 2,
+          "identity_conflicts": 0,
+          "exact_details": 0
+        },
+        "game_versions": [
+          "5.0.15.95841"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 97364,
+          "data_build": 97364,
+          "data_version": "9305DCF6E5680FFEBD8B679EF05C947F",
+          "game_version": "5.0.16.97364"
+        },
+        "counts": {
+          "all_races": 1,
+          "tvt_candidates": 1,
+          "human_tvt": 1,
+          "tvt_over_2min": 1,
+          "identity_conflicts": 0,
+          "exact_details": 1
+        },
+        "game_versions": [
+          "5.0.16.97364"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 97425,
+          "data_build": 97425,
+          "data_version": "0F8662FB3166F81670574D8E620E4340",
+          "game_version": "5.0.16.97425"
+        },
+        "counts": {
+          "all_races": 173,
+          "tvt_candidates": 0,
+          "human_tvt": 0,
+          "tvt_over_2min": 0,
+          "identity_conflicts": 0,
+          "exact_details": 173
+        },
+        "game_versions": [
+          "5.0.16.97425"
+        ],
+        "environment_status": "not_verified_for_this_identity"
+      },
+      {
+        "identity": {
+          "base_build": 97563,
+          "data_build": 97563,
+          "data_version": "F364D7C8BB1A0444ABC9BEE547B3FBB3",
+          "game_version": "5.0.16.97563"
+        },
+        "counts": {
+          "all_races": 2,
+          "tvt_candidates": 2,
+          "human_tvt": 2,
+          "tvt_over_2min": 2,
+          "identity_conflicts": 0,
+          "exact_details": 2
+        },
+        "game_versions": [
+          "5.0.16.97563"
+        ],
+        "environment_status": "existing_windows_environment; two_prior_games_replayed"
+      }
+    ],
+    "deduplication": "SHA-256 only; same-match variants not certified",
+    "engine_replay_verified": false,
+    "training_alignment_verified": false
+  },
+  "by_source": {
+    "sc2reset": {
+      "occurrences": 24057,
+      "unique": 23675,
+      "tvt": 1749,
+      "non_replay": 33
+    },
+    "spawning_public_sources": {
+      "occurrences": 2587,
+      "unique": 2586,
+      "tvt": 126,
+      "non_replay": 0
+    }
+  },
+  "all_base_builds": 53,
+  "all_identity_combinations": 57,
+  "tvt_base_builds": 46,
+  "tvt_identity_combinations": 46,
+  "tvt_excluding_91115": 1719,
+  "tvt_excluding_91115_base_builds": 45,
+  "tvt_excluding_91115_identity_combinations": 45,
+  "paused_91115_tvt": 129,
+  "init_hash_groups_with_multiple_tvt_files": 2,
+  "game_level_deduplication_verified": false,
+  "raw_replay_statistics_only": true
+}

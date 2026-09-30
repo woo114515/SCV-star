@@ -13,6 +13,7 @@
 | [M1 GPU 验证](M1_ACCEPTANCE.md) | 固定 PyTorch 环境、合成数据前后向和检查点恢复 |
 | [M1 实测记录](experiments/M1_2026-09-30.md) | GPU、CUDA runtime、精度、显存和恢复一致性证据 |
 | [M2 三来源小样本](M2_REPLAY_SOURCES.md) | 本机国服重放、公开样本解析、版本差异与历史引擎限制 |
+| [M2 公开数据总体采集](M2_PUBLIC_DATA.md) | SC2ReSet全量、补充赛事、下载边界、去重统计及精确引擎需求 |
 | [M2 国际97563验证](M2_INTERNATIONAL_97563.md) | 官方独立引擎、隔离运行、资源补齐及两场外部录像结果 |
 | [M2 国际91115获取](M2_INTERNATIONAL_91115.md) | 已验签历史引擎、旧数据阻塞、97563复测与空间清理 |
 | [实验记录约定](experiments/README.md) | 记录版本、预算、结果与可复现证据 |

@@ -11,4 +11,4 @@
 
 原始录像不是完整逐帧观测，需由匹配引擎重放；不同版本失败不能静默改用新版。详细流程见[技术方案](../docs/SC2_TVT_RESEARCH_PLAN.md)和[架构与数据契约](../docs/ARCHITECTURE.md)。
 
-所有新增数据计入项目100 GB上限。当前已按用户授权下载一个SC2ReSet小样本包和三场Spawning Tool录像；本机录像只读引用原路径。来源和失败记录见[M2说明](../docs/M2_REPLAY_SOURCES.md)，尚无正式训练分片或模型，不自动扩大下载。
+所有新增数据计入项目100 GB上限。用户已在小样本验证后授权公开原始录像的总体下载及精确引擎统计；结果和覆盖限制见[公开数据采集](../docs/M2_PUBLIC_DATA.md)。完整包与补充录像保存在`downloads/public-replays/`，复用`downloads/m2-samples/`中的已下载文件，不整体解压或复制到本目录。逐文件索引与来源清单位于`artifacts/runs/m2-public-001/`，字节去重尚不等于比赛级去重。本机国服录像继续只读引用原路径；尚无正式训练分片或模型。
