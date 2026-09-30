@@ -4,7 +4,9 @@
 
 ## 当前状态
 
-已完成初步技术调研、许可要求整理、Git／GitHub 管理与基础目录搭建。**M0 已通过用户验收**：验证本轮中国区正式 build 97579、基础动作、双向迷雾和真人操作；用户接受修复后已有的约8分钟运行证据，不再要求补足10分钟。实际时长及中断原因保留在记录中。已有隔离 Python 环境、固定通信依赖和可运行检查。模型、BC／RL 与联赛仍为占位，未安装 PyTorch、下载训练数据或运行训练。详见 [M0 验收说明](docs/M0_ACCEPTANCE.md)和[实测记录](docs/experiments/M0_2026-09-29.md)。
+已完成初步技术调研、许可要求整理、Git／GitHub 管理与基础目录搭建。**M0 已通过用户验收**：验证本轮中国区正式 build 97579、基础动作、双向迷雾和真人操作；用户接受修复后已有的约8分钟运行证据，不再要求补足10分钟。实际时长及中断原因保留在[M0记录](docs/experiments/M0_2026-09-29.md)。
+
+**M1 GPU兼容性已通过实测**：项目内 PyTorch 2.13.0+cu130 在 NVIDIA RTX 5070 Ti Laptop 上完成 FP32/FP16/BF16 合成数据前后向及检查点恢复；未使用Intel核显。详见[M1说明](docs/M1_ACCEPTANCE.md)和[实测记录](docs/experiments/M1_2026-09-30.md)。正式策略模型、BC／RL 与联赛仍为占位，未下载训练数据或运行正式训练。
 
 ## 基本结构
 
@@ -18,7 +20,7 @@
 | `artifacts/` | 检查点、运行记录和评测输出，仅保留目录占位 |
 | `docs/` | 架构、开发、调研、许可、里程碑和实验记录 |
 
-完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0` 可选依赖及 `scv-m0` 入口；`requirements/` 保存 M0 依赖锁，尚无训练依赖锁或训练 CLI。
+完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存 M0、M1 和开发工具锁。M1 CUDA依赖按其专用锁安装；尚无正式训练 CLI。
 
 ## 本地命令
 
@@ -26,6 +28,8 @@
 
 ```powershell
 .\.venv\Scripts\scv-m0.exe --help
+# 安装 M1 专用锁后执行小型 GPU 验证；不启动游戏
+.\.venv\Scripts\scv-m1.exe --output artifacts/runs/m1-gpu-next
 .\.venv\Scripts\python.exe -m unittest discover -s tests/unit -v
 .\.venv\Scripts\ruff.exe format --check src tests
 .\.venv\Scripts\ruff.exe check src tests
@@ -42,7 +46,7 @@
 - 策略使用己方合法观测，保留战争迷雾；额外价值信息与执行策略隔离。
 - 从随机初始化网络自行训练；旧录像按对应版本解码，不伪造新版轨迹。
 - 项目新增存储占用不超过 100 GB，额外空间须事先征得用户同意。
-- 可使用已有 Windows／Ubuntu 双系统；当前实施授权覆盖 M0 环境和接口验收，训练及后续阶段另行安排。
+- 可使用已有 Windows／Ubuntu 双系统；当前实施授权覆盖 M0 接口与 M1 GPU 验证，录像数据和正式训练阶段另行安排。
 
 ## 文档
 

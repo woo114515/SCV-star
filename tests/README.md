@@ -2,7 +2,7 @@
 
 当前使用标准库 `unittest`，`unit/test_m0_guards.py` 验证版本漂移、缺失身份字段、地图变更、协议错误及观测配置。运行 `.\.venv\Scripts\python.exe -m unittest discover -s tests/unit -v`。真实客户端验收通过 [M0 命令](../docs/M0_ACCEPTANCE.md) 单独运行，不在单元测试中隐式启动游戏。
 
-当前共14项回归检查，也覆盖真人房主接口分离及测试工人损失后的选择。代码提交前执行 Ruff 格式与静态检查，命令见[开发说明](../docs/DEVELOPMENT.md)。
+当前共17项回归检查：14项 M0 检查也覆盖真人房主接口分离及测试工人损失后的选择；`test_m1_checkpoint.py` 的3项负例检查拒绝优化器计数变化、缺少随机数状态或张量精度变化。缺少 PyTorch 时明确跳过这3项，不能计为通过。真实 GPU 检查通过[M1入口](../docs/M1_ACCEPTANCE.md)单独运行。代码提交前执行 Ruff 格式与静态检查，命令见[开发说明](../docs/DEVELOPMENT.md)。
 
 | 目录 | 未来覆盖范围 | 依赖边界 |
 | --- | --- | --- |

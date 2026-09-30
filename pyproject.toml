@@ -13,6 +13,7 @@ classifiers = ["Private :: Do Not Upload"]
 
 [project.optional-dependencies]
 dev = ["ruff==0.16.9"]
+m1 = ["torch==2.13.0+cu130", "setuptools==84.0.0"]
 m0 = [
     "s2clientprotocol==5.0.16.97563.0",
     "protobuf==3.20.3",
@@ -22,6 +23,7 @@ m0 = [
 
 [project.scripts]
 scv-m0 = "scv_star.runtime.m0:main"
+scv-m1 = "scv_star.runtime.m1:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

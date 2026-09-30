@@ -4,7 +4,7 @@
 
 ## 环境与复现
 
-实测环境为项目内 Python 3.11.16、setuptools 84.0.0；通信依赖见带哈希的 [M0 锁文件](../requirements/m0-windows-py311.txt)。安装于 `.venv/`，Python 本体与 uv 缓存位于 `cache/`，下载位于 `downloads/`，均不提交。没有修改系统 PATH，也没有安装 PyTorch。
+M0 实测环境为项目内 Python 3.11.16、setuptools 84.0.0；通信依赖见带哈希的 [M0 锁文件](../requirements/m0-windows-py311.txt)。安装于 `.venv/`，Python 本体与 uv 缓存位于 `cache/`，下载位于 `downloads/`，均不提交。M0 首次部署没有修改系统 PATH 或安装 PyTorch；后续同一环境新增的 GPU 依赖见[M1说明](M1_ACCEPTANCE.md)。
 
 官方 `s2clientprotocol==5.0.16.97563.0` 的生成代码不能直接配合 protobuf 7.36.2 导入。本阶段固定 protobuf 3.20.3；这只是 M0 的兼容环境，不能据此锁定未来训练环境。Python 下限调整为 3.11，使用标准库的流式文件哈希接口。
 

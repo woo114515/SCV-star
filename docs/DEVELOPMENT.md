@@ -2,9 +2,9 @@
 
 ## 当前可用范围
 
-当前提供 M0 SC2 启动与通信、基础动作/迷雾/真人检查、专用本机配置和单元测试。数据处理器、模型、BC／RL 和联赛仍为占位；不提供尚不存在的 `train`／`play` 命令。
+当前提供 M0 SC2 启动与通信、基础动作/迷雾/真人检查，以及 M1 GPU 合成数据前后向和恢复检查。数据处理器、正式策略模型、BC／RL 和联赛仍为占位；不提供尚不存在的 `train`／`play` 命令。
 
-M0 使用项目内 `.venv/Scripts/python.exe`（Python 3.11.16）和带哈希的通信依赖锁。用户 PATH 中的 Python 仍是 WindowsApps 别名，未修改系统 PATH；未找到可复用 pyenv，用户表示可能不存在。没有安装 PyTorch 或运行训练。详见 [M0 部署与命令](M0_ACCEPTANCE.md)。
+M0/M1 使用项目内 `.venv/Scripts/python.exe`（Python 3.11.16），通信、GPU 和开发工具依赖分别保存哈希锁。未修改系统 PATH；未找到可复用 pyenv，用户表示可能不存在。M1 已安装 PyTorch 2.13.0+cu130 并在 NVIDIA GPU 上通过小型验证，未运行正式训练。详见 [M0 部署与命令](M0_ACCEPTANCE.md)和[M1 验证命令](M1_ACCEPTANCE.md)。
 
 ## 环境验证顺序
 
@@ -13,7 +13,7 @@ M0 使用项目内 `.venv/Scripts/python.exe`（Python 3.11.16）和带哈希的
 3. 为项目准备隔离依赖，验证 PyTorch 前后向及 SC2 通信，再固定精确版本和平台锁文件。
 4. 填写本机配置和经过验证的版本清单，最后实现 BC／RL 入口。
 
-`pyproject.toml` 声明 `src/scv_star` 包、Python 3.11+、setuptools 84.0.0 和 `m0` 可选依赖。顶层空依赖列表不代表执行 M0 不需要第三方库；必须安装对应 extra 或固定依赖清单。训练环境尚未选定或验证。
+`pyproject.toml` 声明 `src/scv_star` 包、Python 3.11+、setuptools 84.0.0 和 `m0`/`m1` 可选依赖。顶层空依赖列表不代表检查入口不需要第三方库；安装时使用相应固定依赖清单。M1 的 CUDA wheel 需要专用索引，命令见其部署说明；完整训练依赖仍需后续验证。
 
 M0 依赖已经固定；其他阶段正式实验前仍需单独固定环境。不声明本项目为 Apache 2.0，不自动继承 DI-star 许可，也不设置 PyPI 发布流程。元数据的 `Private :: Do Not Upload` 是发布防护标记，不替代访问控制。
 
@@ -69,4 +69,4 @@ Get-ChildItem configs -Recurse -Filter '*.example.json' | ForEach-Object {
 
 检查改动范围、文档链接与配置语法；若影响真实行为，执行相应测试并说明未满足的环境条件。确认没有凭据、录像、模型或游戏资源被跟踪，再提交和同步私有仓库。
 
-用户已授权 M0 部署和接口验收；后续 GPU、录像解码与训练仍按[里程碑](MILESTONES.md)分阶段开展。
+用户已授权并完成 M0 接口与 M1 GPU 验证；后续录像解码与正式训练仍按[里程碑](MILESTONES.md)分阶段开展。

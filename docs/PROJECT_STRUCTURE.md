@@ -1,6 +1,6 @@
 # 项目目录结构
 
-本仓库采用 Python `src` 布局。`envs/sc2_client.py` 与 `runtime/m0*.py` 已实现 M0 接口验收；模型、训练和联赛仍为占位，目录名不代表能力完成。
+本仓库采用 Python `src` 布局。`envs/sc2_client.py` 与 `runtime/m0*.py` 实现 M0 接口验收，`runtime/m1.py` 实现 GPU 合成数据与恢复验证；正式策略模型、训练和联赛仍为占位，目录名不代表能力完成。
 
 ```text
 SCV-star/
