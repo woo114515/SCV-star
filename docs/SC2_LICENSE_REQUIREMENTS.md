@@ -2,6 +2,8 @@
 
 阅读日期：2026-09-29。适用项目：自训完整 TvT AI；参见[技术方案](SC2_TVT_RESEARCH_PLAN.md)。
 
+补充记录：2026-10-05，新增第 8 节，记录用户提供的 Spawning Tool Kevin 邮件要求；该日期为项目记录日期，不推定为邮件发送日期。
+
 本文区分许可原文的要求、对本项目的解释和工程建议。它是条款阅读摘要，不代替协议原文，也不是针对具体商业发行的法律意见。本次只整理文档，没有安装软件、接受协议、下载数据或发布任何成果。
 
 ## 1. 原始依据与核查范围
@@ -120,3 +122,26 @@ Apache 2.0 不要求仅因内部修改就公开代码，也不强制把修改贡
 3. 若将来计划公开权重、分发数据或商业部署，其具体发行方式是否被相关授权覆盖。
 
 普通项目实施授权、用户同意增加存储和第三方版权授权是不同事项。涉及上述新用途时，应按具体材料与活动判断；本文件不新增一概要求“先向暴雪申请”的流程。
+
+## 8. Spawning Tool：Kevin 提供的录像导出
+
+依据为用户在本会话提供的 Kevin 邮件全文。Kevin 提供了一份已有导出的内容摘要 CSV 和原始录像 TAR，并建议自行筛选 TvT。以下条件适用于这批邮件提供的导出，不据此改写其他公开赛事包或 SC2ReSet 的使用条款。
+
+### 8.1 邮件明确要求
+
+| 邮件原文 | 项目执行要求 |
+| --- | --- |
+| “credit Spawning Tool as the source of the data” | 使用该数据的项目说明、报告或其他成果中注明 Spawning Tool 为数据来源 |
+| “send me a copy of your final report (or whatever other deliverable) so I can see what you figured out.” | 最终报告或其他交付成果完成后，向 Kevin 提供一份副本；这是待完成事项 |
+| “please don't redistribute. You can direct any followups back to me” | 不再分发该批数据；其他人的数据获取请求转交 Kevin |
+
+推荐署名：`Replay data provided by Spawning Tool. Thanks to Kevin for providing the export.`
+
+### 8.2 本项目的保存与发布安排
+
+- 原始 TAR、逐场 CSV、解出的录像及其筛选副本只作本地数据管理，不上传 GitHub（包括私有仓库），不作为报告附件或公开下载提供。
+- 邮件中的两条 Drive 分享链接保存在本地来源记录 `data/manifests/spawningtool-kevin-2026-10-05.json`，由 Git 忽略；对外获取数据引导至 Kevin 或 [Spawning Tool 联系页面](https://lotv.spawningtool.com/contact/)。这是本项目的存储安排，并非邮件额外列出的逐项要求。
+- 邮件没有逐项说明解码特征、训练权重等衍生产物的发布范围；不能把数据使用条件写成这些产物已获明确发布授权。
+- 报告回传状态：**待最终成果完成后发送**。本次记录不代表已回复邮件或已向 Kevin 发送成果。
+
+当前仅收到用户转述的导出链接，尚未读取 CSV、下载 TAR、验证内容或计入现有数据集；不能认定该导出覆盖全部 6,876 条 TvT 目录记录。
