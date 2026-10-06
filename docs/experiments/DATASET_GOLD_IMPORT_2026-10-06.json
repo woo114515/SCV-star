@@ -1,0 +1,856 @@
+{
+  "source": {
+    "date": "2026-10-06",
+    "source": "User-provided gold-tier ladder replay ZIP",
+    "skill_label_basis": "user_reported",
+    "archive_bytes": 165635481,
+    "archive_sha256": "d75b121b2246e8c7166c42381187a6ad55bab605712d6aa7fe28b29c6ba657a0",
+    "replay_members": 1138,
+    "matchups": {
+      "nonstandard_player_count": 671,
+      "TvT": 165,
+      "PvT": 142,
+      "ZvZ": 8,
+      "PvZ": 29,
+      "TvZ": 118,
+      "PvP": 4,
+      "unclassified_race": 1
+    },
+    "retained_tvt": 165,
+    "overlap_files": 0,
+    "new_files": 165,
+    "extracted_bytes": 15598896,
+    "queues": {
+      "tvt_candidates": 143,
+      "identity_review": 22
+    },
+    "human_status": {
+      "unverified": 165
+    },
+    "engine_replay_verified": false,
+    "training_ready_files": 0,
+    "merged_snapshot": "unified-tvt-2026-10-06-002"
+  },
+  "merged": {
+    "schema_version": 2,
+    "date": "2026-10-06",
+    "snapshot": "unified-tvt-2026-10-06-002",
+    "unique_replay_files": 3077,
+    "previous_files": 2912,
+    "incoming_files": 165,
+    "overlap_files": 0,
+    "new_files": 165,
+    "queues": {
+      "tvt_candidates": 2832,
+      "tvt_91115_paused": 182,
+      "identity_review": 63
+    },
+    "human_status": {
+      "unverified": 956,
+      "confirmed": 2120,
+      "excluded": 1
+    },
+    "historically_replay_verified_files": 12,
+    "historically_verified_perspectives": 24,
+    "training_ready_files": 0,
+    "same_match_deduplication_verified": false,
+    "engine_group_count": 66,
+    "engine_groups": [
+      {
+        "identity": {
+          "base_build": 49716,
+          "data_build": 49957,
+          "data_version": "77A80D17030F8CBE08D581ED8FAB23E4",
+          "game_version": "3.10.1.49957"
+        },
+        "counts": {
+          "files": 53,
+          "tvt_candidates": 53
+        }
+      },
+      {
+        "identity": {
+          "base_build": 51702,
+          "data_build": 51702,
+          "data_version": "C610D0D7A40CED89B46CE5030A017095",
+          "game_version": "3.12.0.51702"
+        },
+        "counts": {
+          "files": 21,
+          "tvt_candidates": 21
+        }
+      },
+      {
+        "identity": {
+          "base_build": 53644,
+          "data_build": 53644,
+          "data_version": "CA275C4D6E213ED30F80BACCDFEDB1F5",
+          "game_version": "3.14.0.53644"
+        },
+        "counts": {
+          "files": 16,
+          "tvt_candidates": 16
+        }
+      },
+      {
+        "identity": {
+          "base_build": 55505,
+          "data_build": 55505,
+          "data_version": "60718A7CA50D0DF42987A30CF87BCB80",
+          "game_version": "3.16.0.55505"
+        },
+        "counts": {
+          "files": 8,
+          "tvt_candidates": 8
+        }
+      },
+      {
+        "identity": {
+          "base_build": 56787,
+          "data_build": 57218,
+          "data_version": "3F2FCED08798D83B873B5543BEFA6C4B",
+          "game_version": "3.17.1.57218"
+        },
+        "counts": {
+          "files": 20,
+          "tvt_candidates": 20
+        }
+      },
+      {
+        "identity": {
+          "base_build": 58400,
+          "data_build": 58600,
+          "data_version": "D9B568472880CC4719D1B698C0D86984",
+          "game_version": "3.19.1.58600"
+        },
+        "counts": {
+          "files": 14,
+          "tvt_candidates": 14
+        }
+      },
+      {
+        "identity": {
+          "base_build": 59587,
+          "data_build": 59877,
+          "data_version": "B43D9EE00A363DAFAD46914E3E4AF362",
+          "game_version": "4.0.2.59877"
+        },
+        "counts": {
+          "files": 2,
+          "tvt_candidates": 2
+        }
+      },
+      {
+        "identity": {
+          "base_build": 60321,
+          "data_build": 61545,
+          "data_version": "2E2A3F6E0BAFE5AC659C4D39F13A938C",
+          "game_version": "4.1.4.61545"
+        },
+        "counts": {
+          "files": 24,
+          "tvt_candidates": 24
+        }
+      },
+      {
+        "identity": {
+          "base_build": 62347,
+          "data_build": 62347,
+          "data_version": "C0C0E9D37FCDBC437CE386C6BE2D1F93",
+          "game_version": "4.2.0.62347"
+        },
+        "counts": {
+          "files": 40,
+          "tvt_candidates": 40
+        }
+      },
+      {
+        "identity": {
+          "base_build": 62848,
+          "data_build": 62848,
+          "data_version": "29BBAC5AFF364B6101B661DB468E3A37",
+          "game_version": "4.2.1.62848"
+        },
+        "counts": {
+          "files": 2,
+          "tvt_candidates": 2
+        }
+      },
+      {
+        "identity": {
+          "base_build": 63454,
+          "data_build": 63785,
+          "data_version": "5E3A8B21E41B987E05EE4917AAD68C69",
+          "game_version": "4.2.3.63785"
+        },
+        "counts": {
+          "files": 6,
+          "tvt_candidates": 6
+        }
+      },
+      {
+        "identity": {
+          "base_build": 65384,
+          "data_build": 65384,
+          "data_version": "B6D73C85DFB70F5D01DEABB2517BF11C",
+          "game_version": "4.3.2.65384"
+        },
+        "counts": {
+          "files": 21,
+          "tvt_candidates": 21
+        }
+      },
+      {
+        "identity": {
+          "base_build": 65895,
+          "data_build": 65895,
+          "data_version": "BF41339C22AE2EDEBEEADC8C75028F7D",
+          "game_version": "4.4.0.65895"
+        },
+        "counts": {
+          "files": 40,
+          "tvt_candidates": 40
+        }
+      },
+      {
+        "identity": {
+          "base_build": 67926,
+          "data_build": 67926,
+          "data_version": "7DE59231CBF06F1ECE9A25A27964D4AE",
+          "game_version": "4.6.0.67926"
+        },
+        "counts": {
+          "files": 24,
+          "tvt_candidates": 24
+        }
+      },
+      {
+        "identity": {
+          "base_build": 70154,
+          "data_build": 70326,
+          "data_version": "94596A85191583AD2EBFAE28C5D532DB",
+          "game_version": "4.7.1.70326"
+        },
+        "counts": {
+          "files": 42,
+          "tvt_candidates": 42
+        }
+      },
+      {
+        "identity": {
+          "base_build": 71663,
+          "data_build": 71663,
+          "data_version": "FE90C92716FC6F8F04B74268EC369FA5",
+          "game_version": "4.8.2.71663"
+        },
+        "counts": {
+          "files": 17,
+          "tvt_candidates": 17
+        }
+      },
+      {
+        "identity": {
+          "base_build": 72282,
+          "data_build": 72282,
+          "data_version": "0F14399BBD0BA528355FF4A8211F845B",
+          "game_version": "4.8.3.72282"
+        },
+        "counts": {
+          "files": 47,
+          "tvt_candidates": 47
+        }
+      },
+      {
+        "identity": {
+          "base_build": 73620,
+          "data_build": 73620,
+          "data_version": "AA18FEAD6573C79EF707DF44ABF1BE61",
+          "game_version": "4.8.6.73620"
+        },
+        "counts": {
+          "files": 47,
+          "tvt_candidates": 47
+        }
+      },
+      {
+        "identity": {
+          "base_build": 74741,
+          "data_build": 74741,
+          "data_version": "614480EF79264B5BD084E57F912172FF",
+          "game_version": "4.9.2.74741"
+        },
+        "counts": {
+          "files": 14,
+          "tvt_candidates": 14
+        }
+      },
+      {
+        "identity": {
+          "base_build": 75025,
+          "data_build": 75025,
+          "data_version": "C305368C63621480462F8F516FB64374",
+          "game_version": "4.9.3.75025"
+        },
+        "counts": {
+          "files": 56,
+          "tvt_candidates": 56
+        }
+      },
+      {
+        "identity": {
+          "base_build": 76052,
+          "data_build": 76052,
+          "data_version": "D0F1A68AA88BA90369A84CD1439AA1C3",
+          "game_version": "4.10.2.76052"
+        },
+        "counts": {
+          "files": 13,
+          "tvt_candidates": 13
+        }
+      },
+      {
+        "identity": {
+          "base_build": 76811,
+          "data_build": 76811,
+          "data_version": "FF9FA4EACEC5F06DEB27BD297D73ED67",
+          "game_version": "4.10.4.76811"
+        },
+        "counts": {
+          "files": 44,
+          "tvt_candidates": 44
+        }
+      },
+      {
+        "identity": {
+          "base_build": 78285,
+          "data_build": 78285,
+          "data_version": "69493AFAB5C7B45DDB2F3442FD60F0CF",
+          "game_version": "4.11.4.78285"
+        },
+        "counts": {
+          "files": 50,
+          "tvt_candidates": 50
+        }
+      },
+      {
+        "identity": {
+          "base_build": 79998,
+          "data_build": 79998,
+          "data_version": "B47567DEE5DC23373BFF57194538DFD3",
+          "game_version": "4.12.0.79998"
+        },
+        "counts": {
+          "files": 22,
+          "tvt_candidates": 22
+        }
+      },
+      {
+        "identity": {
+          "base_build": 80188,
+          "data_build": 80188,
+          "data_version": "44DED5AED024D23177C742FC227C615A",
+          "game_version": "4.12.0.80188"
+        },
+        "counts": {
+          "files": 62,
+          "tvt_candidates": 62
+        }
+      },
+      {
+        "identity": {
+          "base_build": 81433,
+          "data_build": 81433,
+          "data_version": "5FD8D4B6B52723B44862DF29F232CF31",
+          "game_version": "5.0.2.81433"
+        },
+        "counts": {
+          "files": 117,
+          "tvt_candidates": 117
+        }
+      },
+      {
+        "identity": {
+          "base_build": 82457,
+          "data_build": 82457,
+          "data_version": "D2707E265785612D12B381AF6ED9DBF4",
+          "game_version": "5.0.4.82457"
+        },
+        "counts": {
+          "files": 22,
+          "tvt_candidates": 22
+        }
+      },
+      {
+        "identity": {
+          "base_build": 82893,
+          "data_build": 82893,
+          "data_version": "D795328C01B8A711947CC62AA9750445",
+          "game_version": "5.0.5.82893"
+        },
+        "counts": {
+          "files": 84,
+          "tvt_candidates": 84
+        }
+      },
+      {
+        "identity": {
+          "base_build": 83830,
+          "data_build": 83830,
+          "data_version": "B4745D6A4F982A3143C183D8ACB6C3E3",
+          "game_version": "5.0.6.83830"
+        },
+        "counts": {
+          "files": 113,
+          "tvt_candidates": 113
+        }
+      },
+      {
+        "identity": {
+          "base_build": 84643,
+          "data_build": 84643,
+          "data_version": "A389D1F7DF9DD792FBE980533B7119FF",
+          "game_version": "5.0.7.84643"
+        },
+        "counts": {
+          "files": 275,
+          "tvt_candidates": 275
+        }
+      },
+      {
+        "identity": {
+          "base_build": 86383,
+          "data_build": 86383,
+          "data_version": "22EAC562CD0C6A31FB2C2C21E3AA3680",
+          "game_version": "5.0.8.86383"
+        },
+        "counts": {
+          "files": 169,
+          "tvt_candidates": 169
+        }
+      },
+      {
+        "identity": {
+          "base_build": 87702,
+          "data_build": 87702,
+          "data_version": "F799E093428D419FD634CCE9B925218C",
+          "game_version": "5.0.9.87702"
+        },
+        "counts": {
+          "files": 105,
+          "tvt_candidates": 105
+        }
+      },
+      {
+        "identity": {
+          "base_build": 88500,
+          "data_build": 88500,
+          "data_version": "F38043A301B034A78AD13F558257DCF8",
+          "game_version": "5.0.10.88500"
+        },
+        "counts": {
+          "files": 88,
+          "tvt_candidates": 87,
+          "identity_review": 1
+        }
+      },
+      {
+        "identity": {
+          "base_build": 89165,
+          "data_build": 89165,
+          "data_version": "36A9F8C9AECF5C1D6CA261B3CD0DBA2D",
+          "game_version": "5.0.10.89165"
+        },
+        "counts": {
+          "files": 69,
+          "tvt_candidates": 69
+        }
+      },
+      {
+        "identity": {
+          "base_build": 89720,
+          "data_build": 89720,
+          "data_version": "D371D4D7D1E6C131B24A09FC0E758547",
+          "game_version": "5.0.11.89720"
+        },
+        "counts": {
+          "files": 52,
+          "tvt_candidates": 52
+        }
+      },
+      {
+        "identity": {
+          "base_build": 90136,
+          "data_build": 90136,
+          "data_version": "207F9DD45D02C9E6D19F868E0239E72D",
+          "game_version": "5.0.11.90136"
+        },
+        "counts": {
+          "files": 110,
+          "tvt_candidates": 110
+        }
+      },
+      {
+        "identity": {
+          "base_build": 90870,
+          "data_build": 90870,
+          "data_version": "A3FC7B99B9F515326107F490D0E0AA7C",
+          "game_version": "5.0.11.90870"
+        },
+        "counts": {
+          "files": 4,
+          "tvt_candidates": 4
+        }
+      },
+      {
+        "identity": {
+          "base_build": 91115,
+          "data_build": 91115,
+          "data_version": "7857A76754FEB47C823D18993C476BF0",
+          "game_version": "5.0.12.91115"
+        },
+        "counts": {
+          "files": 182,
+          "tvt_91115_paused": 182
+        }
+      },
+      {
+        "identity": {
+          "base_build": 92028,
+          "data_build": 92028,
+          "data_version": "2B7746A6706F919775EF1BADFC95EA1C",
+          "game_version": "5.0.13.92028"
+        },
+        "counts": {
+          "files": 29,
+          "tvt_candidates": 29
+        }
+      },
+      {
+        "identity": {
+          "base_build": 92138,
+          "data_build": 92138,
+          "data_version": "D6B5BB5033A820B05C39CC615AE6F77B",
+          "game_version": "5.0.13.92138"
+        },
+        "counts": {
+          "files": 1,
+          "tvt_candidates": 1
+        }
+      },
+      {
+        "identity": {
+          "base_build": 92174,
+          "data_build": 92174,
+          "data_version": "D44E66924A56B2D4BC94786D8A7EB5B8",
+          "game_version": "5.0.13.92174"
+        },
+        "counts": {
+          "files": 64,
+          "tvt_candidates": 64
+        }
+      },
+      {
+        "identity": {
+          "base_build": 92440,
+          "data_build": 92440,
+          "data_version": "79F6D78E27ED069D2D84FB14288B88B9",
+          "game_version": "5.0.13.92440"
+        },
+        "counts": {
+          "files": 77,
+          "tvt_candidates": 77
+        }
+      },
+      {
+        "identity": {
+          "base_build": 93272,
+          "data_build": 93272,
+          "data_version": "52920A9D89C7F63235945D10F3C73C64",
+          "game_version": "5.0.14.93272"
+        },
+        "counts": {
+          "files": 41,
+          "tvt_candidates": 41
+        }
+      },
+      {
+        "identity": {
+          "base_build": 93333,
+          "data_build": 93333,
+          "data_version": "446907060311FB1CC29EB31E547BB9FD",
+          "game_version": "5.0.14.93333"
+        },
+        "counts": {
+          "files": 147,
+          "tvt_candidates": 147
+        }
+      },
+      {
+        "identity": {
+          "base_build": 94137,
+          "data_build": 94137,
+          "data_version": "519EE8D06E384469C652DD58FC6016AC",
+          "game_version": "5.0.14.94137"
+        },
+        "counts": {
+          "files": 90,
+          "tvt_candidates": 90
+        }
+      },
+      {
+        "identity": {
+          "base_build": 95299,
+          "data_build": 95299,
+          "data_version": "EF9BBA0959BD280845A38EFEDE6E4D27",
+          "game_version": "5.0.15.95299"
+        },
+        "counts": {
+          "files": 29,
+          "tvt_candidates": 29
+        }
+      },
+      {
+        "identity": {
+          "base_build": 95405,
+          "data_build": 95405,
+          "data_version": "416373938FFFB422ED87403149C16BB2",
+          "game_version": "5.0.15.95405"
+        },
+        "counts": {
+          "files": 7,
+          "tvt_candidates": 7
+        }
+      },
+      {
+        "identity": {
+          "base_build": 95435,
+          "data_build": 95435,
+          "data_version": "EFE0BCBAC4A46C7F712CA5B9E363C0E4",
+          "game_version": "5.0.15.95435"
+        },
+        "counts": {
+          "files": 6,
+          "tvt_candidates": 6
+        }
+      },
+      {
+        "identity": {
+          "base_build": 95621,
+          "data_build": 95621,
+          "data_version": "B6495F6EC0B9C48627381A1338D7DCC8",
+          "game_version": "0.0.0.95621"
+        },
+        "counts": {
+          "files": 7,
+          "identity_review": 7
+        }
+      },
+      {
+        "identity": {
+          "base_build": 95740,
+          "data_build": 95740,
+          "data_version": "2965679CCA1793EEAF969589E29DB327",
+          "game_version": "0.0.0.95740"
+        },
+        "counts": {
+          "files": 55,
+          "identity_review": 55
+        }
+      },
+      {
+        "identity": {
+          "base_build": 95841,
+          "data_build": 95841,
+          "data_version": "536442325AEC578B31B2482F733396D5",
+          "game_version": "5.0.15.95841"
+        },
+        "counts": {
+          "files": 28,
+          "tvt_candidates": 28
+        }
+      },
+      {
+        "identity": {
+          "base_build": 95841,
+          "data_build": 96592,
+          "data_version": "AC2E912BA9FEB25765FC69B171E1A58F",
+          "game_version": "5.0.15.96592"
+        },
+        "counts": {
+          "files": 9,
+          "tvt_candidates": 9
+        }
+      },
+      {
+        "identity": {
+          "base_build": 95841,
+          "data_build": 96828,
+          "data_version": "15A93BC970AE1E127953345F89BCC14F",
+          "game_version": "5.0.15.96828"
+        },
+        "counts": {
+          "files": 12,
+          "tvt_candidates": 12
+        }
+      },
+      {
+        "identity": {
+          "base_build": 96163,
+          "data_build": 96163,
+          "data_version": "77C990EF126D964AC326DAFA457DAC3E",
+          "game_version": "5.0.15.96163"
+        },
+        "counts": {
+          "files": 4,
+          "tvt_candidates": 4
+        }
+      },
+      {
+        "identity": {
+          "base_build": 96242,
+          "data_build": 96242,
+          "data_version": "5E87172FCF3C11407207C1CF3FAED7CB",
+          "game_version": "5.0.15.96242"
+        },
+        "counts": {
+          "files": 21,
+          "tvt_candidates": 21
+        }
+      },
+      {
+        "identity": {
+          "base_build": 96314,
+          "data_build": 96314,
+          "data_version": "74445FFC50A6C3933594D6BE0769D2F7",
+          "game_version": "5.0.15.96314"
+        },
+        "counts": {
+          "files": 18,
+          "tvt_candidates": 18
+        }
+      },
+      {
+        "identity": {
+          "base_build": 96516,
+          "data_build": 96516,
+          "data_version": "B5A551ED8B1A137FFFCC2BA50EC63173",
+          "game_version": "5.0.15.96516"
+        },
+        "counts": {
+          "files": 135,
+          "tvt_candidates": 135
+        }
+      },
+      {
+        "identity": {
+          "base_build": 96883,
+          "data_build": 96883,
+          "data_version": "B49DA51995BA9767F4C624034C211342",
+          "game_version": "5.0.15.96883"
+        },
+        "counts": {
+          "files": 13,
+          "tvt_candidates": 13
+        }
+      },
+      {
+        "identity": {
+          "base_build": 96921,
+          "data_build": 96921,
+          "data_version": "C83ECFF50A077219461434CF97BB5497",
+          "game_version": "5.0.15.96921"
+        },
+        "counts": {
+          "files": 22,
+          "tvt_candidates": 22
+        }
+      },
+      {
+        "identity": {
+          "base_build": 96999,
+          "data_build": 96999,
+          "data_version": "23B8C46C24575B941B6BCC81763C11EE",
+          "game_version": "5.0.15.96999"
+        },
+        "counts": {
+          "files": 124,
+          "tvt_candidates": 124
+        }
+      },
+      {
+        "identity": {
+          "base_build": 97172,
+          "data_build": 97172,
+          "data_version": "43D3E6ABDC0EA96C86170E8EF828E204",
+          "game_version": "5.0.16.97172"
+        },
+        "counts": {
+          "files": 2,
+          "tvt_candidates": 2
+        }
+      },
+      {
+        "identity": {
+          "base_build": 97337,
+          "data_build": 97337,
+          "data_version": "17DDC00FFB6141C21BC3AD259F5D70E9",
+          "game_version": "5.0.16.97337"
+        },
+        "counts": {
+          "files": 1,
+          "tvt_candidates": 1
+        }
+      },
+      {
+        "identity": {
+          "base_build": 97364,
+          "data_build": 97364,
+          "data_version": "9305DCF6E5680FFEBD8B679EF05C947F",
+          "game_version": "5.0.16.97364"
+        },
+        "counts": {
+          "files": 4,
+          "tvt_candidates": 4
+        }
+      },
+      {
+        "identity": {
+          "base_build": 97426,
+          "data_build": 97426,
+          "data_version": "C3DE662D9CA80BB03970FDDC112B5723",
+          "game_version": "5.0.15.97426"
+        },
+        "counts": {
+          "files": 1,
+          "tvt_candidates": 1
+        }
+      },
+      {
+        "identity": {
+          "base_build": 97563,
+          "data_build": 97563,
+          "data_version": "F364D7C8BB1A0444ABC9BEE547B3FBB3",
+          "game_version": "5.0.16.97563"
+        },
+        "counts": {
+          "files": 2,
+          "tvt_candidates": 2
+        }
+      },
+      {
+        "identity": {
+          "base_build": 97579,
+          "data_build": 97579,
+          "data_version": "CA45995A39D1BC3967B2AB29FA1C0A73",
+          "game_version": "5.0.15.97579"
+        },
+        "counts": {
+          "files": 33,
+          "tvt_candidates": 33
+        }
+      }
+    ],
+    "source_policies_preserved": true,
+    "all_referenced_replays_sha256_verified": true
+  }
+}

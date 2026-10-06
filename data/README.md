@@ -13,6 +13,8 @@ Kevin 邮件提供的 Spawning Tool 导出另受三项要求约束：注明来�
 
 原始录像不是完整逐帧观测，需由匹配引擎重放；不同版本失败不能静默改用新版。详细流程见[技术方案](../docs/SC2_TVT_RESEARCH_PLAN.md)和[架构与数据契约](../docs/ARCHITECTURE.md)。
 
-当前统一入口为 `manifests/current.json`，指向 `unified-tvt-2026-10-06-001/`。清单含2,912个TvT候选文件：解码候选2,689个、91115暂缓182个、版本身份待核对41个。入口schema为2，以每条记录的 `local_replay`（相对项目根目录）定位录像；`replay_directories` 列出原有与新增两个存储目录。934个重复文件保留双方来源记录及各自使用条件。旧全种族派生清单已删除；完整来源扫描索引作为审计资料保留，不能作为当前训练清单。训练就绪数量为0，详情见[数据集总览](../docs/DATASET_OVERVIEW.md)。
+当前统一入口为 `manifests/current.json`，指向 `unified-tvt-2026-10-06-002/`。清单含3,077个TvT候选文件：解码候选2,832个、91115暂缓182个、版本身份待核对63个。入口schema为2，以每条记录的 `local_replay`（相对项目根目录）定位录像；`replay_directories` 列出三个存储目录。934个重复文件保留双方来源记录及各自使用条件。旧全种族派生清单已删除；完整来源扫描索引作为审计资料保留，不能作为当前训练清单。训练就绪数量为0，详情见[数据集总览](../docs/DATASET_OVERVIEW.md)。
 
-所有新增数据计入项目100 GB上限。公开ZIP与原始本机录像保留为来源档案；筛选后的TvT副本存放于`raw/replays/tvt-curated/`及`raw/replays/spawningtool-kevin-tvt/`。本机账号原件继续留在游戏目录。公开包位于`downloads/public-replays/`；逐文件全量扫描索引位于`artifacts/runs/m2-public-001/`，仅作审计，不纳入当前清单。字节去重尚不等于比赛级去重；尚无正式训练分片或模型。
+新增黄金录像包保留165个TvT文件，存于 `raw/replays/local-gold-2026-10-06/`；来源清单位于 `manifests/local-gold-2026-10-06/`。原ZIP保留在用户提供位置，非TvT及种族未明成员未解压纳入工作集。详见[接收记录](../docs/M2_GOLD_REPLAY_IMPORT.md)。
+
+所有新增数据计入项目100 GB上限。公开ZIP与原始本机录像保留为来源档案；筛选后的TvT副本存放于`raw/replays/tvt-curated/`、`raw/replays/spawningtool-kevin-tvt/`及`raw/replays/local-gold-2026-10-06/`。本机账号原件继续留在游戏目录。公开包位于`downloads/public-replays/`；逐文件全量扫描索引位于`artifacts/runs/m2-public-001/`，仅作审计，不纳入当前清单。字节去重尚不等于比赛级去重；尚无正式训练分片或模型。
