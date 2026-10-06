@@ -1,0 +1,47 @@
+# 首批缺失引擎获取尝试
+
+完成日期：2026-10-07；运行目录沿用启动时的 `m2-engine-acquisition-2026-10-06`。本轮尝试 84643、86383、93333、96516，91115 继续暂缓。
+
+## 结果
+
+| Build | 对应文件 | 获取结果 | 运行状态 |
+| --- | ---: | --- | --- |
+| 84643 | 275 | 官方 ReplayInfo 下载请求超时，未取得 EXE | 未验证 |
+| 86383 | 169 | 官方 ReplayInfo 下载请求超时，未取得 EXE | 未验证 |
+| 93333 | 147 | 官方 EXE 下载、内容哈希和签名验证通过 | 两次启动均未在时限内建立 API 连接 |
+| 96516 | 135 | 官方接口返回 `DownloadError: Replay build version is not available.` | 未验证 |
+
+上述失败仅适用于本次尝试，不证明所有获取路径不可用。补查版本历史元数据接口返回403，未据此判断历史版本不存在。
+
+## 93333 官方来源与完整性
+
+来源链为[官方 build 配置](https://us.cdn.blizzard.com/tpr/sc2/config/84/53/8453c2f1c98b955334c7284215429c36) → [安装对象](https://us.cdn.blizzard.com/tpr/sc2/data/cc/2a/cc2a08a1956138122ac20a9855e8b045) → 编码索引 → [官方 EXE 传输对象](https://us.cdn.blizzard.com/tpr/sc2/data/e3/87/e387c2c94d9fd6a8f511ddb59a511f1a)。复用先前下载并通过哈希校验的93333编码索引。
+
+- 传输对象：52,536,210 字节；解包 EXE：64,852,096 字节。
+- 内容 MD5：`cf7a167eee9d245ecb87bcf11dda2a9e`。
+- EXE SHA-256：`e67dcd28e5c5b21d3e4d9e38aada09ed522af28ac0cc5338d709357040493ee0`。
+- Authenticode：Valid，签名者 Blizzard Entertainment, Inc.
+- BLTE头、所有分块MD5、解压长度及最终内容MD5均通过验证。
+
+另外取得并校验 [93333根数据](https://us.cdn.blizzard.com/tpr/sc2/data/e8/dc/e8dca12fd2324abaeccea3c0fab6d941)（传输14,410,699字节）和[patch配置](https://us.cdn.blizzard.com/tpr/sc2/config/30/a0/30a013de71779bd84c9d90b3288ccc62)。根数据对象仅归档，不宣称已正确安装进CASC或已补齐全部资源。
+
+独立目录 `cache/sc2-international-93333/` 实际复制约27.75 GB已有资源，无硬链接；复制耗时约68.5秒，使用独立`.build.info`。首次启动API超时；补入已校验patch配置后复测仍未通过。**尚不能确定根因，不能将147个文件计入可解码数据。** 固定身份见[93333清单](../configs/engines/sc2-international-93333.json)，状态明确为未通过运行验证。
+
+## 现有环境与空间
+
+自动下载接口在97563项目隔离环境运行，实际更新部分CASC缓存；未改国服安装配置和EXE。对每个下载尝试设置120秒及1GB新增空间限制，请求超时后只关闭自己启动的进程。
+
+之后对97563原有两场／四视角做回归，全部通过；耗时 66.9 秒。97579／97563固定EXE哈希以及AGENTS.md保持不变。没有运行训练，也没有将API返回的玩家资料上传GitHub。
+
+本轮结束前项目占用 **71.90 GB**，上限100 GB。主要新增占用为独立资源副本；部署、下载、启动排查时间不计为训练时间。
+
+## 更新后的缺口
+
+- 已通过样本重放的环境仍是96999、97563、97579，覆盖159个候选文件。
+- 尚未找到有效本地EXE：**59个BaseBuild／61种精确身份，2,589个文件**。
+- 93333：EXE已有、运行验证未通过，147个文件。
+- 91115：EXE已有、完整运行数据缺失且暂缓，182个文件。
+
+完整更新矩阵见[脱敏JSON](experiments/ENGINE_ACQUISITION_2026-10-07.json)，本地入口为 `data/manifests/engine-availability-2026-10-07.json`。原[缺口表](M2_ENGINE_AUDIT.md)保留获取前快照。
+
+下一步应优先定位93333的API启动问题；另三个版本需取得可验证的历史配置／安装清单或有效旧安装备份，再继续小规模下载验证。当前不继续盲目复制更多完整环境。

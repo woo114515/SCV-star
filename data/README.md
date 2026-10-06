@@ -11,6 +11,8 @@
 
 Kevin 邮件提供的 Spawning Tool 导出另受三项要求约束：注明来源、回传最终报告或其他成果、不再分发数据，其他获取请求转交 Kevin。原始 TAR、逐场 CSV 和筛选后的录像均不上传 GitHub，包括私有仓库；本地来源记录为 `manifests/spawningtool-kevin-2026-10-05.json`。详见[许可记录](../docs/SC2_LICENSE_REQUIREMENTS.md#8-spawning-toolkevin-提供的录像导出)。2026-10-06 已下载并核对：保留1,720个候选，934个复用现有文件，786个新增文件位于 `raw/replays/spawningtool-kevin-tvt/`。独立清单位于 `manifests/spawningtool-kevin-2026-10-06/`，已合入当前主清单，原来源快照保留；详见[获取记录](../docs/M2_SPAWNING_TOOL_EXPORT.md)。
 
+最新环境可用性矩阵为 `manifests/engine-availability-2026-10-07.json`，区分EXE缺失、已有但未通过运行、已通过样本重放。
+
 最新引擎验证及逐文件增量证据位于 `manifests/engine-audit-2026-10-06/`，按SHA-256关联当前清单；历史快照保持不变。完整引擎需求见[验证记录](../docs/M2_ENGINE_AUDIT.md)。
 
 原始录像不是完整逐帧观测，需由匹配引擎重放；不同版本失败不能静默改用新版。详细流程见[技术方案](../docs/SC2_TVT_RESEARCH_PLAN.md)和[架构与数据契约](../docs/ARCHITECTURE.md)。

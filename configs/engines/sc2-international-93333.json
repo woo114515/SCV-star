@@ -1,0 +1,14 @@
+{
+  "base_build": 93333,
+  "data_build": 93333,
+  "data_version": "446907060311FB1CC29EB31E547BB9FD",
+  "game_version": "5.0.14.93333",
+  "binary_sha256": "e67dcd28e5c5b21d3e4d9e38aada09ed522af28ac0cc5338d709357040493ee0",
+  "build_config": "8453c2f1c98b955334c7284215429c36",
+  "status": "official_binary_verified_api_start_unresolved",
+  "schema_version": 1,
+  "product": "s2",
+  "official_encoded_key": "e387c2c94d9fd6a8f511ddb59a511f1a",
+  "official_content_md5": "cf7a167eee9d245ecb87bcf11dda2a9e",
+  "binary_bytes": 64852096
+}
