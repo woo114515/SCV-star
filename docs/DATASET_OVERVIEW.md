@@ -4,7 +4,7 @@
 
 ## 来源与数量
 
-2026-10-05 新增来源线索：Spawning Tool 的 Kevin 通过邮件提供已有导出的 CSV 和录像 TAR，尚未检查或下载，未计入下表。使用该导出须署名 Spawning Tool、向 Kevin 提供最终报告或其他成果副本，且不得再分发数据；获取请求转交 Kevin。完整原文与执行安排见[许可要求第 8 节](SC2_LICENSE_REQUIREMENTS.md#8-spawning-toolkevin-提供的录像导出)。
+2026-10-06 补充：Kevin 提供的 CSV 和 TAR 已获取并核对，22,810 个各族录像中保留 1,720 个 TvT 候选，934 个与已有内容相同，新增 786 个。新来源使用独立清单，尚未切换 `current.json`；联合字节去重后为 2,912 个候选。下表仍是原批次的来源扫描统计。详见[Kevin 导出获取记录](M2_SPAWNING_TOOL_EXPORT.md)。使用该导出须署名 Spawning Tool、回传最终报告或其他成果，且不得再分发；完整要求见[许可记录](SC2_LICENSE_REQUIREMENTS.md#8-spawning-toolkevin-提供的录像导出)。
 
 | 来源扫描范围 | 去重后可读录像 | 已识别 TvT | 定位 |
 | --- | ---: | ---: | --- |

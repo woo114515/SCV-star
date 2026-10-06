@@ -15,6 +15,7 @@
 | [M2 三来源小样本](M2_REPLAY_SOURCES.md) | 本机国服重放、公开样本解析、版本差异与历史引擎限制 |
 | [M2 公开数据总体采集](M2_PUBLIC_DATA.md) | SC2ReSet全量、补充赛事、下载边界、去重统计及精确引擎需求 |
 | [数据集总览与统一清单](DATASET_OVERVIEW.md) | 公开与本机合并统计、处理队列、版本隔离和本地清单入口 |
+| [Spawning Tool Kevin 导出](M2_SPAWNING_TOOL_EXPORT.md) | 邮件提供导出的下载、TvT筛选、去重、使用条件及验收边界 |
 | [M2 国际97563验证](M2_INTERNATIONAL_97563.md) | 官方独立引擎、隔离运行、资源补齐及两场外部录像结果 |
 | [M2 国际91115获取](M2_INTERNATIONAL_91115.md) | 已验签历史引擎、旧数据阻塞、97563复测与空间清理 |
 | [实验记录约定](experiments/README.md) | 记录版本、预算、结果与可复现证据 |
