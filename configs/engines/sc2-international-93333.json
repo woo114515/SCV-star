@@ -5,7 +5,7 @@
   "game_version": "5.0.14.93333",
   "binary_sha256": "e67dcd28e5c5b21d3e4d9e38aada09ed522af28ac0cc5338d709357040493ee0",
   "build_config": "8453c2f1c98b955334c7284215429c36",
-  "status": "official_binary_verified_api_start_unresolved",
+  "status": "sample_replay_verified",
   "schema_version": 1,
   "product": "s2",
   "official_encoded_key": "e387c2c94d9fd6a8f511ddb59a511f1a",

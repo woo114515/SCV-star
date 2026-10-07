@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-07",
+  "status": "passed",
+  "identity": {
+    "game_version": "5.0.14.93333",
+    "data_version": "446907060311FB1CC29EB31E547BB9FD",
+    "data_build": 93333,
+    "base_build": 93333
+  },
+  "seconds": 38.7190000000046,
+  "step": 224,
+  "files_passed": 1,
+  "perspectives_passed": 2,
+  "terminal_loop": 12492,
+  "original_unchanged": true,
+  "cleanup": {
+    "forced_termination": false,
+    "pid": 23748,
+    "returncode": 0,
+    "exited": true
+  },
+  "dependencies": {
+    "s2protocol": "5.0.16.97563.0",
+    "mpyq": "0.2.5",
+    "s2clientprotocol": "5.0.16.97563.0",
+    "protobuf": "3.20.3",
+    "websocket-client": "1.9.2"
+  },
+  "bc_alignment_verified": false,
+  "training_ready_files": 0,
+  "matching_environment_candidates": 306,
+  "matching_93333_candidates": 147,
+  "cumulative_verified_files": 15,
+  "cumulative_verified_perspectives": 30,
+  "project_bytes_before_probe": 71543254035,
+  "added_official_map_bytes": 722970
+}
