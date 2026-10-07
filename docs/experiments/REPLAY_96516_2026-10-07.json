@@ -1,0 +1,51 @@
+{
+  "date": "2026-10-07",
+  "status": "passed",
+  "identity": {
+    "game_version": "5.0.15.96516",
+    "data_version": "B5A551ED8B1A137FFFCC2BA50EC63173",
+    "data_build": 96516,
+    "base_build": 96516
+  },
+  "seconds": 49.57800000000134,
+  "step": 224,
+  "files_passed": 1,
+  "perspectives_passed": 2,
+  "terminal_loops": [
+    16352,
+    16352
+  ],
+  "metadata_loops": 16441,
+  "recorded_tail_loops": 89,
+  "original_unchanged": true,
+  "cleanup": {
+    "forced_termination": false,
+    "pid": 29492,
+    "returncode": 0,
+    "exited": true
+  },
+  "bc_alignment_verified": false,
+  "cumulative_verified_files": 18,
+  "cumulative_verified_perspectives": 36,
+  "matching_verified_environment_candidates": 885,
+  "training_ready_files": 0,
+  "dependencies": {
+    "s2protocol": "5.0.16.97563.0",
+    "mpyq": "0.2.5",
+    "s2clientprotocol": "5.0.16.97563.0",
+    "protobuf": "3.20.3",
+    "websocket-client": "1.9.2"
+  },
+  "runtime": "cache/sc2-cn-96516",
+  "project_limit_gb_for_probe": 200,
+  "start_project_bytes": 72533523517,
+  "measured_before_cleanup_bytes": 100386255928,
+  "measured_after_cleanup_bytes": 99803018641,
+  "removed_bytes": 583243706,
+  "original_cn_build_info_and_exe_unchanged": true,
+  "map_dependencies_verified": 7,
+  "map_dependencies_downloaded": 0,
+  "details_parser_build_for_map_handles": 97563,
+  "exact_96516_event_parser_verified": false,
+  "agents_sha256": "e4a13139c4f03d835cffc71a80f04cf9d5ed887471685310569449723d39ac9b"
+}

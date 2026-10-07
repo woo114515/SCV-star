@@ -144,7 +144,15 @@ def main() -> None:
         help="Allow SC2 to fetch missing replay binary/data into the selected installation",
     )
     parser.add_argument("--step", type=int, default=112)
+    parser.add_argument(
+        "--project-limit-gb",
+        type=int,
+        default=80,
+        help="Project storage guard in decimal GB; raise only within the authorized budget",
+    )
     args = parser.parse_args()
+    if not 1 <= args.project_limit_gb <= 200:
+        parser.error("project-limit-gb must be between 1 and 200")
     if not 1 <= args.step <= 224:
         parser.error("step must be between 1 and 224")
     args.output.mkdir(parents=True, exist_ok=False)
@@ -159,6 +167,7 @@ def main() -> None:
         "engine": expected,
         "step": args.step,
         "download_replay_data": args.download_replay_data,
+        "project_limit_gb": args.project_limit_gb,
         "replays": [],
         "status": "running",
         "started_at": datetime.now(timezone.utc).isoformat(),
@@ -197,8 +206,10 @@ def main() -> None:
         usage = sum(p.stat().st_size for p in root.rglob("*") if p.is_file())
         free = shutil.disk_usage(root).free
         report["storage_before"] = {"project_file_bytes": usage, "volume_free_bytes": free}
-        if usage >= 80_000_000_000 or free < 20_000_000_000:
-            raise RuntimeError("Storage guard: project >=80 GB or volume free <20 GB")
+        if usage >= args.project_limit_gb * 1_000_000_000 or free < 20_000_000_000:
+            raise RuntimeError(
+                f"Storage guard: project >={args.project_limit_gb} GB or volume free <20 GB"
+            )
         with Client(
             Path(local["install_path"]),
             expected["base_build"],
