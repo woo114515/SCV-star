@@ -2,7 +2,7 @@
 
 此目录提交可审阅、已脱敏的实验计划与结果；实际数据、模型和逐步日志分别在 `data/`、`artifacts/`，不提交 Git。
 
-复制 [TEMPLATE.md](TEMPLATE.md) 为 `YYYYMMDD_stage_description_seedN.md`，填写计划后再开始实验，结束后补充真实结果。已有[M0实测](M0_2026-09-29.md)、[M1实测](M1_2026-09-30.md)及[M2来源验证](../M2_REPLAY_SOURCES.md)，尚无正式策略训练实验。
+复制 [TEMPLATE.md](TEMPLATE.md) 为 `YYYYMMDD_stage_description_seedN.md`，填写计划后再开始实验，结束后补充真实结果。已有[M0实测](M0_2026-09-29.md)、[M1实测](M1_2026-09-30.md)及[M2来源验证](../M2_DATA_COLLECTION.md#m2-replay-sources)，尚无正式策略训练实验。
 
 - 一次受控实验只改变一个因素，说明按墙钟时间还是样本预算比较，同时报告两者。
 - 相同条件固定游戏 build、数据版本、地图、对手、出生侧处理方式、种子与动作节奏。
