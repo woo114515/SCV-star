@@ -1,0 +1,81 @@
+{
+  "scope": 885,
+  "light_counts": {
+    "excluded": 50,
+    "eligible": 835
+  },
+  "exclusion_reasons": {
+    "not_two_human_terran_participants": 39,
+    "nonstandard_custom_map": 9,
+    "invalid_duration_or_map": 2
+  },
+  "identity_mismatch_found": 0,
+  "eligible_with_unknown_outcome": 10,
+  "sample_size": 96,
+  "sample_outcomes": {
+    "passed": 91,
+    "completed_with_outcome_label_review": 3,
+    "excluded_custom_map": 2
+  },
+  "both_perspectives_completed": 94,
+  "strata_total": 145,
+  "strata_total_after_map_filter": 143,
+  "eligible_strata_sampled": 94,
+  "eligible_files_in_sampled_strata": 746,
+  "eligible_api_map_names_sampled": 66,
+  "strata_sampled": 96,
+  "strata_uncovered": 49,
+  "files_in_sampled_strata": 755,
+  "versions_sampled": 7,
+  "api_map_names_sampled": 67,
+  "sources_sampled": 5,
+  "by_build": {
+    "84643": {
+      "passed": 15
+    },
+    "86383": {
+      "passed": 26
+    },
+    "93333": {
+      "passed": 13
+    },
+    "96516": {
+      "passed": 10,
+      "excluded_custom_map": 2
+    },
+    "96999": {
+      "completed_with_outcome_label_review": 3,
+      "passed": 16
+    },
+    "97563": {
+      "passed": 2
+    },
+    "97579": {
+      "passed": 9
+    }
+  },
+  "source_counts": {
+    "SC2ReSet": 22,
+    "SpawningTool_Kevin_export": 32,
+    "Local_account": 26,
+    "Local_Multiplayer_zip": 14,
+    "External_initial_samples": 2
+  },
+  "seed": 20261007,
+  "resource_download_count": 42,
+  "resource_download_bytes": 52755640,
+  "elapsed_seconds_since_scope_change": 1571.1494131088257,
+  "completed_at": "2026-10-07T06:33:32.149413+00:00",
+  "limitations": [
+    "Full replays are sampled, not verified for all eligible files.",
+    "Maps are stratified by API names; localized names/resource revisions are not canonicalized.",
+    "Uncovered joint strata and nonrandom stratum selection prevent a population-wide pass guarantee.",
+    "BC alignment and training readiness are not verified."
+  ],
+  "storage_after": {
+    "project_bytes": 99810641441,
+    "volume_free_bytes": 121265102848
+  },
+  "temporary_replay_copies_removed": 885,
+  "original_hashes_reverified": 885
+}
