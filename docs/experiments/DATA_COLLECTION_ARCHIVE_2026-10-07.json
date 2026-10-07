@@ -1,0 +1,37 @@
+{
+  "schema_version": 3,
+  "snapshot": "unified-tvt-2026-10-07-001",
+  "unique_replay_files": 3077,
+  "queues": {
+    "tvt_candidates": 2781,
+    "excluded": 51,
+    "tvt_91115_paused": 182,
+    "identity_review": 63
+  },
+  "screening": {
+    "not_screened": 2192,
+    "excluded": 50,
+    "eligible": 835
+  },
+  "sample_verification": {
+    "not_sampled": 2981,
+    "passed": 91,
+    "excluded_custom_map": 2,
+    "completed_with_outcome_label_review": 3
+  },
+  "outcome_label_review": 10,
+  "training_ready_files": 0,
+  "same_match_deduplication_performed": false,
+  "raw_files_moved_or_deleted": 0,
+  "raw_sha256_verified": 3077,
+  "project_bytes_at_verification": 99859302966,
+  "project_limit_bytes": 100000000000,
+  "jsonl_sqlite_equal": true,
+  "screening_evidence_paths_verified": 885,
+  "resource_hashes_verified": 42,
+  "historical_scripts_archived": 13,
+  "new_replay_runs": 0,
+  "tests_passed": 3,
+  "count_correction": "One previously excluded 2v2 record removed from active queue",
+  "storage_scope": "Project directory logical file sizes, not external Blizzard cache"
+}

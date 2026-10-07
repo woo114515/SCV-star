@@ -1,5 +1,7 @@
 # 文档导航
 
+> 数据收集当前入口：[数据总览](DATASET_OVERVIEW.md)；可复用命令：[数据工具](DATA_COLLECTION_TOOLS.md)。各M2报告保留其验收时点统计。
+
 ## 当前项目约定
 
 | 文档 | 阅读目的 |
