@@ -5,7 +5,7 @@
   "game_version": "5.0.8.86383",
   "binary_sha256": "e363e134d57c4feadbfbff5eb3561b8b9f872221c1df927471cf8bfbab9f8773",
   "schema_version": 1,
-  "status": "official_binary_verified_api_start_unresolved",
+  "status": "sample_replay_verified",
   "official_content_md5": "9b8fff72729927230bfdcf9e488b5bd3",
   "official_encoded_key": "3591ced0e2d68df43dcc330ea114b2a4",
   "binary_bytes": 65018256,

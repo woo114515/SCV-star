@@ -1,0 +1,98 @@
+{
+  "date": "2026-10-07",
+  "status": "passed",
+  "identity": {
+    "game_version": "5.0.8.86383",
+    "data_version": "22EAC562CD0C6A31FB2C2C21E3AA3680",
+    "data_build": 86383,
+    "base_build": 86383
+  },
+  "seconds": 76.45299999999406,
+  "step": 224,
+  "files_passed": 1,
+  "perspectives_passed": 2,
+  "terminal_loops": [
+    18024,
+    18024
+  ],
+  "original_unchanged": true,
+  "cleanup": {
+    "forced_termination": false,
+    "pid": 2348,
+    "returncode": 0,
+    "exited": true
+  },
+  "bc_alignment_verified": false,
+  "cumulative_verified_files": 17,
+  "cumulative_verified_perspectives": 34,
+  "matching_verified_environment_candidates": 750,
+  "training_ready_files": 0,
+  "map_dependencies": [
+    {
+      "sha256": "6de41503baccd05656360b6f027db88169fa1989bb6357b1b215a2547939f5fb",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": false,
+      "bytes": 26
+    },
+    {
+      "sha256": "421c8aa0f3619b652d23a2735dfee812ab644228235e7a797edecfe8b67da30e",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": false,
+      "bytes": 29
+    },
+    {
+      "sha256": "66093832128453efffbb787c80b7d3eec1ad81bde55c83c930dea79c4e505a04",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": false,
+      "bytes": 27
+    },
+    {
+      "sha256": "d92dfc48c484c59154270b924ad7d57484f2ab9a47621c7ab16431bf66c53b40",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": false,
+      "bytes": 26
+    },
+    {
+      "sha256": "9e4eb0b5828dd241e0303e1c8bb11a1dac116e44e731d57e44d4406ae968b7c6",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": false,
+      "bytes": 688519
+    },
+    {
+      "sha256": "6c0552724744d9826059fa49fc1ed226f5113b6e3b6c2c8063e00dbcbc637e1f",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": true,
+      "url": "https://eu-s2-depot.classic.blizzard.com/6c0552724744d9826059fa49fc1ed226f5113b6e3b6c2c8063e00dbcbc637e1f.s2ma",
+      "bytes": 275051
+    },
+    {
+      "sha256": "045488e38c9f850143e0bb5703c08efcc26c8f7997438365a248dfcfb4d1a165",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": true,
+      "url": "https://eu-s2-depot.classic.blizzard.com/045488e38c9f850143e0bb5703c08efcc26c8f7997438365a248dfcfb4d1a165.s2ma",
+      "bytes": 1191046
+    },
+    {
+      "sha256": "7f41411aa597f4b46440d42a563348bf53822d2a68112f0104f9b891f6f05ae1",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": false,
+      "bytes": 29
+    },
+    {
+      "sha256": "68935c92125a3828034dd3f93212ef0adf8ec33b491b7bdd0ee158c3daccc8df",
+      "region": "eu",
+      "extension": "s2ma",
+      "added": true,
+      "url": "https://eu-s2-depot.classic.blizzard.com/68935c92125a3828034dd3f93212ef0adf8ec33b491b7bdd0ee158c3daccc8df.s2ma",
+      "bytes": 3063659
+    }
+  ]
+}
