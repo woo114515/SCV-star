@@ -1,0 +1,18 @@
+[
+  {
+    "build": 97563,
+    "correct_child_path": true,
+    "window_created": true,
+    "last_observed_second": 30,
+    "switcher_exit_code": 0,
+    "menu_or_replay_verified": false
+  },
+  {
+    "build": 93333,
+    "correct_child_path": true,
+    "window_created": true,
+    "last_observed_second": 30,
+    "switcher_exit_code": null,
+    "menu_or_replay_verified": false
+  }
+]
