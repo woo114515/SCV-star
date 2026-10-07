@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-07",
+  "scope": "one CN replay prefix, both perspectives, not full BC acceptance",
+  "cn_build": 97579,
+  "execution_horizon_loops": 2240,
+  "drain_until_loop": 2248,
+  "raw_commands": 82,
+  "candidate_observation_pairs_verified": 164,
+  "step_1_and_8_command_sequences_equal": {
+    "1": true,
+    "2": true
+  },
+  "receipt_lag_step_1": 1,
+  "unresolved_selected_tags": 0,
+  "same_loop_command_groups_observed": 0,
+  "seconds": 55.6869999999908,
+  "output_bytes": 622143,
+  "training_ready": false,
+  "window_mode": "hidden Windows client; not graphics-free",
+  "international_status": "blocked: elevated context cannot read curated replay; sandbox context SC2 exited 536936448",
+  "first_probe_storage_measurement_valid": false,
+  "storage_fix": "directory traversal now fails on unreadable directories",
+  "complete_project_bytes_after": 99860275589,
+  "unit_tests_passed": 5
+}

@@ -15,6 +15,7 @@
 | [M1 GPU 验证](M1_ACCEPTANCE.md) | 固定 PyTorch 环境、合成数据前后向和检查点恢复 |
 | [M1 实测记录](experiments/M1_2026-09-30.md) | GPU、CUDA runtime、精度、显存和恢复一致性证据 |
 | [M2 数据收集与重放验证](M2_DATA_COLLECTION.md) | 数据来源、引擎获取、历史验收及分层抽样的合并记录 |
+| [观测—动作对齐](REPLAY_ALIGNMENT.md) | 下一阶段的小样本时间语义、实体标签、信息边界和验收门槛 |
 | [数据集总览与统一清单](DATASET_OVERVIEW.md) | 公开与本机合并统计、处理队列、版本隔离和本地清单入口 |
 | [实验记录约定](experiments/README.md) | 记录版本、预算、结果与可复现证据 |
 | [配置模板说明](../configs/README.md) | 区分项目默认值、实验配置和本机配置 |
