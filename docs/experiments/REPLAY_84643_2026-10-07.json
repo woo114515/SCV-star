@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-07",
+  "status": "passed",
+  "identity": {
+    "game_version": "5.0.7.84643",
+    "data_version": "A389D1F7DF9DD792FBE980533B7119FF",
+    "data_build": 84643,
+    "base_build": 84643
+  },
+  "seconds": 42.45299999999406,
+  "step": 224,
+  "files_passed": 1,
+  "perspectives_passed": 2,
+  "original_unchanged": true,
+  "cleanup": {
+    "forced_termination": false,
+    "pid": 11052,
+    "returncode": 0,
+    "exited": true
+  },
+  "bc_alignment_verified": false,
+  "cumulative_verified_files": 16,
+  "cumulative_verified_perspectives": 32,
+  "matching_verified_environment_candidates": 581,
+  "training_ready_files": 0,
+  "manual_switcher_actual_build": 97563,
+  "manual_switcher_data_build": 84643,
+  "manual_switcher_exit_code": 536936448
+}
