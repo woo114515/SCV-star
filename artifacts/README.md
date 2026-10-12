@@ -22,3 +22,5 @@
 2026-10-07 已将顶层20个、早期M2运行目录13个退役脚本归并至 `archives/2026-10-07-retired-scripts/scripts.zip`。同目录 `manifest.json` 保存原路径、逐文件SHA-256和压缩包SHA-256；校验后移除33个散落脚本及1个可重建字节码文件。归档包含历史固定路径和下载诊断，仅供查看，不应直接执行。
 
 `runs/m0-human-002/executed-source/` 和 `runs/data-collection-archive-2026-10-07/historical-scripts/` 保持原位，以维持既有验收证据和索引。日志、报告、模型、录像及游戏资源不在本次清理范围。档案可能包含私有路径和来源链接，不提交GitHub。
+
+2026-10-12：M2 数据验收完成后，24 个临时脚本／历史提取器归并至 `archives/2026-10-12-m2-readiness-scripts/scripts.zip`，逐文件与压缩包哈希记录在同目录 `manifest.json`。已被完整提取替代的中断分片按哈希索引清理，共回收 110,504,989 字节；原始录像、引擎、地图、报告与隔离记录保留。

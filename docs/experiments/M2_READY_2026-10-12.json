@@ -1,0 +1,179 @@
+{
+  "date": "2026-10-12",
+  "stage": "M2 first BC dataset",
+  "passed": true,
+  "scope": "100 complete human TvT files; not all collected candidates",
+  "schema": "tvt-bc-v2",
+  "files": 100,
+  "player_views": 200,
+  "file_splits": {
+    "train": 80,
+    "test": 10,
+    "validation": 10
+  },
+  "rows": 285459,
+  "rows_by_split": {
+    "train": 226310,
+    "test": 36541,
+    "validation": 22608
+  },
+  "engine": {
+    "base_build": 86383,
+    "data_build": 86383,
+    "data_version": "22EAC562CD0C6A31FB2C2C21E3AA3680",
+    "game_version": "5.0.8.86383",
+    "binary_sha256": "e363e134d57c4feadbfbff5eb3561b8b9f872221c1df927471cf8bfbab9f8773",
+    "schema_version": 1,
+    "status": "sample_replay_verified",
+    "official_content_md5": "9b8fff72729927230bfdcf9e488b5bd3",
+    "official_encoded_key": "3591ced0e2d68df43dcc330ea114b2a4",
+    "binary_bytes": 65018256,
+    "source_root_build": 87702
+  },
+  "dependency_versions": {
+    "s2clientprotocol": "5.0.16.97563.0",
+    "s2protocol": "5.0.16.97563.0",
+    "mpyq": "0.2.5",
+    "protobuf": "3.20.3",
+    "websocket-client": "1.9.2",
+    "psutil": "7.2.2",
+    "torch": "2.13.0+cu130"
+  },
+  "python_version": "3.11.16",
+  "collection_sources": {
+    "SC2ReSet": 62,
+    "SpawningTool_Kevin_export": 38
+  },
+  "map_names_count": 20,
+  "minimum_view_coverage": 0.9878048780487805,
+  "aggregate_coverage": 0.9979199731519224,
+  "quarantine_reasons": {
+    "target_tag_missing": 346,
+    "selected_tag_missing": 242,
+    "pre_observation_missing": 7
+  },
+  "api_action_errors": 1411,
+  "observed_abilities": 156,
+  "max_entities": 531,
+  "same_loop_groups": 3427,
+  "autocast_rows": 38,
+  "blip_rows": 23870,
+  "queued_actions": 8418,
+  "addon_rows": 238916,
+  "cargo_rows": 38510,
+  "max_order_queue": 24,
+  "execution_failure_reasons": {},
+  "quality_excluded_files": 2,
+  "known_initialization_groups_crossing_splits": 0,
+  "same_match_deduplication_performed": false,
+  "cross_copy_leakage_not_ruled_out": true,
+  "gpu_smoke": {
+    "passed": true,
+    "gpu": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+    "torch_version": "2.13.0+cu130",
+    "batches": [
+      {
+        "split": "train",
+        "batch_size": 16,
+        "entities_shape": [
+          16,
+          175,
+          27
+        ],
+        "loss": 8.236004829406738,
+        "parameters_unchanged": true
+      },
+      {
+        "split": "validation",
+        "batch_size": 16,
+        "entities_shape": [
+          16,
+          199,
+          27
+        ],
+        "loss": 8.432822227478027,
+        "parameters_unchanged": true
+      },
+      {
+        "split": "test",
+        "batch_size": 16,
+        "entities_shape": [
+          16,
+          143,
+          27
+        ],
+        "loss": 8.406131744384766,
+        "parameters_unchanged": true
+      },
+      {
+        "split": "largest_observation",
+        "batch_size": 16,
+        "entities_shape": [
+          16,
+          531,
+          27
+        ],
+        "loss": 8.258438110351562,
+        "parameters_unchanged": true
+      }
+    ],
+    "peak_cuda_bytes": 73416192,
+    "optimizer_steps": 0,
+    "purpose": "tensor loading and differentiability smoke only, not policy training"
+  },
+  "unit_tests_passed": 63,
+  "lint_passed": true,
+  "format_scope": "Tracked Python files and this task new BC modules/tests",
+  "preexisting_format_exclusion": "Untracked src/scv_star/runtime/manual_replay.py needs formatting; left untouched",
+  "project_logical_bytes": 97544775110,
+  "project_size_excludes_external_blizzard_cache": true,
+  "dataset_bytes": 558792695,
+  "compressed_shard_bytes": 426770288,
+  "shard_compression": {
+    ".xz": 200
+  },
+  "verified_map_resource_count": 30,
+  "dependency_lock_sha256": {
+    "requirements\\dev-windows-py311.txt": "5546cfd2c57951799922e144ad9c4bd4a34b849ed7963b0caf934afad7734061",
+    "requirements\\m0-windows-py311.txt": "30a0aa08ead7194ff7a961071ba16b87cd448da8f9a8c4218a306b7f21690c3d",
+    "requirements\\m1-windows-py311-cu130.txt": "6db46834531e1fd871e1417c186cc42a2d252a55c974d9fd2c552b1e47cdea51",
+    "requirements\\m2-replays.txt": "d7f198e8f36e8d3a774387f0724c2713443bc3c5fc91e2eb8c803e904915f267"
+  },
+  "training_optimizer_steps": 0,
+  "formal_training_seconds": 0,
+  "selected_replay_processing_seconds_sum": 34410.582999999955,
+  "first_pass_action_stream_difference_views": 146,
+  "manifest_sha256": "738a34fe3ccd4ee184d9e75ddbc9e29592159f30246b56e61e539c1d2ec090a6",
+  "extraction_source_sha256": {
+    "src\\scv_star\\data\\bc_extract.py": "a9d9f273f96d25ed3b2cb1c4e5c810468c9089513ec40f5bab4325be401401af",
+    "src\\scv_star\\data\\bc_schema.py": "9eb0ada6a8fdfe527d3437c9c3ba8aee55bc5bc7de44bab978acb1d8f22cd843",
+    "src\\scv_star\\envs\\sc2_client.py": "8c1cf66eaca8841f9de6db04426f36c70ace42e793a3c14037790686c41d3ee7"
+  },
+  "acceptance_source_sha256": "e38daa1a5709fd3572995306be7e30270cb13e0b8dc632eebdd82f593a7f21eb",
+  "latest_version_deployment_revalidation_required": true,
+  "limitations": [
+    "Simplified actor feature whitelist omits RAW effects and full combat attributes",
+    "Offline action roundtrip is not complete online legality validation",
+    "API action conversion is not an exact copy of all original human inputs",
+    "GPU smoke uses a tiny ability head; it does not benchmark the final policy network"
+  ],
+  "resume_date": "2026-10-12",
+  "resume_batch_wall_seconds": 2784.2969999999914,
+  "qualified_replays_reused_after_pause": 72,
+  "local_cn_install_manifest_version": "5.0.17.98370",
+  "local_cn_api_revalidated": false,
+  "final_phase_timing": {
+    "acceptance": {
+      "seconds": 477.9070000000065,
+      "exit_code": 0
+    },
+    "gpu": {
+      "seconds": 4.342999999993481,
+      "exit_code": 0
+    },
+    "diff_check": {
+      "seconds": 0.14100000000325963,
+      "exit_code": 0
+    }
+  }
+}

@@ -2,7 +2,9 @@
 
 当前使用标准库 `unittest`，`unit/test_m0_guards.py` 验证版本漂移、缺失身份字段、地图变更、协议错误及观测配置。运行 `.\.venv\Scripts\python.exe -m unittest discover -s tests/unit -v`。真实客户端验收通过 [M0 命令](../docs/M0_ACCEPTANCE.md) 单独运行，不在单元测试中隐式启动游戏。
 
-当前共41项回归检查：16项环境检查覆盖M0版本／协议、真人房主接口、工人选择，以及独立引擎路径不能绕过哈希验证；`test_m1_checkpoint.py`的3项负例检查拒绝优化器计数变化、缺少随机数状态或张量精度变化；`test_replay_sources.py`的7项检查覆盖实际种族筛选、AI排除、录像头版本冲突、重复计数、终局胜负冲突及尾帧差异保留。新增`test_public_download.py`的6项下载保护检查和`test_public_inventory.py`的4项清单检查，覆盖路径、大小、校验、续传、AppleDouble元数据及版本／重复统计。`test_consolidate.py`的5项检查覆盖未知种族、非标准人数、版本复核优先级、双视角重放证据及跨来源相同字节归并。运行全套需安装M0、M2依赖；缺少PyTorch时明确跳过M1的3项，不能计为通过。真实GPU检查通过[M1入口](../docs/M1_ACCEPTANCE.md)单独运行。代码提交前执行Ruff格式与静态检查，命令见[开发说明](../docs/DEVELOPMENT.md)。
+当前共63项单元测试，覆盖版本／协议保护、M1恢复、录像筛选、下载与清单合并，以及观测时间对齐、雷达点、动作逆转换、序列边界、条件掩码、冻结数据哈希和无损重压缩。依赖M0、M2及M1的PyTorch环境；缺依赖的跳过不能算通过。真实客户端回放、全分片逐条检查和NVIDIA GPU前后向另外执行，见[M2数据验收](../docs/REPLAY_ALIGNMENT.md)。
+
+全仓库Ruff静态检查通过。格式检查覆盖已跟踪Python代码及本轮新增BC模块／测试；本轮开始前已有的未跟踪`runtime/manual_replay.py`格式问题未改动，不冒称整个工作区格式检查通过。
 
 | 目录 | 未来覆盖范围 | 依赖边界 |
 | --- | --- | --- |

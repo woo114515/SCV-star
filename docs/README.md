@@ -10,12 +10,13 @@
 | [架构与数据契约](ARCHITECTURE.md) | 理解模块职责、信息边界和数据传递 |
 | [开发说明](DEVELOPMENT.md) | 了解当前能做什么、后续环境验证顺序与代码约定 |
 | [里程碑](MILESTONES.md) | 查看完成状态和下一阶段验收标准 |
+| [当前任务交接](HANDOFF.md) | 跨会话／系统接手时核对任务、产物和恢复位置 |
 | [M0 接口验收](M0_ACCEPTANCE.md) | 环境、固定版本、本机命令和真人连接 |
 | [M0 实测记录](experiments/M0_2026-09-29.md) | 中国区 build、动作、迷雾及真人运行证据 |
 | [M1 GPU 验证](M1_ACCEPTANCE.md) | 固定 PyTorch 环境、合成数据前后向和检查点恢复 |
 | [M1 实测记录](experiments/M1_2026-09-30.md) | GPU、CUDA runtime、精度、显存和恢复一致性证据 |
 | [M2 数据收集与重放验证](M2_DATA_COLLECTION.md) | 数据来源、引擎获取、历史验收及分层抽样的合并记录 |
-| [观测—动作对齐](REPLAY_ALIGNMENT.md) | 下一阶段的小样本时间语义、实体标签、信息边界和验收门槛 |
+| [观测—动作对齐与训练数据](REPLAY_ALIGNMENT.md) | M2时间语义、完整提取、RAW标签、训练读取与验收状态 |
 | [数据集总览与统一清单](DATASET_OVERVIEW.md) | 公开与本机合并统计、处理队列、版本隔离和本地清单入口 |
 | [实验记录约定](experiments/README.md) | 记录版本、预算、结果与可复现证据 |
 | [配置模板说明](../configs/README.md) | 区分项目默认值、实验配置和本机配置 |
