@@ -10,10 +10,21 @@ from scv_star.data.bc_batch import (
     normalise_source,
     plan_candidates,
     validate_screen,
+    worker_interruption,
 )
 
 
 class BatchTests(unittest.TestCase):
+    def test_worker_loss_is_retryable_twice_and_never_a_quality_exclusion(self):
+        row = {"sha256": "one", "identity": {"base_build": 86383}}
+        first = worker_interruption(row, RuntimeError("worker exited"))
+        second = worker_interruption(row, RuntimeError("worker exited"), first)
+        third = worker_interruption(row, RuntimeError("worker exited"), second)
+        self.assertEqual(first["status"], "infra_interrupted")
+        self.assertEqual(second["status"], "infra_interrupted")
+        self.assertEqual(third["status"], "infrastructure_failed")
+        self.assertEqual(third["infrastructure_retries"], 3)
+
     def test_dispatch_reserves_memory_before_concurrent_workers_start(self):
         self.assertEqual(dispatch_slots(8, 0, 100, 10_000_000_000), 2)
         self.assertEqual(dispatch_slots(8, 6, 100, 5_900_000_000), 0)
@@ -21,6 +32,10 @@ class BatchTests(unittest.TestCase):
     def test_dispatch_does_not_overshoot_target_with_inflight_cases(self):
         self.assertEqual(dispatch_slots(8, 3, 4, 20_000_000_000), 1)
         self.assertEqual(dispatch_slots(8, 3, 2, 20_000_000_000), 0)
+
+    def test_windows_commit_can_stop_dispatch_even_when_ram_is_available(self):
+        self.assertEqual(dispatch_slots(8, 0, 100, 20_000_000_000, 5_000_000_000), 0)
+        self.assertEqual(dispatch_slots(8, 0, 100, 20_000_000_000, 9_000_000_000), 2)
 
     def test_source_label_preserves_all_restricted_source_terms(self):
         row = {

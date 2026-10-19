@@ -1,22 +1,24 @@
 # 当前任务交接
 
-## 当前任务：扩展到1,000场（已恢复，2026-10-19）
+## 当前任务：扩展到1,000场（进行中，2026-10-19）
 
-负责人Windows Codex，分支main；用户于本日16:10后明确要求继续；已从暂停状态恢复，1,000场目标尚未完成。用户允许本轮项目最多150 GB，保留1,000场，清理须先复核。原100场清单与哈希保持下面的冻结记录，不重新提取。当前仍未开始正式训练。
+负责人Windows Codex，分支main；用户明确恢复任务。本轮允许项目最多150 GB，保留1,000场，清理前复核。目标尚未完成，未开始正式BC／RL训练。原100场冻结清单及下面的SHA记录保持不变，当前训练入口仍指向原100场。
 
-新阶段计划、注册表、逐场进度和日志位于 `artifacts/runs/m2-expand-1000-2026-10-19/`；候选输出位于 `data/processed/m2-expand-2026-10-19/`。`plan.json`固定种子20261019并继承旧比赛指纹划分；`registry.json`只允许通过受控时序及单场完整提取验收的版本进入批处理。新集合达到1,000场前不替换原 `data/manifests/training-current.json`。
+计划、注册表、逐场进度和日志在 `artifacts/runs/m2-expand-1000-2026-10-19/`；新增输出在 `data/processed/m2-expand-2026-10-19/`。plan固定种子20261019、原始SHA和已知比赛指纹划分，启用版本共1,063条新候选；已有100场另计。所有来源限制延续到派生数据，逐场清单、收据及日志不得上传Git。
 
-已恢复96999、97579，新增83830、87702、88500、90136及备用94137的校验EXE；官方获取证据在 `downloads/engine-expand-2026-10-19/`。11个启用版本已通过受控动作时序验证；94137仅备用，未计可用。CN96999/97579须使用 `cache/sc2-cn-96516/Versions/` 内EXE，二者同根复测均通过；registry引用r2本机配置。91115继续暂停，92440有界获取失败，未纳入计数。
+11个启用版本：83830、84643、86383、87702、88500、90136、93333、96516、96999、97563、97579，均通过边界和完整单场试点。94137仅备用，未计可用；91115继续暂停，92440获取失败。CN96999/97579须使用 `cache/sc2-cn-96516/Versions/` 内EXE，registry引用r2配置；不要混用国际根EXE。mutable CASC三个数据根均仍有使用，不得硬链接或直接删除。
 
-单场验收与集合代码已合入 `9366a87`，地图获取为 `5605caa`；本轮提取、调度及试点实现为 `0a4e264`，内存调度保护与恢复说明为 `b5b0d5b`，均已推送。受控实验 `boundaries.py`、试点 `pilots.py` 的一次性入口在 `tmp/2026-10-19-data-1000/`。全部11版本试点已通过，试点日志为 `pilots-v3.log`；批处理 `batch-v2.log` 已排空，八路 `batch-v3.log` 已在上次暂停正常排空；本次八路恢复日志为 `batch-v4.log`，转换证据在 `eight-worker-transition.log`，受控汇总为 `boundaries.log`。先查真实进程与报告，不重跑已通过项目。来源标签缺失修复已核对全部1,063条可启用新候选，完整提取报告可直接重做验收；标签从精确下载证据和原始来源政策恢复，保留所有限制。早先中断输出保留在对应build的 `.interrupted/`；本次暂停的8项仍在原单场目录，恢复工具会先归档再重跑，均不计可用。
+恢复从212场开始；共享进程池在 `batch-v4.log` 中发生BrokenProcessPool，根因未证实。已归档失败快照，仅关闭精确匹配本轮单场临时目录的6个孤儿SC2；复用完整报告后达到221场、442个玩家视角、555,887条样本，7场基础设施中断重新排队。证据为 `pool-recovery.json`、`pool-orphan-cleanup.json` 和 `isolated-resume.json`。不要把这些中断解释为录像质量问题。
 
-101项单元测试与Ruff通过；124场的中途集合通过8个版本、三个split及最大实体观测的NVIDIA GPU检查，0次优化器更新，证据在本轮 `gpu-preview-v1/`。这只是预检，不替代最终1,000场的集合与GPU验收。上次暂停共212场、424个玩家视角、534,234条样本，历史快照为本轮 `pause-state.json` 和 `progress-at-pause.json`。恢复前113个子manifest及全部冻结文件哈希复核通过，11个引擎EXE/边界/试点哈希通过；已仅移除8个人为中断失败记录并重新排队，其余112条accepted、5条质量排除和1条原有失败保留。恢复证据为本轮 `resume-*.json`，当前计数以 `progress.json` 为准；采样与最终验收等待已重新启动。训练入口仍是原100场；不要把当前212场或预检124场当作目标完成。已逐个复核并删除13份引擎运输副本，回收757,973,270字节；临时获取脚本已核验归档至 `artifacts/archives/2026-10-19-engine-acquisition-scripts/` 并移除源目录。清理证据为本轮 `engine-transport-cleanup.json` 与 `storage-after-transport-cleanup.json`。另约138MB国际根96999/97579重复EXE须在复核旧配置引用后再处理；mutable CASC三个数据根仍须保留。
+当前批处理日志 `batch-v5.log`。`bc_isolated.py` 每场启动一个新Python进程，父进程核对任务哈希、PID、结果收据及完整manifest；私有日志在 `worker-attempts/`。基础设施异常最多自动重试两次，连续异常触发停止；每任务最多1小时。110项单元测试、Ruff及差异检查通过，日志 `code-checks-v4.log`。提取与schema未改变，仍按原门槛完整回放双方、逐条检查。
 
-当前已获用户明确继续授权并执行恢复，不要重复启动。未来若再次暂停，先核对没有本轮存活任务，保留暂停快照，从 `progress.json` 的results中仅移除 `pause-state.json` 的 `interrupted_replay_sha256` 所列8项（其余accepted、质量排除和原有失败记录保留）；将registry的drain清为false、workers恢复8，再执行下述命令并重启finalize.py。不要直接重复运行试点。
+并发上限8路，按RAM和Windows提交内存同时限流，实际可低于8路；详见[数据契约](REPLAY_ALIGNMENT.md)。批处理与最终验收等待已启动，接手先查进程和执行收据，不重复启动。registry设 `drain: true` 可停止派发并等待当前任务结束。恢复前核对没有存活manager，保留完整产物，仅将有证据的基础设施中断重新排队；不得删除真实质量排除或原始失败记录。
 
-正式批处理恢复命令：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 8`。运行前核对代码与当前任务进程；仅完整单场manifest可增加可用计数，未完成输出先归档恢复。整体版本混合、GPU读取、指纹与SHA检查通过后才发布新入口。
+恢复命令：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 8`。仅完整单场manifest计数，不按视角或启动次数计数；实际进度以progress.json和manifest复核为准。
 
-最终验收准备：`tmp/2026-10-19-data-1000/finalize.py` 已重新启动，日志为 `finalization-v3.log`；仅等待最终集合，不启动训练；达到1,000场后重查全部子清单与哈希、三个split、各版本及最大实体观测的GPU读取，再原子发布训练入口。状态在本轮 `finalization.json`，成功后仍须复核清理、更新里程碑和脱敏汇总，不得仅凭后台脚本结果标记整个任务完成。
+最终验收等待程序为 `tmp/2026-10-19-data-1000/finalize.py`，日志 `finalization-v3.log`，状态 `finalization.json`。达到1,000场后检查全部子manifest、分片哈希、SHA唯一性、比赛指纹与划分，再在NVIDIA GPU验证各版本、三个split及最大实体观测，0次优化器更新。全部通过才发布 `training-current.json`；之后仍须复核清理、更新里程碑及脱敏汇总，不能仅凭后台脚本完成标记任务通过。124场预检在 `gpu-preview-v1/`，不替代最终验收。
+
+已核验删除13份引擎运输副本，回收757,973,270字节；获取脚本归档在 `artifacts/archives/2026-10-19-engine-acquisition-scripts/`。清理证据为 `engine-transport-cleanup.json` 与 `storage-after-transport-cleanup.json`。另约138 MB重复EXE须先退休旧本机配置引用再处理。阶段收尾复核中断分片、临时脚本和工作树；不能删除仍运行任务引用的文件。其他会话未提交的AGENTS、架构、算力说明与人工回放工具保持原状，不混入本轮提交。
 
 下方为首批100场的冻结验收记录，状态与版本号不代表本轮目标已完成。
 

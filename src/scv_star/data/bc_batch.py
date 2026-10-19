@@ -2,7 +2,7 @@
 
 import argparse
 from collections import Counter
-from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED
+from concurrent.futures import wait, FIRST_COMPLETED
 from copy import deepcopy
 from functools import lru_cache
 import hashlib
@@ -18,9 +18,11 @@ from s2clientprotocol import sc2api_pb2 as sc
 from scv_star.data.bc_accept import accept_dataset
 from scv_star.data.bc_collection import publish_collection
 from scv_star.data.bc_extract import extract
+from scv_star.data.bc_isolated import IsolatedExecutor, WorkerInterrupted
 from scv_star.data.map_resources import ensure_replay_resources
 from scv_star.envs.sc2_client import Client, message_dict, sha256, validate_version
 from scv_star.runtime.alignment_probe import directory_bytes
+from scv_star.runtime.host_memory import windows_memory_info
 from scv_star.runtime.replay_probe import human_tvt
 
 
@@ -208,10 +210,26 @@ def completed_unit(unit):
     }
 
 
-def dispatch_slots(workers, active, remaining, available_ram):
-    """Reserve 6 GB for the desktop and allow 1.6 GB per new client/worker."""
+def dispatch_slots(workers, active, remaining, available_ram, available_commit=None):
+    """Reserve 6 GB RAM and, on Windows, 4 GB commit before starting clients."""
     memory_slots = max(0, (available_ram - 6_000_000_000) // 1_600_000_000)
+    if available_commit is not None:
+        memory_slots = min(
+            memory_slots, max(0, (available_commit - 4_000_000_000) // 2_500_000_000)
+        )
     return max(0, min(workers - active, remaining - active, memory_slots))
+
+
+def worker_interruption(row, error, previous=None):
+    """Bound infrastructure retries without classifying them as replay quality."""
+    attempts = (previous or {}).get("infrastructure_retries", 0) + 1
+    return {
+        "status": "infra_interrupted" if attempts <= 2 else "infrastructure_failed",
+        "sha256": row["sha256"],
+        "build": row["identity"]["base_build"],
+        "infrastructure_retries": attempts,
+        "error": f"{type(error).__name__}: {error}",
+    }
 
 
 def run_candidate(task):
@@ -354,13 +372,21 @@ def run_batch(plan_path, registry_path, destination, progress_path, target=1000,
         r["sha256"] for build in builds for r in pilot_rows(plan["candidates"], build)
     }
     for path in destination.glob("*/*/manifest.json"):
-        if path.parent.name in planned and path.parent.name not in results:
+        if (
+            path.parent.name in planned
+            and results.get(path.parent.name, {}).get("status") != "accepted"
+        ):
             result = completed_unit(path.parent)
             results[result["sha256"]] = result
     started = time.monotonic()
-    attempted = {r["sha256"] for r in results.values()}
-    with ProcessPoolExecutor(max_workers=workers) as pool:
+    attempted = {r["sha256"] for r in results.values() if r["status"] != "infra_interrupted"}
+    with IsolatedExecutor(
+        max_workers=workers,
+        audit_root=progress_path.resolve().parent / "worker-attempts",
+        project_root=root,
+    ) as pool:
         jobs = {}
+        consecutive_infrastructure_failures = 0
         while True:
             accepted = [r for r in results.values() if r["status"] == "accepted"]
             if existing_count + len(accepted) >= target and not jobs:
@@ -403,11 +429,16 @@ def run_batch(plan_path, registry_path, destination, progress_path, target=1000,
                     "No remaining candidates with verified engine/boundary; checkpoint retained"
                 )
             available_ram = psutil.virtual_memory().available
+            memory_info = windows_memory_info()
             capacity = min(workers, registry.get("workers", workers))
             if available_ram < 4_000_000_000:
                 capacity = min(capacity, 6)
             slots = dispatch_slots(
-                capacity, len(jobs), target - existing_count - len(accepted), available_ram
+                capacity,
+                len(jobs),
+                target - existing_count - len(accepted),
+                available_ram,
+                memory_info["commit_available_bytes"] if memory_info is not None else None,
             )
             if draining or shutil.disk_usage(root).free < 25_000_000_000:
                 slots = 0
@@ -423,7 +454,7 @@ def run_batch(plan_path, registry_path, destination, progress_path, target=1000,
                     "engine": enabled[build],
                     "limit_bytes": limit_bytes,
                 }
-                jobs[pool.submit(run_candidate, task)] = row
+                jobs[pool.submit(task)] = row
             if not jobs:
                 time.sleep(5)
                 continue
@@ -432,6 +463,12 @@ def run_batch(plan_path, registry_path, destination, progress_path, target=1000,
                 row = jobs.pop(job)
                 try:
                     result = job.result()
+                    consecutive_infrastructure_failures = 0
+                except WorkerInterrupted as error:
+                    consecutive_infrastructure_failures += 1
+                    result = worker_interruption(row, error, results.get(row["sha256"]))
+                    if result["status"] == "infra_interrupted":
+                        attempted.discard(row["sha256"])
                 except Exception as error:
                     result = {
                         "status": "failed",
@@ -452,6 +489,10 @@ def run_batch(plan_path, registry_path, destination, progress_path, target=1000,
                 }
                 atomic_json(progress_path, summary)
                 print(json.dumps({k: v for k, v in summary.items() if k != "results"}), flush=True)
+            if consecutive_infrastructure_failures >= max(4, workers):
+                raise RuntimeError(
+                    "Repeated worker infrastructure failures; retry checkpoint retained"
+                )
     manifests = existing_paths + [
         Path(r["manifest"]) for r in results.values() if r["status"] == "accepted"
     ]

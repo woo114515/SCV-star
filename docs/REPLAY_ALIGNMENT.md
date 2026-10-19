@@ -15,7 +15,9 @@
 .venv\Scripts\python.exe -m scv_star.runtime.bc_reader_check --collection data/processed/m2-expand-2026-10-19/collection.json --output artifacts/runs/m2-expand-1000-2026-10-19/gpu-final.json
 ```
 
-调度以实际内存限制并发：保留6 GB系统余量，按每个新任务1.6 GB估算；低于25 GB空闲磁盘暂停派发，低于20 GB或逼近150 GB项目上限时保存进度并停止。registry设置 `drain: true` 可停止派发、等当前任务完成后退出；重启前须核对没有另一个manager。
+调度上限8路，以实际物理内存和Windows提交内存共同限制并发：保留6 GB可用RAM，每个新任务预留1.6 GB；保留4 GB提交余量，每个新任务预留2.5 GB。这些是保守调度估算，并非实测峰值保证。低于25 GB空闲磁盘暂停派发，低于20 GB或逼近150 GB项目上限时保存进度并停止。registry设置 `drain: true` 可停止派发、等当前任务完成后退出；重启前须核对没有另一个manager。
+
+每场录像由独立Python进程执行；父进程校验任务、PID、结果收据及完整manifest。任务、输出日志和执行收据保存在本轮 `worker-attempts/`，不进入Git。进程异常退出与质量排除分开记录，基础设施中断最多自动重试两次；反复发生会保存进度并停止。超时只清理该任务Python子进程与精确匹配该单场临时目录的SC2。原共享进程池曾中断，根因未证实；已完成产物复用，其余重新排队，未降低数据验收门槛。
 
 读取接口为 `iter_collection_rows(collection_path, split, builds={86383})`。子manifest和集合均禁止覆盖。实际进度与恢复信息见[交接](HANDOFF.md)；预检通过不代表1,000场完成，也不代表正式BC模型已实现。
 
