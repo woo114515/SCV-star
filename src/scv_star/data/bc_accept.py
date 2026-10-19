@@ -14,7 +14,9 @@ import mpyq
 from s2protocol import versions
 
 from scv_star.data.bc_schema import SCHEMA, UNIT_FIELDS, SCALAR_FIELDS, decode_action
-from scv_star.envs.sc2_client import sha256
+from scv_star.envs.sc2_client import sha256, validate_version
+from scv_star.data.replay_sources import inspect_path
+from scv_star.runtime.replay_probe import replay_identity
 from scv_star.data.bc_storage import open_shard
 
 
@@ -173,26 +175,58 @@ def inspect_shard(path, report, view):
     }
 
 
-def main():
+VALID_SPLITS = ("train", "validation", "test")
+
+
+def resource_protocol_identity(build, resource_protocol_build=None):
+    """Resolve a declared details-only parser; never guess a compatible version."""
+    selected = build if resource_protocol_build is None else resource_protocol_build
+    protocol = versions.build(selected)
+    return {
+        "replay_base_build": build,
+        "protocol_build": selected,
+        "exact_build": selected == build,
+        "scope": "replay.details static map cache handles only",
+        "module_sha256": sha256(Path(protocol.__file__)),
+    }
+
+
+def accept_dataset(
+    root,
+    selection,
+    boundary,
+    minimum_files=100,
+    cache_root=None,
+    resource_protocol_build=None,
+    required_splits=VALID_SPLITS,
+):
+    """Audit one pinned engine bucket and publish a new immutable manifest.
+
+    An explicit alternate protocol only decodes map dependency handles. The
+    replay header and API-reported engine identity must still match exactly.
+    """
     if not __debug__:
         raise RuntimeError("Acceptance requires Python assertions; do not use -O")
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--root", type=Path, required=True, help="One dataset build directory")
-    parser.add_argument("--selection", type=Path, required=True)
-    parser.add_argument("--boundary", type=Path, required=True)
-    parser.add_argument("--minimum-files", type=int, default=100)
-    parser.add_argument(
-        "--cache-root",
-        type=Path,
-        default=Path(os.environ.get("PROGRAMDATA", r"C:\ProgramData"))
-        / "Blizzard Entertainment/Battle.net/Cache",
+    root, selection_path, boundary_path = map(Path, (root, selection, boundary))
+    root = root.resolve()
+    required_splits = tuple(required_splits)
+    if minimum_files < 1 or not required_splits or not set(required_splits) <= set(VALID_SPLITS):
+        raise ValueError("Invalid minimum files or required splits")
+    cache_root = (
+        Path(cache_root)
+        if cache_root is not None
+        else Path(os.environ.get("PROGRAMDATA", r"C:\ProgramData"))
+        / "Blizzard Entertainment/Battle.net/Cache"
     )
-    args = parser.parse_args()
-    if (args.root / "manifest.json").exists():
+    if (root / "manifest.json").exists():
         raise ValueError("Manifest exists")
-    boundary = json.loads(args.boundary.read_text())
-    assert boundary["passed"] and boundary["engine"]["base_build"] == 86383
-    selection = {r["sha256"]: r for r in json.loads(args.selection.read_text(encoding="utf-8"))}
+    boundary = json.loads(boundary_path.read_text(encoding="utf-8"))
+    assert boundary["passed"], "Boundary evidence did not pass"
+    expected = boundary["engine"]
+    validate_version(expected, expected)
+    build = expected["base_build"]
+    resource_protocol = resource_protocol_identity(build, resource_protocol_build)
+    selection = {r["sha256"]: r for r in json.loads(selection_path.read_text(encoding="utf-8"))}
     shards = []
     files = []
     excluded = []
@@ -210,7 +244,7 @@ def main():
     abilities_by_split = {split: Counter() for split in ("train", "validation", "test")}
     resource_memo = {}
     project_root = Path(__file__).resolve().parents[3]
-    for path in sorted(args.root.glob("*/report.json")):
+    for path in sorted(root.glob("*/report.json")):
         report = json.loads(path.read_text(encoding="utf-8"))
         if report["status"] != "extracted" or not report["training_ready"]:
             excluded.append(
@@ -231,11 +265,15 @@ def main():
             and report["cleanup"]["exited"]
         )
         assert len(report["views"]) == 2 and {v["player_id"] for v in report["views"]} == {1, 2}
-        assert report["engine"]["base_build"] == 86383
+        validate_version(report["engine"], expected)
+        if expected.get("binary_sha256"):
+            assert report["engine"]["binary_sha256"] == expected["binary_sha256"]
         if engine is None:
             engine = report["engine"]
             extraction_sources = report["source_sha256"]
         assert report["engine"] == engine and report["source_sha256"] == extraction_sources
+        assert report["split"] in VALID_SPLITS
+        validate_version(source["identity"], expected)
         assert source["screening_status"] == "eligible" and source["human_1v1"]
         assert source["races"] == ["Terr", "Terr"] and source["outcome_label_ready"]
         init_hash = source["init_data_sha256"]
@@ -258,7 +296,10 @@ def main():
         static_map_hash = sha256(static_map)
         raw_replay = project_root / source["local_replay"]
         assert sha256(raw_replay) == report["replay_sha256"]
-        resources = replay_resources(raw_replay, 86383, args.cache_root, resource_memo)
+        validate_version(replay_identity(inspect_path(raw_replay)), expected)
+        resources = replay_resources(
+            raw_replay, resource_protocol["protocol_build"], cache_root, resource_memo
+        )
         vocabulary.update(a["ability_id"] for a in gamedata["abilities"])
         ability_names.update(
             {a["ability_id"]: a.get("friendly_name", "") for a in gamedata["abilities"]}
@@ -280,14 +321,16 @@ def main():
             abilities_by_split[report["split"]].update(summary["ability_counts"])
             shards.append(
                 {
-                    "path": shard.relative_to(args.root).as_posix(),
+                    "path": shard.relative_to(root).as_posix(),
                     "sha256": view["shard_sha256"],
                     "split": report["split"],
                     "replay_sha256": report["replay_sha256"],
                     "player_id": view["player_id"],
                     "rows": summary["rows"],
-                    "static_map": static_map.relative_to(args.root).as_posix(),
+                    "static_map": static_map.relative_to(root).as_posix(),
                     "static_map_sha256": static_map_hash,
+                    "engine_base_build": build,
+                    "data_version": engine["data_version"],
                     "max_entities": summary["max_entities"],
                     "max_entities_source_index": summary["max_entities_source_index"],
                 }
@@ -303,7 +346,7 @@ def main():
                 "replay_resources": resources,
                 "source_records": source["source_records"],
                 "source_policies": source["source_policies"],
-                "report": path.relative_to(args.root).as_posix(),
+                "report": path.relative_to(root).as_posix(),
                 "report_sha256": sha256(path),
             }
         )
@@ -312,13 +355,16 @@ def main():
             json.dumps({"validated_files": len(files), "rows": sum(s["rows"] for s in shards)}),
             flush=True,
         )
-    assert len(files) >= args.minimum_files and min(file_splits.values()) >= 1
-    assert set(file_splits) == {"train", "validation", "test"}
+    assert len(files) >= minimum_files, "Insufficient accepted files"
+    assert set(required_splits) <= set(file_splits), "Missing required split"
+    assert set(file_splits) <= set(VALID_SPLITS)
     assert len({f["sha256"] for f in files}) == len(files)
     manifest = {
         "schema": SCHEMA,
         "training_ready": True,
-        "engine_base_build": 86383,
+        "engine_base_build": build,
+        "resource_protocol": resource_protocol,
+        "required_splits": list(required_splits),
         "engine": engine,
         "extraction_source_sha256": extraction_sources,
         "acceptance_source_sha256": sha256(Path(__file__)),
@@ -347,7 +393,7 @@ def main():
         "unit_fields": list(UNIT_FIELDS),
         "scalar_fields": list(SCALAR_FIELDS),
         "policy_action_types": ["unit_command", "toggle_autocast"],
-        "minimum_files_gate": args.minimum_files,
+        "minimum_files_gate": minimum_files,
         "files": files,
         "shards": shards,
         "ability_ids": sorted(vocabulary),
@@ -375,15 +421,29 @@ def main():
         "max_order_queue": max(s["max_order_queue"] for s in summaries),
         "known_initialization_groups_crossing_splits": 0,
         "verified_map_resources": list(resource_memo.values()),
-        "selection_sha256": sha256(args.selection),
-        "boundary_sha256": sha256(args.boundary),
+        "selection_sha256": sha256(selection_path),
+        "boundary_sha256": sha256(boundary_path),
         "same_match_deduplication_performed": False,
         "cross_copy_leakage_not_ruled_out": True,
         "policy_input_excludes_outcomes": True,
         "spawningtool_redistribution_allowed": False,
     }
-    with (args.root / "manifest.json").open("x", encoding="utf-8") as stream:
+    with (root / "manifest.json").open("x", encoding="utf-8") as stream:
         json.dump(manifest, stream, indent=2)
+    return manifest
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--root", type=Path, required=True, help="One dataset build directory")
+    parser.add_argument("--selection", type=Path, required=True)
+    parser.add_argument("--boundary", type=Path, required=True)
+    parser.add_argument("--minimum-files", type=int, default=100)
+    parser.add_argument("--cache-root", type=Path)
+    parser.add_argument("--resource-protocol-build", type=int)
+    parser.add_argument("--required-splits", nargs="+", choices=VALID_SPLITS, default=VALID_SPLITS)
+    args = parser.parse_args()
+    manifest = accept_dataset(**vars(args))
     print(
         json.dumps(
             {
