@@ -1,16 +1,22 @@
 # 当前任务交接
 
-> **用户最新定时指令：2026-10-19 21:45（Asia/Shanghai，UTC13:45）暂停，覆盖此前21:00；21点不要暂停。** 唯一计时器已于20:29启动，私有计划 `artifacts/runs/m2-expand-1000-2026-10-19/pause-schedule.json`、心跳 `pause-timer-state.json`，id为 `20261019T134500Z-80923c17`，当前watcher PID33704。不要重复启动计时器。到点保存完整数据、单列中断项，停止本轮采样和finalize等待，再更新本页并将Goal设为paused；不得标记完成或自动恢复。接手若已过21:45，应先确认暂停已落实，不能直接继续采样。
+> **已按用户要求于2026-10-19 21:45（Asia/Shanghai，UTC13:45）暂停。** 此时间覆盖此前21:00；没有在21点暂停。定时器于21:45:00触发，21:45:19完成，采样、独立worker、所属SC2、最终验收等待及计时器均已退出；21:48–21:49只读复核确认无本轮存活任务。等待用户明确恢复，不得自动重启、开始训练或将1,000场目标标记完成。
 
-定时控制使用 `tmp/2026-10-19-data-1000/pause_timer.py` 与 `pause_isolated.py`，已绑定源码哈希，12项隔离计时测试及停止脚本只读预检通过。停止脚本在21:45前拒绝执行；仅匹配本阶段manager、独立worker、精确单场tempDir的SC2和finalize路径，保留旧暂停历史与完成manifest，恢复默认7路。两份脚本已冻结，修改须先协调计时器和哈希；改变暂停安排时先取消旧watcher、确认退出后再创建新请求，不能同时启动两个。
+私有证据目录为 `artifacts/runs/m2-expand-1000-2026-10-19/`：`pause-schedule.json` 与 `pause-timer-state.json` 均为 `pause_complete`，id为 `20261019T134500Z-80923c17`；`pause-state.json` 为 `paused`，`finalization.json` 为 `paused_by_user`。`progress.json` 与 `progress-at-pause.json` 一致；旧暂停文件已保存在 `pause-history/`，未覆盖历史。暂停脚本与计时器仍保留于 `tmp/2026-10-19-data-1000/`，不要重新执行旧定时请求。
 
-## 当前任务：扩展到1,000场（进行中，2026-10-19）
+完整只读核验报告 `paused-audit.json`（SHA-256 `d64df2513a7136317c6de1c8ab30f8fb7cfe42ea4bb8179ed6855c9af10c11f5`）确认：全部已接受manifest、报告、游戏数据、静态地图及训练分片哈希通过；原100场与训练入口未变，已知初始化指纹跨集合数为0；无漏记完整manifest、无恢复错误或进程检查盲区。核验约28.2秒，未进行GPU终验或优化器更新。报告、逐场清单和收据不上传Git。
 
-负责人Windows Codex，分支main；用户明确恢复任务。本轮允许项目最多150 GB，保留1,000场，清理前复核。目标尚未完成，未开始正式BC／RL训练。原100场冻结清单及下面的SHA记录保持不变，当前训练入口仍指向原100场。
+## 当前任务：扩展到1,000场（已按用户要求暂停，2026-10-19）
 
-本日20:00检查点：502场／1,004视角／1,184,489条样本，11个版本；训练／验证／测试422／43／37场。来源为SC2ReSet255、Spawning Tool Kevin176、公开补充2、黄金ZIP36、本机账号31、最初外部样本2。新增部分402场通过、20场数据门槛排除、7场处理失败（2场SC2异常退出、2场30分钟回放时限、3场API启动超时），失败不等于质量排除。项目逻辑占用100,142,200,959字节。全部已接受manifest哈希与进度一致，原100场manifest和训练入口保持冻结；私有证据 `checkpoint-500.json`，此前400场记录保留于 `checkpoint-400.json`。批处理仍运行，后续以progress为准。
+负责人Windows Codex，分支main；本轮批处理实现为 `3f558e4`，后续进度记录已推送至 `1fbbf08`，本次收尾提交只更新本页与里程碑。用户允许项目最多150 GB，保留1,000场，清理前复核。当前643场／1,286视角／1,566,690条样本，距目标还差357场；训练／验证／测试为542／53／48场。新增543场通过、31场未通过覆盖率或最少样本门槛、8场处理失败、6场用户暂停中断分别记录。原100场冻结清单及下面的SHA记录不变，训练入口仍指向原100场；未开始正式BC／RL训练。
+
+暂停时覆盖11个版本；来源为SC2ReSet315、Spawning Tool Kevin222、公开Spawning Tool5、黄金ZIP46、本机账号53、最初外部样本2。项目逻辑占用100,809,801,906字节（约100.81 GB），C盘剩余约94.58 GB；统计跳过junction，不含项目外游戏安装和暴雪缓存。150 GB例外适用于本轮扩展，暂停不等于阶段完成；尚未执行阶段结束清理。保留完整数据、诊断、临时恢复脚本及工作树，不在暂停期间做清理。
+
+历史检查点：本日20:00为502场／1,004视角／1,184,489条样本，私有证据 `checkpoint-500.json`；此前400场记录为 `checkpoint-400.json`。这些是运行中快照，当前状态以643场暂停快照及 `paused-audit.json` 为准。
 
 19:55–19:56的三场API启动超时跨86383、90136、84643及不同地图，worker收据和清理正常，客户端日志为空、根因未证实；当时RAM和提交余量充足，不能断言OOM。随后84643再次成功，暂无暂停单一版本的依据；若再次成批出现，先核查共享启动环节。超时录像原始文件与诊断保留，不作为质量不合格处理；不要在manager运行中直接改写progress重新排队，内存状态会覆盖外部修改。
+
+暂停前最终8场失败包括2场SC2异常退出、2场30分钟回放时限、4场API启动超时。最后一场84643约21:43:32启动超时，worker正常退出并完成清理、没有视角或地图观测；发生于定时暂停之前，属于既有故障模式，根因仍未证实。6场暂停中断标记 `paused_by_user`，不可混入质量排除或原始失败数。停止finalize等待产生的退出码1来自已记录的定时终止，不是集合验收失败。
 
 计划、注册表、逐场进度和日志在 `artifacts/runs/m2-expand-1000-2026-10-19/`；新增输出在 `data/processed/m2-expand-2026-10-19/`。plan固定种子20261019、原始SHA和已知比赛指纹划分，启用版本共1,063条新候选；已有100场另计。所有来源限制延续到派生数据，逐场清单、收据及日志不得上传Git。
 
@@ -22,11 +28,13 @@
 
 本日17:23稳定性快照 `isolated-worker-observation.json` 已绑定冻结日志、health和收据索引哈希：恢复基线221场，进度快照270场；较早的任务扫描49次完成、8次运行，收据／清理异常为0，原7个进程池中断候选均已通过。读数各有UTC，非同一原子快照；吞吐仅为混合录像的观察值，不作为并发数量的因果比较。当前增量仍以progress及实际manifest为准。
 
-当前并发上限7路，按RAM和Windows提交内存同时限流；19:40观测八路期间可用RAM最低5.42 GB，已仅将registry的workers从8降至7，现有任务自然结束，没有重启批处理。证据 `worker-cap-7.json`；此调整不证明先前异常退出的原因。详见[数据契约](REPLAY_ALIGNMENT.md)。批处理与最终验收等待已启动，接手先查进程和执行收据，不重复启动。Windows虚拟环境可能同时显示Python启动器与解释器两个PID，应核对父子关系，不能仅按PID数量判断重复manager。registry设 `drain: true` 可停止派发并等待当前任务结束。恢复前核对没有存活manager，保留完整产物，仅将有证据的基础设施中断重新排队；不得删除真实质量排除或原始失败记录。
+恢复默认并发上限7路，按RAM和Windows提交内存同时限流；19:40观测八路期间可用RAM最低5.42 GB，已仅将registry的workers从8降至7，现有任务自然结束，没有重启批处理。证据 `worker-cap-7.json`；此调整不证明先前异常退出的原因。详见[数据契约](REPLAY_ALIGNMENT.md)。定时暂停后registry为 `drain: true`、`workers: 0`，批处理与最终验收等待均已停止。Windows虚拟环境可能同时显示Python启动器与解释器两个PID，应核对父子关系，不能仅按PID数量判断重复manager。
 
-恢复命令：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 7`。仅完整单场manifest计数，不按视角或启动次数计数；实际进度以progress.json和manifest复核为准。
+收到明确恢复指令后，先运行 `.venv/Scripts/python.exe -B tmp/2026-10-19-data-1000/audit_paused.py` 复核暂停快照与环境，确认无存活manager、产物完整。保存当前进度副本，仅移除 `pause-state.json` 中6个中断SHA且状态仍为 `paused_by_user` 的结果以重新排队；保留全部accepted、真实质量排除和8个失败记录。然后清除registry的drain、恢复workers=7，启动一个manager及一个finalize等待。历史定时器已结束，不自动创建新计时器；若用户要求新的截止时间，另行记录授权与新调度。
 
-最终验收等待程序为 `tmp/2026-10-19-data-1000/finalize.py`，日志 `finalization-v3.log`，状态 `finalization.json`。达到1,000场后检查全部子manifest、分片哈希、SHA唯一性、比赛指纹与划分，再在NVIDIA GPU验证各版本、三个split及最大实体观测，0次优化器更新。全部通过才发布 `training-current.json`；之后仍须复核清理、更新里程碑及脱敏汇总，不能仅凭后台脚本完成标记任务通过。124场预检在 `gpu-preview-v1/`，不替代最终验收。
+完成上述恢复前置检查后使用：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 7`。仅完整单场manifest计数，不按视角或启动次数计数；实际进度以progress.json和manifest复核为准。
+
+最终验收等待程序为 `tmp/2026-10-19-data-1000/finalize.py`，旧日志 `finalization-v3.log`，状态 `finalization.json`；恢复授权及前置核验完成后使用 `.venv/Scripts/python.exe -u tmp/2026-10-19-data-1000/finalize.py`，新运行日志另存、保留旧证据。达到1,000场后检查全部子manifest、分片哈希、SHA唯一性、比赛指纹与划分，再在NVIDIA GPU验证各版本、三个split及最大实体观测，0次优化器更新。全部通过才发布 `training-current.json`；之后仍须复核清理、更新里程碑及脱敏汇总，不能仅凭后台脚本完成标记任务通过。124场预检在 `gpu-preview-v1/`，不替代最终验收。
 
 已核验删除13份引擎运输副本，回收757,973,270字节；获取脚本归档在 `artifacts/archives/2026-10-19-engine-acquisition-scripts/`。清理证据为 `engine-transport-cleanup.json` 与 `storage-after-transport-cleanup.json`。另约138 MB重复EXE须先退休旧本机配置引用再处理。阶段收尾复核中断分片、临时脚本和工作树；不能删除仍运行任务引用的文件。其他会话未提交的AGENTS、架构、算力说明与人工回放工具保持原状，不混入本轮提交。
 
