@@ -208,6 +208,12 @@ def completed_unit(unit):
     }
 
 
+def dispatch_slots(workers, active, remaining, available_ram):
+    """Reserve 6 GB for the desktop and allow 1.6 GB per new client/worker."""
+    memory_slots = max(0, (available_ram - 6_000_000_000) // 1_600_000_000)
+    return max(0, min(workers - active, remaining - active, memory_slots))
+
+
 def run_candidate(task):
     root = Path(task["root"])
     unit = Path(task["unit"])
@@ -360,9 +366,12 @@ def run_batch(plan_path, registry_path, destination, progress_path, target=1000,
             if existing_count + len(accepted) >= target and not jobs:
                 break
             registry = json.loads(Path(registry_path).read_text(encoding="utf-8"))
+            draining = registry.get("drain", False)
+            if draining and not jobs:
+                return {"drained": True, "qualified_total": existing_count + len(accepted)}
             limit_bytes = int(registry["project_limit_bytes"])
             if (
-                directory_bytes(root) > limit_bytes - 1_000_000_000
+                directory_bytes(root) > limit_bytes - 2_000_000_000
                 or shutil.disk_usage(root).free < 20_000_000_000
             ):
                 raise RuntimeError("Storage guard; checkpoint retained")
@@ -393,15 +402,16 @@ def run_batch(plan_path, registry_path, destination, progress_path, target=1000,
                 raise RuntimeError(
                     "No remaining candidates with verified engine/boundary; checkpoint retained"
                 )
-            batch = pending[
-                : max(
-                    0,
-                    min(
-                        min(workers, registry.get("workers", workers)) - len(jobs),
-                        target - existing_count - len(accepted) - len(jobs),
-                    ),
-                )
-            ]
+            available_ram = psutil.virtual_memory().available
+            capacity = min(workers, registry.get("workers", workers))
+            if available_ram < 4_000_000_000:
+                capacity = min(capacity, 6)
+            slots = dispatch_slots(
+                capacity, len(jobs), target - existing_count - len(accepted), available_ram
+            )
+            if draining or shutil.disk_usage(root).free < 25_000_000_000:
+                slots = 0
+            batch = pending[:slots]
             for row in batch:
                 digest = row["sha256"]
                 attempted.add(digest)
@@ -414,6 +424,9 @@ def run_batch(plan_path, registry_path, destination, progress_path, target=1000,
                     "limit_bytes": limit_bytes,
                 }
                 jobs[pool.submit(run_candidate, task)] = row
+            if not jobs:
+                time.sleep(5)
+                continue
             done, _ = wait(jobs, timeout=30, return_when=FIRST_COMPLETED)
             for job in done:
                 row = jobs.pop(job)
@@ -455,12 +468,12 @@ def main():
     result = run_batch(
         args.plan, args.registry, args.destination, args.progress, args.target, args.workers
     )
-    print(
-        json.dumps(
-            {"collection_published": True, "files": result.get("files", result.get("file_count"))}
-        ),
-        flush=True,
+    summary = (
+        result
+        if result.get("drained")
+        else {"collection_published": True, "files": result["files"]}
     )
+    print(json.dumps(summary), flush=True)
 
 
 if __name__ == "__main__":

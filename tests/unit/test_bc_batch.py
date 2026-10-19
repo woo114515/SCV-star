@@ -5,6 +5,7 @@ import unittest
 
 from scv_star.data.bc_batch import (
     atomic_json,
+    dispatch_slots,
     normalise_existing_screen,
     normalise_source,
     plan_candidates,
@@ -13,6 +14,14 @@ from scv_star.data.bc_batch import (
 
 
 class BatchTests(unittest.TestCase):
+    def test_dispatch_reserves_memory_before_concurrent_workers_start(self):
+        self.assertEqual(dispatch_slots(8, 0, 100, 10_000_000_000), 2)
+        self.assertEqual(dispatch_slots(8, 6, 100, 5_900_000_000), 0)
+
+    def test_dispatch_does_not_overshoot_target_with_inflight_cases(self):
+        self.assertEqual(dispatch_slots(8, 3, 4, 20_000_000_000), 1)
+        self.assertEqual(dispatch_slots(8, 3, 2, 20_000_000_000), 0)
+
     def test_source_label_preserves_all_restricted_source_terms(self):
         row = {
             "sha256": "a",
@@ -47,6 +56,33 @@ class BatchTests(unittest.TestCase):
                     "sha256": "a",
                     "source_records": [{"record": {"sha256": "a"}}],
                     "source_policies": [{}],
+                }
+            )
+
+    def test_public_source_requires_exact_successful_download_record(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            evidence = root / "artifacts/runs/m2-public-001/zenodo-downloads.json"
+            atomic_json(evidence, [{"path": "C:/downloads/exact.zip", "status": "downloaded"}])
+            row = {
+                "sha256": "a",
+                "source_records": [{"record": {"sha256": "a"}}],
+                "source_policies": [{"redistribution_allowed": False}],
+                "locations": [{"source": "C:\\downloads\\exact.zip", "category": "public"}],
+            }
+            result = normalise_source(row, root)
+            self.assertEqual(result["collection_source"], "SC2ReSet")
+            row["locations"][0]["source"] = "C:/unverified/sc2reset-2.0/exact.zip"
+            with self.assertRaisesRegex(ValueError, "Unrecognised"):
+                normalise_source(row, root)
+
+    def test_source_record_for_another_replay_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "Source record SHA"):
+            normalise_source(
+                {
+                    "sha256": "a",
+                    "source_records": [{"record": {"sha256": "another"}}],
+                    "source_policies": [{"redistribution_allowed": False}],
                 }
             )
 

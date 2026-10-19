@@ -10,10 +10,12 @@
 
 ```powershell
 # 可恢复的全量提取与验收；配置、地图和受控时序须事先通过
-.venv\Scripts\python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 6
+.venv\Scripts\python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 8
 # 最终集合发布后验证读取、张量与有限梯度；不进行优化器更新
 .venv\Scripts\python.exe -m scv_star.runtime.bc_reader_check --collection data/processed/m2-expand-2026-10-19/collection.json --output artifacts/runs/m2-expand-1000-2026-10-19/gpu-final.json
 ```
+
+调度以实际内存限制并发：保留6 GB系统余量，按每个新任务1.6 GB估算；低于25 GB空闲磁盘暂停派发，低于20 GB或逼近150 GB项目上限时保存进度并停止。registry设置 `drain: true` 可停止派发、等当前任务完成后退出；重启前须核对没有另一个manager。
 
 读取接口为 `iter_collection_rows(collection_path, split, builds={86383})`。子manifest和集合均禁止覆盖。实际进度与恢复信息见[交接](HANDOFF.md)；预检通过不代表1,000场完成，也不代表正式BC模型已实现。
 
