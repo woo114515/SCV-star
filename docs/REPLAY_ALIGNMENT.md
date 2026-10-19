@@ -1,5 +1,24 @@
 # M2 观测—动作对齐与训练数据
 
+## 2026-10-19：扩容至1,000场（进行中）
+
+用户授权本轮项目上限150 GB，并要求保留1,000场可用数据、清理前复核。原100场冻结清单保持不变；新数据逐场构建、完整提取、逐条验收，最终由 `tvt-bc-collection-v1` 集合引用。当前训练入口仍指向原100场，只有最终集合和GPU检查通过后才切换。下面首批100场的版本、数量、时长及100 GB限制均属历史记录。
+
+启用历史build为83830、84643、86383、87702、88500、90136、93333、96516、96999、97563、97579。每个版本先验受控SCV动作时序，再验一场双视角完整提取；候选来源、人数种族、胜负、地图和资源哈希须核对。缺失地图仅从暴雪官方depot获取，按录像记录的SHA校验。CN版本读取地图依赖时显式记录97563的details协议回退；游戏回放及训练标签仍由匹配的CN引擎生成，不宣称存在对应的完整事件解码协议。
+
+增量候选固定种子20261019，继承已知初始化指纹的旧split，新组按80/10/10概率固定划分，最终报告实际数量。沿用≥128条/视角、≥98%配对率、同遍标签、逐条逆转换、双方终局等门槛。原始ability ID、DataVersion及各版本技能目录分开保留；未实现跨版本语义映射前，训练读取须按版本形成批次，不把旧规则改写成新轨迹。
+
+```powershell
+# 可恢复的全量提取与验收；配置、地图和受控时序须事先通过
+.venv\Scripts\python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 6
+# 最终集合发布后验证读取、张量与有限梯度；不进行优化器更新
+.venv\Scripts\python.exe -m scv_star.runtime.bc_reader_check --collection data/processed/m2-expand-2026-10-19/collection.json --output artifacts/runs/m2-expand-1000-2026-10-19/gpu-final.json
+```
+
+读取接口为 `iter_collection_rows(collection_path, split, builds={86383})`。子manifest和集合均禁止覆盖。实际进度与恢复信息见[交接](HANDOFF.md)；预检通过不代表1,000场完成，也不代表正式BC模型已实现。
+
+## 首批100场验收记录
+
 更新：2026-10-12。本页接续[数据收集归档](M2_DATA_COLLECTION.md)。**首批 M2 验收通过**：100 场／200 个视角、285,459 条样本，正式训练清单已发布；没有启动正式 BC／RL。
 
 ## 范围与验收门槛

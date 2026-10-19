@@ -4,6 +4,7 @@ import argparse
 from collections import Counter
 import gzip
 import json
+import lzma
 from pathlib import Path
 import shutil
 import time
@@ -58,12 +59,28 @@ def policy_actions(response):
     ]
 
 
-def extract(replay, output, engine_path, local_path, split, deadline_seconds=1800):
+def extract(
+    replay,
+    output,
+    engine_path,
+    local_path,
+    split,
+    deadline_seconds=1800,
+    *,
+    project_limit_bytes=100_000_000_000,
+    compression="gzip",
+    per_replay_output_bytes=100_000_000,
+):
     root = Path(__file__).resolve().parents[3]
     output = output.resolve()
     if not output.is_relative_to(root / "data/processed") or output.exists():
         raise ValueError("Need a new output directory under data/processed")
-    if directory_bytes(root) > 99_000_000_000 or shutil.disk_usage(root).free < 20_000_000_000:
+    if compression not in ("gzip", "xz") or project_limit_bytes <= 1_000_000_000:
+        raise ValueError("Invalid extraction storage configuration")
+    if (
+        directory_bytes(root) > project_limit_bytes - 1_000_000_000
+        or shutil.disk_usage(root).free < 20_000_000_000
+    ):
         raise RuntimeError("Storage guard")
     engine = json.loads(engine_path.read_text(encoding="utf-8"))
     local = json.loads(local_path.read_text(encoding="utf-8"))
@@ -82,6 +99,9 @@ def extract(replay, output, engine_path, local_path, split, deadline_seconds=180
         "status": "running",
         "training_ready": False,
         "observation_offset": -2,
+        "compression": compression,
+        "project_limit_bytes": project_limit_bytes,
+        "per_replay_output_bytes": per_replay_output_bytes,
         "source_sha256": {
             str(p.relative_to(root)): sha256(p)
             for p in [
@@ -96,11 +116,20 @@ def extract(replay, output, engine_path, local_path, split, deadline_seconds=180
     def guard():
         if time.monotonic() - started > deadline_seconds:
             raise TimeoutError("Replay deadline")
-        if directory_bytes(output) > 100_000_000:
+        if directory_bytes(output) > per_replay_output_bytes:
             raise RuntimeError("Per-replay output limit")
 
     def save():
-        (output / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+        temporary = output / "report.next.json"
+        temporary.write_text(json.dumps(report, indent=2), encoding="utf-8")
+        for attempt in range(100):
+            try:
+                temporary.replace(output / "report.json")
+                return
+            except PermissionError:
+                if attempt == 99:
+                    raise
+                time.sleep(0.05)
 
     try:
         client = Client(
@@ -174,9 +203,14 @@ def extract(replay, output, engine_path, local_path, split, deadline_seconds=180
                 second = []
                 loops = Counter()
                 last_action = -1
-                shard = output / f"player-{player}.jsonl.gz"
+                shard = output / f"player-{player}.jsonl.{'xz' if compression == 'xz' else 'gz'}"
+                compressed_writer = (
+                    lzma.open(shard, "wt", encoding="utf-8", preset=3)
+                    if compression == "xz"
+                    else gzip.open(shard, "wt", encoding="utf-8", compresslevel=3)
+                )
                 with (
-                    gzip.open(shard, "wt", encoding="utf-8", compresslevel=3) as writer,
+                    compressed_writer as writer,
                     (output / f"player-{player}-quarantine.jsonl").open(
                         "w", encoding="utf-8"
                     ) as quarantine,
@@ -350,8 +384,18 @@ def main():
     for name in ["replay", "output", "engine", "local"]:
         p.add_argument("--" + name, type=Path, required=True)
     p.add_argument("--split", choices=["train", "validation", "test"], required=True)
+    p.add_argument("--project-limit-gb", type=float, default=100)
+    p.add_argument("--compression", choices=["gzip", "xz"], default="gzip")
     a = p.parse_args()
-    r = extract(a.replay, a.output, a.engine, a.local, a.split)
+    r = extract(
+        a.replay,
+        a.output,
+        a.engine,
+        a.local,
+        a.split,
+        project_limit_bytes=int(a.project_limit_gb * 1_000_000_000),
+        compression=a.compression,
+    )
     if r["status"] != "extracted":
         raise SystemExit(1)
 

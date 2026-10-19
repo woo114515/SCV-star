@@ -72,6 +72,7 @@ def features(obs):
     """Only player API observation fields; no scores, results or future actions."""
     units = addressable_units(obs)
     tags = [u.tag for u in units]
+    indices = {tag: index for index, tag in enumerate(tags)}
     if len(tags) != len(set(tags)):
         raise ValueError("duplicate_entity_tag")
     entities = []
@@ -102,8 +103,8 @@ def features(obs):
                     {
                         "ability_id": o.ability_id,
                         "progress": o.progress,
-                        "target_tag_index": tags.index(o.target_unit_tag)
-                        if o.HasField("target_unit_tag") and o.target_unit_tag in tags
+                        "target_tag_index": indices.get(o.target_unit_tag, -1)
+                        if o.HasField("target_unit_tag")
                         else -1,
                         "target_point": [o.target_world_space_pos.x, o.target_world_space_pos.y]
                         if o.HasField("target_world_space_pos")
@@ -113,9 +114,7 @@ def features(obs):
                 ]
                 if own
                 else [],
-                "addon_index": tags.index(unit.add_on_tag)
-                if own and unit.add_on_tag in tags
-                else -1,
+                "addon_index": indices.get(unit.add_on_tag, -1) if own else -1,
                 "buff_ids": list(unit.buff_ids) if not stale else [],
                 "passengers": [
                     {"unit_type": p.unit_type, "health": p.health, "health_max": p.health_max}

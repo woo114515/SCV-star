@@ -41,6 +41,18 @@ class BCSchemaTests(unittest.TestCase):
             decode_action(encode_action(action, obs, {386}), features(obs)["entity_tags"]), action
         )
 
+    def test_order_and_addon_indices_follow_sorted_current_observation(self):
+        obs = self.observation()
+        own = obs.raw_data.units[0]
+        own.add_on_tag = 30
+        own.orders.add(ability_id=16, target_unit_tag=10)
+        own.orders.add(ability_id=16, target_unit_tag=999)
+        obs.raw_data.units.add(tag=30, alliance=1, display_type=1, unit_type=37)
+        data = features(obs)
+        self.assertEqual(data["entity_tags"], [10, 20, 30])
+        self.assertEqual(data["entities"][1]["addon_index"], 2)
+        self.assertEqual([o["target_tag_index"] for o in data["entities"][1]["orders"]], [0, -1])
+
     def test_unknown_and_missing_selected_explicit(self):
         action = raw.ActionRaw()
         action.unit_command.ability_id = 16

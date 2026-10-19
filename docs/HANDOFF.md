@@ -1,5 +1,21 @@
 # 当前任务交接
 
+## 当前任务：扩展到1,000场（2026-10-19）
+
+负责人Windows Codex，分支main；目标已恢复为活动状态。用户允许本轮项目最多150 GB，保留1,000场，清理须先复核。原100场清单与哈希保持下面的冻结记录，不重新提取。当前仍未开始正式训练。
+
+新阶段计划、注册表、逐场进度和日志位于 `artifacts/runs/m2-expand-1000-2026-10-19/`；候选输出位于 `data/processed/m2-expand-2026-10-19/`。`plan.json`固定种子20261019并继承旧比赛指纹划分；`registry.json`只允许通过受控时序及单场完整提取验收的版本进入批处理。新集合达到1,000场前不替换原 `data/manifests/training-current.json`。
+
+已恢复96999、97579，新增83830、87702、88500、90136及备用94137的校验EXE；官方获取证据在 `downloads/engine-expand-2026-10-19/`。11个启用版本已通过受控动作时序验证；94137仅备用，未计可用。CN96999/97579须使用 `cache/sc2-cn-96516/Versions/` 内EXE，二者同根复测均通过；registry引用r2本机配置。91115继续暂停，92440有界获取失败，未纳入计数。
+
+单场验收与集合代码已合入 `9366a87`，地图获取为 `5605caa`；本轮提取、调度及试点仍有未提交修改。受控实验 `boundaries.py`、试点 `pilots.py` 的一次性入口在 `tmp/2026-10-19-data-1000/`。当前试点日志为 `pilots-v3.log`，批处理为 `batch-v2.log`，受控汇总为 `boundaries.log`。先查真实进程与报告，不重跑已通过项目。来源标签缺失修复已核对全部1,063条可启用新候选，完整提取报告可直接重做验收；标签从精确下载证据和原始来源政策恢复，保留所有限制。中断输出保留在对应build的 `.interrupted/`，不计可用。
+
+97项单元测试与Ruff通过；124场的中途集合通过8个版本、三个split及最大实体观测的NVIDIA GPU检查，0次优化器更新，证据在本轮 `gpu-preview-v1/`。这只是预检，不替代最终1,000场的集合与GPU验收。当前计数以 `progress.json` 为准，剩余批量仍在运行；不要把冻结100场或预检124场当作目标完成。复核后可回收约896MB引擎运输/重复副本；mutable CASC三个数据根仍须保留。
+
+正式批处理恢复命令：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 6`。运行前核对代码与当前任务进程；仅完整单场manifest可增加可用计数，未完成输出先归档恢复。整体版本混合、GPU读取、指纹与SHA检查通过后才发布新入口。
+
+下方为首批100场的冻结验收记录，状态与版本号不代表本轮目标已完成。
+
 更新：2026-10-12。负责人：Windows Codex；分支 `main`，M2 实现提交 `251482cece98fd141e28868736041de1b9108f85`（起点 `caade58`）。本文件后续提交仅补录版本号。其他会话的 AGENTS、架构／算力说明及人工回放工具改动保留，不混入本轮提交。
 
 ## 范围与状态

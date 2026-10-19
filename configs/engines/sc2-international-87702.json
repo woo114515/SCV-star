@@ -1,0 +1,13 @@
+{
+  "base_build": 87702,
+  "data_build": 87702,
+  "data_version": "F799E093428D419FD634CCE9B925218C",
+  "game_version": "5.0.9.87702",
+  "schema_version": 1,
+  "status": "official_binary_verified_runtime_unverified",
+  "binary_sha256": "8aa08210055290973dd86f376a1698f66fdcf4d105defe49c6d97f9bc63ca28e",
+  "binary_bytes": 64870800,
+  "official_content_md5": "5b7775479586e651d6ae2ef89d884515",
+  "official_encoded_key": "1280c152cd5e2cd37456ae4766f831db",
+  "source_root_build": 97579
+}
