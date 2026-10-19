@@ -8,9 +8,9 @@
 
 已恢复96999、97579，新增83830、87702、88500、90136及备用94137的校验EXE；官方获取证据在 `downloads/engine-expand-2026-10-19/`。11个启用版本已通过受控动作时序验证；94137仅备用，未计可用。CN96999/97579须使用 `cache/sc2-cn-96516/Versions/` 内EXE，二者同根复测均通过；registry引用r2本机配置。91115继续暂停，92440有界获取失败，未纳入计数。
 
-单场验收与集合代码已合入 `9366a87`，地图获取为 `5605caa`；本轮提取、调度及试点实现已保存至 `0a4e264`，后续补充内存调度保护。受控实验 `boundaries.py`、试点 `pilots.py` 的一次性入口在 `tmp/2026-10-19-data-1000/`。全部11版本试点已通过，试点日志为 `pilots-v3.log`；批处理 `batch-v2.log` 正排空后改用八路 `batch-v3.log`，转换证据在 `eight-worker-transition.log`，受控汇总为 `boundaries.log`。先查真实进程与报告，不重跑已通过项目。来源标签缺失修复已核对全部1,063条可启用新候选，完整提取报告可直接重做验收；标签从精确下载证据和原始来源政策恢复，保留所有限制。中断输出保留在对应build的 `.interrupted/`，不计可用。
+单场验收与集合代码已合入 `9366a87`，地图获取为 `5605caa`；本轮提取、调度及试点实现为 `0a4e264`，内存调度保护与恢复说明为 `b5b0d5b`，均已推送。受控实验 `boundaries.py`、试点 `pilots.py` 的一次性入口在 `tmp/2026-10-19-data-1000/`。全部11版本试点已通过，试点日志为 `pilots-v3.log`；批处理 `batch-v2.log` 已排空，八路 `batch-v3.log` 已实际运行，转换证据在 `eight-worker-transition.log`，受控汇总为 `boundaries.log`。先查真实进程与报告，不重跑已通过项目。来源标签缺失修复已核对全部1,063条可启用新候选，完整提取报告可直接重做验收；标签从精确下载证据和原始来源政策恢复，保留所有限制。中断输出保留在对应build的 `.interrupted/`，不计可用。
 
-101项单元测试与Ruff通过；124场的中途集合通过8个版本、三个split及最大实体观测的NVIDIA GPU检查，0次优化器更新，证据在本轮 `gpu-preview-v1/`。这只是预检，不替代最终1,000场的集合与GPU验收。当前计数以 `progress.json` 为准，剩余批量仍在运行；不要把冻结100场或预检124场当作目标完成。复核后可回收约896MB引擎运输/重复副本；mutable CASC三个数据根仍须保留。
+101项单元测试与Ruff通过；124场的中途集合通过8个版本、三个split及最大实体观测的NVIDIA GPU检查，0次优化器更新，证据在本轮 `gpu-preview-v1/`。这只是预检，不替代最终1,000场的集合与GPU验收。当前计数以 `progress.json` 为准，剩余批量仍在运行；不要把冻结100场或预检124场当作目标完成。已逐个复核并删除13份引擎运输副本，回收757,973,270字节；临时获取脚本已核验归档至 `artifacts/archives/2026-10-19-engine-acquisition-scripts/` 并移除源目录。清理证据为本轮 `engine-transport-cleanup.json` 与 `storage-after-transport-cleanup.json`。另约138MB国际根96999/97579重复EXE须在复核旧配置引用后再处理；mutable CASC三个数据根仍须保留。
 
 正式批处理恢复命令：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 8`。运行前核对代码与当前任务进程；仅完整单场manifest可增加可用计数，未完成输出先归档恢复。整体版本混合、GPU读取、指纹与SHA检查通过后才发布新入口。
 
