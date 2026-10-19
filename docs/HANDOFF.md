@@ -16,9 +16,9 @@
 
 本日17:23稳定性快照 `isolated-worker-observation.json` 已绑定冻结日志、health和收据索引哈希：恢复基线221场，进度快照270场；较早的任务扫描49次完成、8次运行，收据／清理异常为0，原7个进程池中断候选均已通过。读数各有UTC，非同一原子快照；吞吐仅为混合录像的观察值，不作为并发数量的因果比较。当前增量仍以progress及实际manifest为准。
 
-并发上限8路，按RAM和Windows提交内存同时限流，实际可低于8路；详见[数据契约](REPLAY_ALIGNMENT.md)。批处理与最终验收等待已启动，接手先查进程和执行收据，不重复启动。Windows虚拟环境可能同时显示Python启动器与解释器两个PID，应核对父子关系，不能仅按PID数量判断重复manager。registry设 `drain: true` 可停止派发并等待当前任务结束。恢复前核对没有存活manager，保留完整产物，仅将有证据的基础设施中断重新排队；不得删除真实质量排除或原始失败记录。
+当前并发上限7路，按RAM和Windows提交内存同时限流；19:40观测八路期间可用RAM最低5.42 GB，已仅将registry的workers从8降至7，现有任务自然结束，没有重启批处理。证据 `worker-cap-7.json`；此调整不证明先前异常退出的原因。详见[数据契约](REPLAY_ALIGNMENT.md)。批处理与最终验收等待已启动，接手先查进程和执行收据，不重复启动。Windows虚拟环境可能同时显示Python启动器与解释器两个PID，应核对父子关系，不能仅按PID数量判断重复manager。registry设 `drain: true` 可停止派发并等待当前任务结束。恢复前核对没有存活manager，保留完整产物，仅将有证据的基础设施中断重新排队；不得删除真实质量排除或原始失败记录。
 
-恢复命令：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 8`。仅完整单场manifest计数，不按视角或启动次数计数；实际进度以progress.json和manifest复核为准。
+恢复命令：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 7`。仅完整单场manifest计数，不按视角或启动次数计数；实际进度以progress.json和manifest复核为准。
 
 最终验收等待程序为 `tmp/2026-10-19-data-1000/finalize.py`，日志 `finalization-v3.log`，状态 `finalization.json`。达到1,000场后检查全部子manifest、分片哈希、SHA唯一性、比赛指纹与划分，再在NVIDIA GPU验证各版本、三个split及最大实体观测，0次优化器更新。全部通过才发布 `training-current.json`；之后仍须复核清理、更新里程碑及脱敏汇总，不能仅凭后台脚本完成标记任务通过。124场预检在 `gpu-preview-v1/`，不替代最终验收。
 
