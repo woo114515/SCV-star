@@ -12,6 +12,8 @@
 
 当前批处理日志 `batch-v5.log`。`bc_isolated.py` 每场启动一个新Python进程，父进程核对任务哈希、PID、结果收据及完整manifest；私有日志在 `worker-attempts/`。基础设施异常最多自动重试两次，连续异常触发停止；每任务最多1小时。110项单元测试、Ruff及差异检查通过，日志 `code-checks-v4.log`。提取与schema未改变，仍按原门槛完整回放双方、逐条检查。
 
+本日17:23稳定性快照 `isolated-worker-observation.json` 已绑定冻结日志、health和收据索引哈希：恢复基线221场，进度快照270场；较早的任务扫描49次完成、8次运行，收据／清理异常为0，原7个进程池中断候选均已通过。读数各有UTC，非同一原子快照；吞吐仅为混合录像的观察值，不作为并发数量的因果比较。当前增量仍以progress及实际manifest为准。
+
 并发上限8路，按RAM和Windows提交内存同时限流，实际可低于8路；详见[数据契约](REPLAY_ALIGNMENT.md)。批处理与最终验收等待已启动，接手先查进程和执行收据，不重复启动。registry设 `drain: true` 可停止派发并等待当前任务结束。恢复前核对没有存活manager，保留完整产物，仅将有证据的基础设施中断重新排队；不得删除真实质量排除或原始失败记录。
 
 恢复命令：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 8`。仅完整单场manifest计数，不按视角或启动次数计数；实际进度以progress.json和manifest复核为准。
