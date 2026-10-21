@@ -1,14 +1,14 @@
 # 当前任务交接
 
-> **已按用户要求于2026-10-20 15:06（北京时间）立即暂停。** 当日15:05从643场恢复后，用户再次要求暂停；15:06:30保存并停止，15:06:50完成。采样、独立worker、所属SC2与最终验收等待均已退出。仍保留643场，等待明确恢复，不自动重启、开始训练或将1,000场目标标记完成。
+> **用户已于2026-10-21明确恢复1,000场数据目标，当前正在处理。** 10:54从643场／1,286视角／1,566,690条样本恢复，7场用户暂停中断已重新排队；保留31场质量排除与8场真实失败。仅运行一个批处理manager和一个最终验收等待，不重复启动，不执行正式训练。此前21:45定时请求已结束，本次没有设置新的暂停时间。
 
-私有证据目录为 `artifacts/runs/m2-expand-1000-2026-10-19/`。当前 `pause-state.json` 为 `paused`，`finalization.json` 为 `paused_by_user`；`progress.json` 与 `progress-at-pause.json` 一致。此次请求为 `immediate-pause-request-20261020.json`，执行脚本为 `tmp/2026-10-19-data-1000/pause_now_20261020.py`。此前21:45定时器属于10月19日历史，已退出；未设置新的定时任务。旧暂停与恢复前文件保存在 `pause-history/`、`resume-history/`。
+私有证据目录为 `artifacts/runs/m2-expand-1000-2026-10-19/`。本次恢复证据 `resume-20261021.json`、完整分片审计 `resume-audit-20261021.json`；旧暂停与恢复前文件保存在 `pause-history/`、`resume-history/`。`pause-state.json` 与 `progress-at-pause.json` 现在是10月20日历史；当前状态以 `progress.json`、`finalization.json` 和实际进程为准。10:55检查manager父子PID30188／43872及7个SC2存活，GPU终验仍等待1,000场。不能仅凭虚拟环境的两个Python PID判断重复manager。
 
 最新完整只读核验报告 `pause-audit-20261020.json`（SHA-256 `deebceb683029fd601f25bb0775f65e0c1cf664984218b0f05a5cdf6de6d9e17`）通过：643场全部已接受manifest、报告、游戏数据、静态地图及训练分片哈希完整；原100场和训练入口未变，已知初始化指纹跨集合数为0；无本轮存活进程、恢复错误或进程检查盲区。此前 `resume-audit-20261020.json`、`paused-audit.json` 保留为历史证据。未进行GPU终验或优化器更新；报告、逐场清单和收据不上传Git。
 
-## 当前任务：扩展到1,000场（已按用户要求暂停，2026-10-20）
+## 当前任务：扩展到1,000场（已恢复，2026-10-21）
 
-负责人Windows Codex，分支main；批处理实现为 `3f558e4`，此前暂停提交为 `f3a0f42`，本次收尾只更新本页与里程碑。用户允许项目最多150 GB，保留1,000场，清理前复核。当前643场／1,286视角／1,566,690条样本，距目标还差357场；训练／验证／测试为542／53／48场。新增543场通过、31场未通过覆盖率或最少样本门槛、8场处理失败、7场用户暂停中断分别记录。原100场冻结清单及下面的SHA记录不变，训练入口仍指向原100场；未开始正式BC／RL训练。
+负责人Windows Codex，分支main；批处理实现为 `3f558e4`，本次恢复起点提交 `9c4a63a`，正式提取／schema／进程执行源码哈希保持不变。用户允许项目最多150 GB，保留1,000场，清理前复核。恢复起点643场／1,286视角／1,566,690条样本，距目标还差357场；训练／验证／测试为542／53／48场。新增部分543场通过、31场未通过覆盖率或最少样本门槛、8场处理失败保留，7场用户暂停中断仅移除终态记录后重新排队。当前计数随 `progress.json` 更新。原100场冻结清单及下面的SHA记录不变，训练入口仍指向原100场；未开始正式BC／RL训练。
 
 暂停时覆盖11个版本；来源为SC2ReSet315、Spawning Tool Kevin222、公开Spawning Tool5、黄金ZIP46、本机账号53、最初外部样本2。最新核验时项目逻辑占用100,820,912,128字节（约100.82 GB），C盘剩余约92.98 GB；统计跳过junction，不含项目外游戏安装和暴雪缓存。150 GB例外适用于本轮扩展，暂停不等于阶段完成；尚未执行阶段结束清理。保留完整数据、诊断、临时恢复脚本及工作树，不在暂停期间做清理。
 
@@ -24,13 +24,13 @@
 
 恢复从212场开始；共享进程池在 `batch-v4.log` 中发生BrokenProcessPool，根因未证实。已归档失败快照，仅关闭精确匹配本轮单场临时目录的6个孤儿SC2；复用完整报告后达到221场、442个玩家视角、555,887条样本，7场基础设施中断重新排队。证据为 `pool-recovery.json`、`pool-orphan-cleanup.json` 和 `isolated-resume.json`。不要把这些中断解释为录像质量问题。
 
-历史批处理日志为 `batch-v5.log`；10月20日本次恢复日志为 `batch-v6-20261020.log`，暂停后正常排空退出0；验收等待日志为 `finalization-v4-20261020.log`。`bc_isolated.py` 每场启动新Python进程，父进程核对任务哈希、PID、结果收据及完整manifest；私有日志在 `worker-attempts/`。基础设施异常最多自动重试两次，连续异常触发停止；每任务最多1小时。110项单元测试、Ruff及差异检查通过，日志 `code-checks-v4.log`。提取与schema未改变，仍按原门槛完整回放双方、逐条检查。
+当前日志为 `batch-v7-20261021.log`、`finalization-v5-20261021.log`。历史 `batch-v5.log`、10月20日 `batch-v6-20261020.log`／`finalization-v4-20261020.log` 保留。`bc_isolated.py` 每场启动新Python进程，父进程核对任务哈希、PID、结果收据及完整manifest；私有日志在 `worker-attempts/`。基础设施异常最多自动重试两次，连续异常触发停止；每任务最多1小时。110项单元测试、Ruff及差异检查通过，日志 `code-checks-v4.log`。提取与schema未改变，仍按原门槛完整回放双方、逐条检查。
 
 本日17:23稳定性快照 `isolated-worker-observation.json` 已绑定冻结日志、health和收据索引哈希：恢复基线221场，进度快照270场；较早的任务扫描49次完成、8次运行，收据／清理异常为0，原7个进程池中断候选均已通过。读数各有UTC，非同一原子快照；吞吐仅为混合录像的观察值，不作为并发数量的因果比较。当前增量仍以progress及实际manifest为准。
 
 恢复默认并发上限7路，按RAM和Windows提交内存同时限流；19:40观测八路期间可用RAM最低5.42 GB，已仅将registry的workers从8降至7，现有任务自然结束，没有重启批处理。证据 `worker-cap-7.json`；此调整不证明先前异常退出的原因。详见[数据契约](REPLAY_ALIGNMENT.md)。定时暂停后registry为 `drain: true`、`workers: 0`，批处理与最终验收等待均已停止。Windows虚拟环境可能同时显示Python启动器与解释器两个PID，应核对父子关系，不能仅按PID数量判断重复manager。
 
-收到明确恢复指令后，先运行 `.venv/Scripts/python.exe -B tmp/2026-10-19-data-1000/audit_paused_now_20261020.py` 复核暂停快照与环境，确认无存活manager、产物完整。保存当前进度副本，仅移除 `pause-state.json` 中7个中断SHA且状态仍为 `paused_by_user` 的结果以重新排队；保留全部accepted、真实质量排除和8个失败记录。然后清除registry的drain、恢复workers=7，启动一个manager及一个finalize等待。旧 `resume_20261020.py` 已执行且固定旧6场，不能重复运行。历史定时器已结束，不自动创建新计时器。
+本次已完成恢复前全量审计及进度归档，registry为 `drain: false`、`workers: 7`；manager和finalize已启动，不重复执行恢复脚本。将来若用户再次暂停，先确认全部本轮进程退出、保存新快照，再以新中断清单恢复；旧 `resume_20261020.py`／`resume_20261021.py` 仅用于对应历史快照，不能重复运行。历史定时器已结束，不自动创建新计时器。
 
 完成上述恢复前置检查后使用：`.venv/Scripts/python.exe -m scv_star.data.bc_batch --plan artifacts/runs/m2-expand-1000-2026-10-19/plan.json --registry artifacts/runs/m2-expand-1000-2026-10-19/registry.json --destination data/processed/m2-expand-2026-10-19 --progress artifacts/runs/m2-expand-1000-2026-10-19/progress.json --target 1000 --workers 7`。仅完整单场manifest计数，不按视角或启动次数计数；实际进度以progress.json和manifest复核为准。
 
