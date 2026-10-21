@@ -1,0 +1,155 @@
+{
+  "milestone": "M2",
+  "status": "passed",
+  "date": "2026-10-21",
+  "scope": "Frozen replay data and reader acceptance; policy model and trainer are not implemented.",
+  "files": 1000,
+  "player_views": 2000,
+  "rows": 2467676,
+  "child_manifests": 901,
+  "file_splits": {
+    "train": 824,
+    "test": 89,
+    "validation": 87
+  },
+  "rows_by_split": {
+    "train": 2049826,
+    "test": 207434,
+    "validation": 210416
+  },
+  "files_by_build": {
+    "86383": 150,
+    "84643": 235,
+    "93333": 96,
+    "96516": 59,
+    "96999": 83,
+    "97579": 22,
+    "83830": 95,
+    "87702": 88,
+    "88500": 71,
+    "90136": 99,
+    "97563": 2
+  },
+  "source_files": {
+    "SC2ReSet": 500,
+    "SpawningTool_Kevin_export": 328,
+    "Local_account": 85,
+    "Local_Multiplayer_zip": 79,
+    "External_initial_samples": 2,
+    "SpawningTool_public": 6
+  },
+  "map_names": 105,
+  "minimum_view_coverage": 0.9802158273381295,
+  "quarantined_actions": 5565,
+  "feature_statistics": {
+    "autocast_rows": 472,
+    "same_loop_groups": 28851,
+    "addon_rows": 2018044,
+    "cargo_rows": 346872,
+    "blip_rows": 181585,
+    "queued_actions": 73971
+  },
+  "incremental_results": {
+    "accepted": 900,
+    "quality_excluded": 45,
+    "failed": 16
+  },
+  "training_entry": {
+    "path": "data/manifests/training-current.json",
+    "schema_version": 2,
+    "sha256": "79390eea6ed18a7039e7a5d88457fcedb3b5b4b8ff6ce243ae185bc26ccfbc98",
+    "collection": "data/processed/m2-expand-2026-10-19/collection.json",
+    "collection_schema": "tvt-bc-collection-v1",
+    "row_schema": "tvt-bc-v2",
+    "collection_sha256": "373cfc6f4a267130e5e2259f8bd3f2e109fa35536d7cb8745c6061b690a897da",
+    "previous_100_manifest_sha256": "738a34fe3ccd4ee184d9e75ddbc9e29592159f30246b56e61e539c1d2ec090a6",
+    "full_previous_pointer_preserved": true
+  },
+  "qualification": {
+    "api_qualified_files": 1000,
+    "exact_init_decoded": 836,
+    "exact_protocol_unavailable_api_only": 164,
+    "issues": 0,
+    "init_advisories": 0,
+    "known_excluded_or_identity_review_files": 0,
+    "known_initialization_groups_crossing_splits": 0,
+    "map_mod_semantics_fully_certified": false
+  },
+  "gpu": {
+    "name": "NVIDIA GeForce RTX 5070 Ti Laptop GPU",
+    "torch_version": "2.13.0+cu130",
+    "versions_tested": 11,
+    "cases_verified": 15,
+    "maximum_entities_verified": 531,
+    "peak_cuda_bytes": 73912320,
+    "finite_forward_and_backward_passed": true,
+    "parameters_unchanged": true,
+    "optimizer_steps": 0,
+    "purpose": "reader/tensor/differentiability smoke; not policy training"
+  },
+  "integrity": {
+    "full_raw_replay_sha256_verified": true,
+    "all_processed_shard_and_static_resource_hashes_verified": true,
+    "cleanup_before_and_after_audits_passed": true,
+    "current_data_unchanged_after_script_archival": true,
+    "formal_source_hashes": {
+      "src/scv_star/data/bc_batch.py": "0c1e7721945583bdc6861b460c47c177be2fda30121c19f07f910b3e9b169e6d",
+      "src/scv_star/data/bc_isolated.py": "04cca50d6f1819819fe08d13dd82d72c191de79eda2f60537f4714e1ee2261b3",
+      "src/scv_star/runtime/host_memory.py": "827b08bc2aee30cc87ab15dd0b6ba1b043624e4d6f3cb3cb430acbf4829e06a5",
+      "src/scv_star/data/bc_extract.py": "af8f0ebfb3a3485a210ef50cea23a00f0283b7078442c685776e207addb5cd4d",
+      "src/scv_star/data/bc_schema.py": "78767eaffc1df5113407cf05bcf7d16861d00c38c370c53bb1e6b32f9286569c"
+    }
+  },
+  "cleanup": {
+    "removed_files": 131,
+    "removed_bytes": 261687994,
+    "rejected_shards_removed": 94,
+    "interrupted_shards_removed": 33,
+    "duplicate_executables_removed": 2,
+    "obsolete_local_configs_removed": 2,
+    "clean_merged_worktrees_retired": 2,
+    "temporary_scripts_archived": 48,
+    "temporary_source_directory_removed": true,
+    "raw_replays_and_valid_shards_retained": true
+  },
+  "storage": {
+    "measured_logical_bytes": 102404848093,
+    "authorized_project_limit_bytes": 150000000000,
+    "follows_junctions": false,
+    "excludes_external_game_install_and_blizzard_cache": true
+  },
+  "evidence_hashes": {
+    "completion_audit_post_cleanup": "f7cf4f4150e92206cdab152997bb99f2ba74c4d5d8f8a2af18e26f6879cbe544",
+    "qualification_audit": "2eda5e9a69325923b33b54aaf62789cf1ee48287e0c3fc73bfe419d350327ad4",
+    "gpu_check": "b88e4388e7ce8765de41097bbeba17c6d8fb6fae5a0da974b899da66448655a9",
+    "cleanup_result": "83d94446ae7ff9ea5bf93644f518b61a57027e9403af83aa1ff77cd125e59caf",
+    "temporary_source_archive": "529bd1894f19994b96f517ac52784304ba961a51622b661211d7d3c9571c389c",
+    "temporary_source_manifest": "1ccbb41fc18a04393095f9694bb109d7715d2627a1e38cff5530beddf69e8ebf",
+    "temporary_source_retirement": "4e88ab39a8d04e26e0298b18486bfba07f3a03d620e6159d382089bceb39dec1",
+    "storage_final": "abe6c71232130af94f8c2b181935d7f8d606c9a03e8c0890caa69bf90b86ee92"
+  },
+  "existing_code_validation": {
+    "unit_tests_passed": 110,
+    "ruff_passed": true,
+    "evidence_date": "2026-10-19",
+    "formal_extraction_source_unchanged_on_resume": true
+  },
+  "limitations": {
+    "same_match_deduplication_performed": false,
+    "unrecognized_cross_copy_split_leakage_ruled_out": false,
+    "cross_version_ability_ids_merged": false,
+    "cross_version_semantic_mapping_implemented": false,
+    "online_terran_legality_and_execution_complete": false,
+    "policy_model_or_trainer_implemented": false,
+    "formal_bc_or_rl_training_started": false,
+    "latest_cn_98370_api_revalidated": false,
+    "ubuntu_training_environment_accepted": false,
+    "effects_and_complete_weapon_armour_features_encoded": false
+  },
+  "data_use": {
+    "spawning_tool_credit_required": true,
+    "final_deliverable_to_spawning_tool_required": true,
+    "raw_or_derived_data_redistribution_allowed": false,
+    "per_replay_manifests_or_player_information_published": false
+  }
+}
