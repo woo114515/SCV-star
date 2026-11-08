@@ -1,10 +1,10 @@
 # 测试规划
 
-当前使用标准库 `unittest`，`unit/test_m0_guards.py` 验证版本漂移、缺失身份字段、地图变更、协议错误及观测配置。运行 `.\.venv\Scripts\python.exe -m unittest discover -s tests/unit -v`。真实客户端验收通过 [M0 命令](../docs/M0_ACCEPTANCE.md) 单独运行，不在单元测试中隐式启动游戏。
+当前使用标准库 `unittest`，`unit/test_m0_guards.py` 验证版本漂移、缺失身份字段、地图变更、协议错误及观测配置。Windows 运行 `.\.venv\Scripts\python.exe -m unittest discover -s tests/unit -v`；Ubuntu 运行 `.venv/bin/python -m unittest discover -s tests/unit -v`。真实客户端验收通过 [M0 命令](../docs/M0_ACCEPTANCE.md) 单独运行，不在单元测试中隐式启动游戏。
 
-当前共63项单元测试，覆盖版本／协议保护、M1恢复、录像筛选、下载与清单合并，以及观测时间对齐、雷达点、动作逆转换、序列边界、条件掩码、冻结数据哈希和无损重压缩。依赖M0、M2及M1的PyTorch环境；缺依赖的跳过不能算通过。真实客户端回放、全分片逐条检查和NVIDIA GPU前后向另外执行，见[M2数据验收](../docs/REPLAY_ALIGNMENT.md)。
+当前 Git 分支共 110 项单元测试，覆盖版本／协议保护、M1 恢复、录像筛选、下载与清单合并，以及观测时间对齐、雷达点、动作逆转换、序列边界、条件掩码、冻结数据哈希和无损重压缩。依赖 M0、M2 及 M1 的 PyTorch 环境；缺依赖的跳过不能算通过。真实客户端回放、全分片逐条检查和 NVIDIA GPU 前后向另外执行，见[M2 数据验收](../docs/REPLAY_ALIGNMENT.md)。
 
-全仓库Ruff静态检查通过。格式检查覆盖已跟踪Python代码及本轮新增BC模块／测试；本轮开始前已有的未跟踪`runtime/manual_replay.py`格式问题未改动，不冒称整个工作区格式检查通过。
+Ubuntu 24.04 实测：109 通过、1 项按设计跳过（`test_host_memory` 仅 Windows 原生内存计数器），0 失败；Ruff 格式检查（57 个已跟踪 Python 文件）与静态检查通过。详见 [Ubuntu 环境验收](../docs/experiments/M1_LINUX_2026-11-08.md)。Windows 工作副本另有待提交的 APM 质量测试，合并后数量会更新。
 
 | 目录 | 未来覆盖范围 | 依赖边界 |
 | --- | --- | --- |

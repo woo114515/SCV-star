@@ -15,6 +15,7 @@
 | [M0 实测记录](experiments/M0_2026-09-29.md) | 中国区 build、动作、迷雾及真人运行证据 |
 | [M1 GPU 验证](M1_ACCEPTANCE.md) | 固定 PyTorch 环境、合成数据前后向和检查点恢复 |
 | [M1 实测记录](experiments/M1_2026-09-30.md) | GPU、CUDA runtime、精度、显存和恢复一致性证据 |
+| [Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md) | Linux GPU／PyTorch、110 项测试（109 通过／1 跳过）、M1 探针与 1,000 场集合读取 |
 | [M2 数据收集与重放验证](M2_DATA_COLLECTION.md) | 数据来源、引擎获取、历史验收及分层抽样的合并记录 |
 | [观测—动作对齐与训练数据](REPLAY_ALIGNMENT.md) | M2时间语义、完整提取、RAW标签、训练读取与验收状态 |
 | [数据集总览与统一清单](DATASET_OVERVIEW.md) | 公开与本机合并统计、处理队列、版本隔离和本地清单入口 |

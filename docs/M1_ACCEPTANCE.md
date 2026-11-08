@@ -2,6 +2,8 @@
 
 本阶段使用合成数据、小型随机初始化网络验证本机 GPU 计算和检查点恢复。不会启动 SC2、下载录像或模型，也不运行 BC／RL 正式训练。实测结论见 [M1 记录](experiments/M1_2026-09-30.md)。
 
+> Ubuntu 24.04 上的同类环境、GPU 与恢复检查见 [M1 Linux 环境验收](experiments/M1_LINUX_2026-11-08.md)。该记录不替代 Windows M1 验收，也不代表 BC 训练；Linux 实际依赖锁为 `requirements/bc-linux-py311-cu130.txt`。
+
 ## 固定环境与安装
 
 沿用项目内 Python 3.11.16，选用官方 Windows `torch==2.13.0+cu130`，配套 CUDA runtime 13.0。驱动实测为592.01；`nvidia-smi` 显示的 CUDA 13.1 是驱动支持信息，不代表已安装同版本 Toolkit。无需为本次 wheel 验证安装系统 CUDA Toolkit 或更新驱动。

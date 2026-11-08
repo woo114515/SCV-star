@@ -1,6 +1,6 @@
 # 当前任务交接
 
-更新：2026-10-21。负责人：Windows Codex；分支 `main`。
+更新：2026-10-21（Windows M2 交接）；2026-11-08 Ubuntu/DSH 环境补充见文末。负责人：Windows Codex；分支 `main`。
 
 ## 当前结果
 
@@ -46,3 +46,13 @@
 用户于2026-10-21 14:12明确“先继续任务”，随后再次要求继续，已完成本轮目标。当天14:00的停止是Agent在上下文压缩后误重放昨天的暂停消息，不是用户新的暂停指令；恢复记录 `resume-20261021-r2.json` 绑定真实消息时间。暂停、恢复及643／903／951场快照只作历史，不能覆盖最终状态或重复执行旧脚本。
 
 正式提取、schema和worker源码保持在已验收实现 `3f558e4`，110项单元测试与Ruff的已有证据为 `code-checks-v4.log`；本轮恢复未修改这些源码。Git仅同步源码和脱敏文档。其他会话的AGENTS、架构、算力说明、人工回放工具及根目录删除项保留，不混入本轮提交。
+
+## Ubuntu/DSH 侧补充（2026-11-08）
+
+- 分支：`chore/ubuntu-training-env`（基于 `a24412a`），只在该侧分支提交，不直接改 `main`；本补充的锁文件和文档改动尚未合并。
+- 环境：Ubuntu 24.04.5 LTS、Python 3.11.16、torch 2.13.0+cu130、RTX 5070 Ti Laptop 12,227 MiB、驱动 595.99.02；依赖锁 `requirements/bc-linux-py311-cu130.txt`（SHA-256 `df9b497ae2bb56c7697406de7e405004aebb001bc8bd6a84a94af80a934c98a2`）。Windows 与 Ubuntu 环境互不复制。
+- 数据：本机 `SCV-star/dataset`（仓库父目录，不提交）链接到 `data/processed/`，入口 `data/manifests/training-current.json`；集合 SHA-256 `373cfc6f4a267130e5e2259f8bd3f2e109fa35536d7cb8745c6061b690a897da`、入口 SHA-256 `79390eea6ed18a7039e7a5d88457fcedb3b5b4b8ff6ce243ae185bc26ccfbc98`；1,000 场／2,000 视角／2,467,676 行。
+- 验收：110 项单元测试 109 通过／1 项 Windows 专用跳过；Ruff 通过；M1 GPU 探针 FP32／FP16／BF16 与恢复逐位一致；`bc_reader_check` 15 案例、11 版本、最大 531 实体、优化器更新 0。证据 `artifacts/runs/m1-gpu-linux-20261108/report.json`（SHA-256 `caa968fd14bdcfdf17265d97290e0353839be9af4cbc6f03bf4005904a12a054`）与 `artifacts/runs/m2-linux-reader-check-20261108/gpu-check.json`（SHA-256 `d48baddcc047eae94177b52d13ca26b677c7a6175a82afdf6f8958ce8ed7a785`）；记录见 [M1 Linux 环境验收](experiments/M1_LINUX_2026-11-08.md)。
+- 限制：M4 未获授权，未实现 BC 模型／训练器，未执行优化器更新；M3 在线动作／最新版 API 仍需 Windows。现有 `m1.py` 是 Windows 入口，报告中的 `dependency_lock_sha256` 字段仍指 Windows 锁 `6db46834531e1fd871e1417c186cc42a2d252a55c974d9fd2c552b1e47cdea51`，实际 Linux 锁以本条为准。
+- Windows 工作副本：存在未提交的 APM 质量代码／测试／文档（`bc_quality.py` 等）；截至本记录其描述的质量清单在当前数据入口中不存在。该工作由用户稍后提交；Ubuntu 侧未合并、未改写，不要覆盖。
+- 下一步：等待 M4 授权；建议首轮固定 86383 单 build，先做小样本过拟合与断点／数据游标恢复，再按 2 小时预算训练。验证／测试集保持隔离。

@@ -2,18 +2,26 @@
 
 ## 当前可用范围
 
-当前提供M0 SC2通信与真人检查、M1 GPU与恢复检查、M2元数据扫描、固定版本完整回放、同遍观测—动作提取及训练分片验收。数据入口和命令见[对齐与训练数据](REPLAY_ALIGNMENT.md)。策略模型、BC／RL学习器和联赛仍为占位，不提供尚不存在的`train`／`play`命令。
+当前提供 M0 SC2 通信与真人检查、M1 GPU 与恢复检查、M2 元数据扫描、固定版本完整回放、同遍观测—动作提取及训练分片验收。Ubuntu 24.04 离线训练环境已于 2026-11-08 通过 GPU、单元测试和集合读取检查；策略模型、BC／RL 学习器和联赛仍为占位，M4 实施尚未获授权，不提供尚不存在的 `train`／`play` 命令。数据入口和命令见[对齐与训练数据](REPLAY_ALIGNMENT.md)。
 
-M0/M1 使用项目内 `.venv/Scripts/python.exe`（Python 3.11.16），通信、GPU 和开发工具依赖分别保存哈希锁。未修改系统 PATH；未找到可复用 pyenv，用户表示可能不存在。M1 已安装 PyTorch 2.13.0+cu130 并在 NVIDIA GPU 上通过小型验证，未运行正式训练。详见 [M0 部署与命令](M0_ACCEPTANCE.md)和[M1 验证命令](M1_ACCEPTANCE.md)。
+Windows 与 Ubuntu 分别使用项目内独立环境：Windows 为 `.venv/Scripts/python.exe`（Python 3.11.16），Ubuntu 为 `.venv/bin/python`（uv 管理的 Python 3.11.16）；通信、GPU 和开发工具依赖各自保存哈希锁，不跨系统复用。M1 已在 Windows 上通过 PyTorch 2.13.0+cu130 的小型验证；Ubuntu 2026-11-08 复跑了同类 GPU 探针并通过，详见 [M1 验证命令](M1_ACCEPTANCE.md)、[M0 部署与命令](M0_ACCEPTANCE.md)和[Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。未运行正式 BC／RL 训练。
+
+## Ubuntu 离线训练环境（2026-11-08）
+
+- 系统：Ubuntu 24.04.5 LTS、kernel 6.8.0-137、24 线程、30 GiB RAM；NVIDIA RTX 5070 Ti Laptop 12,227 MiB、驱动 595.99.02。
+- 解释器与依赖：uv 0.12.20 管理的 Python 3.11.16、`.venv`、torch 2.13.0+cu130、CUDA runtime 13.0；锁文件为 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合，仅 linux 平台）。
+- 数据：本机 `SCV-star/dataset`（仓库父目录，不提交）链接到 `data/processed/`，入口为 `data/manifests/training-current.json`；集合 SHA-256 `373cfc6f…97da`，1,000 场／2,467,676 行。
+- 验收：110 项单元测试 109 通过、1 项 Windows 专用跳过；Ruff 格式与静态检查通过；M1 GPU 探针 FP32／FP16／BF16 前后向及恢复逐位一致；`bc_reader_check` 覆盖 11 个 build、15 个案例、最大 531 实体，优化器更新为 0。
+- 边界：未实现 BC 模型／训练器，未执行训练更新；M4 仍需用户授权。M0／M3／M5 的游戏接口仍使用 Windows 客户端，Linux 不启动 SC2。证据见[Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
 
 ## 环境验证顺序
 
 1. 获得相应实施授权后，确认 Windows 游戏路径、最新正式版准确 build、数据版本和所需地图。
-2. 检查现有解释器、驱动及 Ubuntu 环境；优先复用可用环境，按 100 GB 上限规划新增占用。
-3. 为项目准备隔离依赖，验证 PyTorch 前后向及 SC2 通信，再固定精确版本和平台锁文件。
+2. Ubuntu 环境已于 2026-11-08 验收；Windows 侧继续检查解释器、驱动和游戏路径。新增占用按常规 100 GB 与 M2 轮 150 GB 授权的历史边界规划，不自动扩大预算。
+3. 为项目准备隔离依赖，验证 PyTorch 前后向及 SC2 通信，再固定精确版本和平台锁文件。Ubuntu 的组合 Linux 锁已生成；Windows 继续使用各自阶段锁。
 4. 填写本机配置和经过验证的版本清单，最后实现 BC／RL 入口。
 
-`pyproject.toml` 声明 `src/scv_star` 包、Python 3.11+、setuptools 84.0.0 和 `m0`/`m1` 可选依赖。顶层空依赖列表不代表检查入口不需要第三方库；安装时使用相应固定依赖清单。M1 的 CUDA wheel 需要专用索引，命令见其部署说明；完整训练依赖仍需后续验证。
+`pyproject.toml` 声明 `src/scv_star` 包、Python 3.11+、setuptools 84.0.0 和 `m0`/`m1` 可选依赖。顶层空依赖列表不代表检查入口不需要第三方库；安装时使用相应固定依赖清单。M1 的 CUDA wheel 需要专用索引，命令见其部署说明；Ubuntu 侧使用 `requirements/bc-linux-py311-cu130.txt`，完整 M4 训练依赖仍需在实施时确认。
 
 M0 依赖已经固定；其他阶段正式实验前仍需单独固定环境。不声明本项目为 Apache 2.0，不自动继承 DI-star 许可，也不设置 PyPI 发布流程。元数据的 `Private :: Do Not Upload` 是发布防护标记，不替代访问控制。
 
@@ -50,6 +58,18 @@ Get-ChildItem configs -Recurse -Filter '*.example.json' | ForEach-Object {
 
 需要格式化时运行 `.\.venv\Scripts\ruff.exe format src tests`。Python 使用 100 字符目标行宽；检查范围和配置参考 [Ruff 官方配置说明](https://docs.astral.sh/ruff/configuration/)。
 
+Ubuntu 24.04 使用独立环境执行同类检查：
+
+```bash
+.venv/bin/python -m unittest discover -s tests/unit -v
+.venv/bin/ruff format --check src tests
+.venv/bin/ruff check src tests
+.venv/bin/python -m scv_star.runtime.m1 --output artifacts/runs/<新目录>
+.venv/bin/python -m scv_star.runtime.bc_reader_check --collection data/processed/m2-expand-2026-10-19/collection.json --output artifacts/runs/<新目录>/gpu-check.json
+```
+
+Linux 结果与 Windows 分开记录；当前 110 项中 1 项 Windows 专用测试在 Linux 按设计跳过。详见 [Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
+
 ## 代码与文档约定
 
 - Python 使用四空格缩进，JSON 两空格；文件采用 UTF-8，文本默认 LF，见 `.editorconfig` 和 `.gitattributes`。
@@ -79,7 +99,7 @@ Get-ChildItem configs -Recurse -Filter '*.example.json' | ForEach-Object {
 
 检查改动范围、文档链接与配置语法；若影响真实行为，执行相应测试并说明未满足的环境条件。确认没有凭据、录像、模型或游戏资源被跟踪，再提交和同步私有仓库。
 
-用户已明确本轮仅完成M2数据验收，不实现BC网络或训练器。M2解析依赖固定在`requirements/m2-replays.txt`，原生重放还需要M0依赖；训练读取与GPU检查使用M1的PyTorch锁。本轮不安装新依赖，不执行正式BC／RL优化器更新。后续模型和在线TvT执行按[里程碑](MILESTONES.md)开展。
+用户已明确 2026-10-21 的 M2 轮只完成数据验收，不实现 BC 网络或训练器；2026-11-08 的 Ubuntu 环境轮按平台授权安装了固定 Linux 锁并完成环境验收，但仍未获 M4 实施或正式 BC／RL 训练授权，未执行优化器更新。M2 解析依赖固定在 `requirements/m2-replays.txt`，原生重放还需要 M0 依赖；训练读取与 GPU 检查分别使用 M1 PyTorch 锁和 Linux 组合锁。后续模型和在线 TvT 执行按[里程碑](MILESTONES.md)开展。
 
 ## 项目管理与会话交接
 
@@ -101,7 +121,7 @@ Get-ChildItem configs -Recurse -Filter '*.example.json' | ForEach-Object {
 ### 系统、存储与交接
 
 - Windows与Ubuntu分别锁定环境，通过显式的数据schema、清单哈希和模型格式交接。切换双系统前保存检查点、运行命令和恢复位置，并确认没有仍需运行的任务。
-- Windows常规预算仍为100 GB，阶段性200 GB例外及清理要求见上文。用户表示Linux可提供500 GB以上空间；实际挂载路径和可用容量尚需核实，不能据此自动扩大Windows预算或迁移数据。
+- Windows 常规预算仍为 100 GB；M2 扩容轮 150 GB 授权与已结束的 200 GB 例外保留历史口径。2026-11-08 实测 Ubuntu 根分区可用约 1.4 TB；Ubuntu 环境与链接的本机数据约 9.9 GB。Linux 容量不能自动扩大 Windows 预算或迁移数据；跨系统副本仍计入项目存储，实际迁移与清理须单独确认。
 - Git保存源码、配置模板及脱敏文档；录像、游戏资源、环境、模型权重和含受限来源信息的清单按现有忽略与许可规则管理，见[Git工作流程](GIT_WORKFLOW.md)。
 - 每次任务收尾交代：完成项与证据、检查结果、剩余问题及影响、产物位置与资源占用、下一项最小验证任务。清理按本页临时文件管理规则执行。
 - 聊天用于讨论，确认的决策和验收结果归入对应文档。新会话先读取里程碑及相关阶段文档，不假定自动取得其他会话的完整历史；交接摘要写明当前目标、约束、已验证结论、运行任务和下一步。并行会话应明确文件修改范围，避免干扰正在运行的任务。

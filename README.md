@@ -4,17 +4,18 @@
 
 ## 当前状态
 
-**M2 首批训练数据验收通过，可以进入离线行为克隆。** 固定 5.0.8.86383，100 场／200 个玩家视角，训练／验证／测试为 80／10／10 场，共 285,459 条观测—动作样本。完整回放、同遍时间配对、动作逆转换、逐条审计及 NVIDIA GPU 读取／前后向检查通过；尚未进行正式 BC／RL 更新。
+**M2 已扩容至 1,000 场并通过验收，离线 BC 数据入口冻结。** 1,000 个录像文件／2,000 个玩家视角，训练／验证／测试为 824／87／89 场，共 2,467,676 条观测—动作样本；覆盖 11 个历史 build 和 105 个地图名称，原 100 场包含在总数内并保持冻结。完整回放、同遍时间配对、动作逆转换、逐条审计及 NVIDIA GPU 读取／前后向检查通过；尚未进行正式 BC／RL 更新。
 
 - [M2 数据契约与验收](docs/REPLAY_ALIGNMENT.md)：实现、命令、覆盖范围和限制。
-- [数据总览](docs/DATASET_OVERVIEW.md)：3,077 个原始文件、835 个轻筛合格候选；100 场训练集是其中子集。
-- [验收摘要](docs/experiments/M2_READY_2026-10-12.json)：实际样本量、配对率、依赖、GPU 和存储。
+- [数据总览](docs/DATASET_OVERVIEW.md)：3,077 个原始文件、835 个轻筛合格候选；1,000 场是其中已验收子集。
+- [最终验收摘要](docs/experiments/M2_READY_2026-10-21.json)：实际样本量、配对率、依赖、GPU 和存储。
+- [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)：Linux GPU／PyTorch、110 项测试（109 通过／1 跳过）和 BC 集合读取；不含 BC 训练。
 
 M0 历史验收包含国服 97579、战争迷雾和真人操作，见[M0记录](docs/experiments/M0_2026-09-29.md)。10月8日旧97579启动回归失败；10月12日用户重新安装国服，本机清单为5.0.17.98370，新安装的API尚未验收；最终新版RL和真人部署必须重新验收。旧版BC数据就绪不替代这一要求。
 
-M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop**；未混用Intel核显。项目当前约 97.54 GB，继续遵守100 GB限制。原始录像与派生数据仅留本机；GitHub不保存录像、玩家详情或逐场清单。
+M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop**；Windows 环境已通过，Ubuntu 24.04 离线环境于 2026-11-08 通过同类 GPU 探针、110 项单元测试（109 通过／1 项 Windows 专用跳过）及 1,000 场集合读取。Windows 侧项目约 102.40 GB（M2 扩容轮 150 GB 授权内，未声称回到 100 GB）；Ubuntu 侧环境约 4.8 GB，另链接本机已冻结数据 4.6 GB。原始录像与派生数据仅留本机；GitHub 不保存录像、玩家详情或逐场清单。
 
-下一阶段完成网络和训练入口，并补齐M3在线动作合法性及闭环验证。当前GPU检查只验证数据可读和可反向传播，不代表策略已训练或达到任何段位。
+下一阶段是 M4 首个 BC 网络与可恢复训练器；该实施尚未获授权。M3 在线动作合法性及闭环执行仍需在 Windows 补齐。当前 GPU 检查只验证数据可读、探针前后向和恢复链路，不代表策略已训练或达到任何段位。
 
 ## 基本结构
 
@@ -28,7 +29,7 @@ M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop*
 | `artifacts/` | 检查点、运行记录和评测输出，仅保留目录占位 |
 | `docs/` | 架构、开发、调研、许可、里程碑和实验记录 |
 
-完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1`/`m2` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存阶段依赖和开发工具锁。M1 CUDA依赖按其专用锁安装；M2使用文档中的Python模块入口，尚无正式训练 CLI。
+完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1`/`m2` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存阶段依赖和开发工具锁。Ubuntu 侧新增 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合锁）；Windows 侧继续使用各自阶段锁。M2／M4 尚未提供正式训练 CLI。
 
 ## 本地命令
 
@@ -47,14 +48,26 @@ M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop*
 .\scripts\run_m0.ps1 -Mode smoke -RunId m0-smoke-next
 ```
 
+Ubuntu 24.04 离线环境（已验收，仅环境与读取检查；不启动游戏）：
+
+```bash
+.venv/bin/python -m unittest discover -s tests/unit -v
+.venv/bin/ruff format --check src tests
+.venv/bin/ruff check src tests
+.venv/bin/python -m scv_star.runtime.m1 --output artifacts/runs/<新目录>
+.venv/bin/python -m scv_star.runtime.bc_reader_check --collection data/processed/m2-expand-2026-10-19/collection.json --output artifacts/runs/<新目录>/gpu-check.json
+```
+
+数据保存在本机 `SCV-star/dataset` 并链接到 `data/processed/`，不提交 Git；固定步骤与结果见 [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)。
+
 ## 目标与约束
 
 - 最终支持开发、验收时确认的 SC2 最新正式版；每轮实验固定准确 build、数据、地图及依赖版本。
 - 支持内置人族电脑、当前与历史策略自我对战，以及真人实时 TvT。
 - 策略使用己方合法观测，保留战争迷雾；额外价值信息与执行策略隔离。
 - 从随机初始化网络自行训练；旧录像按对应版本解码，不伪造新版轨迹。
-- 项目新增存储占用不超过 100 GB，额外空间须事先征得用户同意。
-- 可使用已有 Windows／Ubuntu 双系统；当前已实施M0接口、M1 GPU验证、M2小样本验证及本轮公开数据采集。其他引擎获取和正式训练另行安排。
+- 常规项目存储预算为 100 GB；2026-10-19 M2 扩容轮按 150 GB 授权执行，最终 Windows 侧约 102.40 GB，未声称已恢复到 100 GB。Ubuntu 侧本轮环境与数据约 9.9 GB；新增空间仍须事先征得用户同意。
+- 可使用已有 Windows／Ubuntu 双系统；当前已实施 M0 接口、M1 GPU 验证（Windows 与 Ubuntu）、M2 全部数据验收及 Ubuntu 离线训练环境验收。M3／M4 正式实施及训练另行授权。
 
 ## 文档
 
@@ -63,6 +76,7 @@ M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop*
 - [开发说明](docs/DEVELOPMENT.md)：当前可执行检查与后续环境验证。
 - [里程碑](docs/MILESTONES.md)：实际状态与验收标准。
 - [实验记录](docs/experiments/README.md)：受控实验与结果模板。
+- [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)：Linux GPU／PyTorch、110 项测试（109 通过／1 跳过）与集合读取记录。
 - [调研与技术方案](docs/SC2_TVT_RESEARCH_PLAN.md)：源码审计、数据流程、模型、迁移、里程碑及评测。
 - [许可要求整理](docs/SC2_LICENSE_REQUIREMENTS.md)：暴雪 AI 许可与 DI-star Apache 2.0 的适用范围和待核查事项。
 - [Git 工作流程](docs/GIT_WORKFLOW.md)：本地提交、同步及分支协作。
