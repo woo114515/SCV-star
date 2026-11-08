@@ -1,8 +1,10 @@
 # 项目目录结构
 
-本仓库采用Python `src`布局。`envs/sc2_client.py`与`runtime/m0*.py`实现M0接口验收，`runtime/m1.py`实现GPU合成数据与恢复验证；`data/replay_sources.py`与`runtime/replay_probe.py`实现M2来源扫描和固定引擎小样本重放。正式策略模型、训练和联赛仍为占位，目录名不代表能力完成。
+本仓库采用Python `src`布局。`envs/sc2_client.py`与`runtime/m0*.py`实现M0接口验收，`runtime/m1.py`实现GPU合成数据与恢复验证；`data/replay_sources.py`与`runtime/replay_probe.py`实现M2来源扫描和固定引擎小样本重放。M4 BC v1的模型与可恢复训练器已实现；在线动作、RL、联赛和评测仍为占位，目录名不代表能力完成。
 
 M2训练数据实现位于`data/bc_schema.py`（合法观测白名单与RAW动作转换）、`bc_extract.py`（完整同遍提取）、`bc_repack.py`（冻结前无损压缩）、`bc_storage.py`（gzip／XZ统一读取）、`bc_accept.py`（全分片验收）、`bc_dataset.py`（哈希校验、流式序列和张量批次）。这些是源码模块；实际训练数据仍放根目录`data/processed/`，不提交Git。
+
+M4 BC v1数据与训练实现位于`data/bc_catalog.py`（按build规范能力词表）、`data/bc_cache.py`（张量化序列缓存）、`data/bc_features.py`（字段分组）、`models/bc.py`（实体／标量编码、两层LSTM、8个动作头）、`training/bc.py`（可恢复训练器）、`training/checkpoint.py`（原子检查点）和`training/metrics.py`（分头指标）。缓存写入`data/interim/`，训练产物写入`artifacts/runs/`，均不提交Git。
 
 ```text
 SCV-star/

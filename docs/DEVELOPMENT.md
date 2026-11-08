@@ -2,7 +2,7 @@
 
 ## 当前可用范围
 
-当前提供 M0 SC2 通信与真人检查、M1 GPU 与恢复检查、M2 元数据扫描、固定版本完整回放、同遍观测—动作提取及训练分片验收。Ubuntu 24.04 离线训练环境已于 2026-11-08 通过 GPU、单元测试和集合读取检查；策略模型、BC／RL 学习器和联赛仍为占位，M4 实施尚未获授权，不提供尚不存在的 `train`／`play` 命令。数据入口和命令见[对齐与训练数据](REPLAY_ALIGNMENT.md)。
+当前提供 M0 SC2 通信与真人检查、M1 GPU 与恢复检查、M2 元数据扫描、固定版本完整回放、同遍观测—动作提取及训练分片验收。Ubuntu 24.04 离线训练环境已于 2026-11-08 通过 GPU、单元测试和集合读取检查；M4 v1 的 BC 缓存、模型与可恢复训练器已实现，正式训练／测试待续。RL 学习器、联赛和在线执行仍为占位，不提供尚不存在的在线 `play` 命令。数据入口和命令见[对齐与训练数据](REPLAY_ALIGNMENT.md)。
 
 Windows 与 Ubuntu 分别使用项目内独立环境：Windows 为 `.venv/Scripts/python.exe`（Python 3.11.16），Ubuntu 为 `.venv/bin/python`（uv 管理的 Python 3.11.16）；通信、GPU 和开发工具依赖各自保存哈希锁，不跨系统复用。M1 已在 Windows 上通过 PyTorch 2.13.0+cu130 的小型验证；Ubuntu 2026-11-08 复跑了同类 GPU 探针并通过，详见 [M1 验证命令](M1_ACCEPTANCE.md)、[M0 部署与命令](M0_ACCEPTANCE.md)和[Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。未运行正式 BC／RL 训练。
 
@@ -12,14 +12,14 @@ Windows 与 Ubuntu 分别使用项目内独立环境：Windows 为 `.venv/Script
 - 解释器与依赖：uv 0.12.20 管理的 Python 3.11.16、`.venv`、torch 2.13.0+cu130、CUDA runtime 13.0；锁文件为 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合，仅 linux 平台）。
 - 数据：本机 `SCV-star/dataset`（仓库父目录，不提交）链接到 `data/processed/`，入口为 `data/manifests/training-current.json`；集合 SHA-256 `373cfc6f…97da`，1,000 场／2,467,676 行。
 - 验收：110 项单元测试 109 通过、1 项 Windows 专用跳过；Ruff 格式与静态检查通过；M1 GPU 探针 FP32／FP16／BF16 前后向及恢复逐位一致；`bc_reader_check` 覆盖 11 个 build、15 个案例、最大 531 实体，优化器更新为 0。
-- 边界：未实现 BC 模型／训练器，未执行训练更新；M4 仍需用户授权。M0／M3／M5 的游戏接口仍使用 Windows 客户端，Linux 不启动 SC2。证据见[Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
+- 边界：M4 v1 已实现；小样本过拟合、2 小时训练和最终测试待续。M0／M3／M5 的游戏接口仍使用 Windows 客户端，Linux 不启动 SC2。证据见[Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
 
 ## 环境验证顺序
 
 1. 获得相应实施授权后，确认 Windows 游戏路径、最新正式版准确 build、数据版本和所需地图。
 2. Ubuntu 环境已于 2026-11-08 验收；Windows 侧继续检查解释器、驱动和游戏路径。新增占用按常规 100 GB 与 M2 轮 150 GB 授权的历史边界规划，不自动扩大预算。
 3. 为项目准备隔离依赖，验证 PyTorch 前后向及 SC2 通信，再固定精确版本和平台锁文件。Ubuntu 的组合 Linux 锁已生成；Windows 继续使用各自阶段锁。
-4. 填写本机配置和经过验证的版本清单，最后实现 BC／RL 入口。
+4. 填写本机配置和经过验证的版本清单。M4 BC 入口已实现；RL 入口待实现。
 
 `pyproject.toml` 声明 `src/scv_star` 包、Python 3.11+、setuptools 84.0.0 和 `m0`/`m1` 可选依赖。顶层空依赖列表不代表检查入口不需要第三方库；安装时使用相应固定依赖清单。M1 的 CUDA wheel 需要专用索引，命令见其部署说明；Ubuntu 侧使用 `requirements/bc-linux-py311-cu130.txt`，完整 M4 训练依赖仍需在实施时确认。
 
@@ -68,7 +68,16 @@ Ubuntu 24.04 使用独立环境执行同类检查：
 .venv/bin/python -m scv_star.runtime.bc_reader_check --collection data/processed/m2-expand-2026-10-19/collection.json --output artifacts/runs/<新目录>/gpu-check.json
 ```
 
-Linux 结果与 Windows 分开记录；当前 110 项中 1 项 Windows 专用测试在 Linux 按设计跳过。详见 [Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
+Linux 结果与 Windows 分开记录；当前 135 项中 1 项 Windows 专用测试在 Linux 按设计跳过。详见 [Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
+
+M4 BC v1 入口（缓存已生成；`<新目录>` 必须不存在）：
+
+```bash
+.venv/bin/python -m scv_star.data.bc_cache --collection data/processed/m2-expand-2026-10-19/collection.json --build 86383 --output data/interim/bc-86383-v1 --splits train validation
+.venv/bin/python -m scv_star.training.bc --config configs/experiments/bc-86383-v1.json --output artifacts/runs/<新目录> --max-updates 2 --device cpu
+```
+
+小样本过拟合、断点恢复、2 小时训练和最终测试的命令与判据见 [M4 BC v1 记录](experiments/20261108_M4_bc86383_seed20261108.md)。
 
 ## 代码与文档约定
 
@@ -99,7 +108,7 @@ Linux 结果与 Windows 分开记录；当前 110 项中 1 项 Windows 专用测
 
 检查改动范围、文档链接与配置语法；若影响真实行为，执行相应测试并说明未满足的环境条件。确认没有凭据、录像、模型或游戏资源被跟踪，再提交和同步私有仓库。
 
-用户已明确 2026-10-21 的 M2 轮只完成数据验收，不实现 BC 网络或训练器；2026-11-08 的 Ubuntu 环境轮按平台授权安装了固定 Linux 锁并完成环境验收，但仍未获 M4 实施或正式 BC／RL 训练授权，未执行优化器更新。M2 解析依赖固定在 `requirements/m2-replays.txt`，原生重放还需要 M0 依赖；训练读取与 GPU 检查分别使用 M1 PyTorch 锁和 Linux 组合锁。后续模型和在线 TvT 执行按[里程碑](MILESTONES.md)开展。
+用户已明确 2026-10-21 的 M2 轮只完成数据验收，不实现 BC 网络或训练器；2026-11-08 的 Ubuntu 环境轮按平台授权安装了固定 Linux 锁并完成环境验收；M4 v1 实现已按批准的计划完成，但正式 BC 训练／测试与 RL／在线执行尚未授权或运行。M2 解析依赖固定在 `requirements/m2-replays.txt`，原生重放还需要 M0 依赖；训练读取与 GPU 检查分别使用 M1 PyTorch 锁和 Linux 组合锁。后续模型和在线 TvT 执行按[里程碑](MILESTONES.md)开展。
 
 ## 项目管理与会话交接
 

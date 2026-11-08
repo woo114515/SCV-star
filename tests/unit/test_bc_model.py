@@ -1,0 +1,144 @@
+import copy
+import unittest
+
+import torch
+
+from scv_star.models.bc import bc_loss, build_bc_model
+
+
+def make_cache():
+    return {
+        "normalization": {
+            "entity_mean": [0.0] * 19,
+            "entity_std": [1.0] * 19,
+            "scalar_mean": [0.0] * 9,
+            "scalar_std": [1.0] * 9,
+        },
+        "unit_type_vocab": [18, 19],
+        "catalog": {"ability_ids": [10, 20, 30]},
+    }
+
+
+def make_batch(batch=2, steps=4, entities=5):
+    torch.manual_seed(7)
+    values = torch.zeros(batch, steps, entities, 27)
+    values[..., 0] = 18.0
+    values[..., 1] = 1.0
+    values[..., 2] = 1.0
+    values[..., 3:6] = 10.0
+    values[..., 7:9] = 100.0
+    mask = torch.ones(batch, steps, entities, dtype=torch.bool)
+    mask[0, 0, 4] = False
+    stale = torch.zeros(batch, steps, entities, dtype=torch.bool)
+    stale[0, 0, 3] = True
+    scalars = torch.arange(batch * steps * 9, dtype=torch.float32).reshape(batch, steps, 9)
+    raw_indices = torch.tensor(
+        [
+            [[0, 1, -1], [2, -1, -1], [0, 0, 1], [3, 2, 1]],
+            [[0, 1, -1], [2, -1, -1], [0, 0, 1], [3, 2, 1]],
+        ]
+    )
+    selected_mask = raw_indices >= 0
+    indices = raw_indices.clamp(min=0)
+    targets = {
+        "ability": torch.randint(0, 3, (batch, steps)),
+        "kind": torch.randint(0, 2, (batch, steps)),
+        "selected_indices": indices,
+        "selected_mask": selected_mask,
+        "target_kind": torch.randint(0, 3, (batch, steps)),
+        "target_index": torch.randint(0, 4, (batch, steps)),
+        "target_point": torch.rand(batch, steps, 2) * 100,
+        "queue": torch.randint(0, 2, (batch, steps)),
+        "queue_mask": torch.rand(batch, steps) > 0.3,
+        "delay": torch.randint(0, 20, (batch, steps)).float(),
+        "delay_mask": torch.rand(batch, steps) > 0.3,
+        "map_size": torch.full((batch, steps, 2), 128.0),
+    }
+    return {
+        "entities": values,
+        "entity_mask": mask,
+        "stale": stale,
+        "scalars": scalars,
+        "targets": targets,
+    }
+
+
+class ModelTests(unittest.TestCase):
+    def test_forward_loss_backward_and_inference_shapes(self):
+        model = build_bc_model(make_cache(), {})
+        batch = make_batch()
+        outputs = model(batch)
+        self.assertEqual(tuple(outputs["ability"].shape), (2, 4, 3))
+        self.assertEqual(tuple(outputs["kind"].shape), (2, 4, 2))
+        self.assertEqual(len(outputs["selection"]), 4)
+        self.assertEqual(tuple(outputs["selection"][0].shape), (8, 6))
+        self.assertEqual(tuple(outputs["target_kind"].shape), (8, 3))
+        self.assertEqual(tuple(outputs["target_unit"].shape), (8, 5))
+        self.assertEqual(tuple(outputs["target_point"].shape), (8, 2))
+        self.assertEqual(tuple(outputs["queue"].shape), (8, 2))
+        self.assertEqual(tuple(outputs["delay"].shape), (8,))
+        losses = bc_loss(outputs, batch["targets"])
+        self.assertTrue(torch.isfinite(losses["total"]))
+        for name in ("ability", "kind", "selection", "target_kind", "target_unit"):
+            self.assertTrue(torch.isfinite(losses[name]), name)
+        self.assertEqual(losses["counts"]["ability"], 8)
+        self.assertEqual(losses["counts"]["kind"], 8)
+        self.assertEqual(losses["counts"]["target_kind"], 8)
+        self.assertEqual(losses["counts"]["selection"], 26)
+        losses["total"].backward()
+        for parameter in model.parameters():
+            if parameter.grad is not None:
+                self.assertTrue(torch.isfinite(parameter.grad).all())
+
+    def test_inference_returns_masked_actions(self):
+        model = build_bc_model(make_cache(), {})
+        model.eval()
+        batch = make_batch()
+        with torch.no_grad():
+            actions = model.act(batch)
+        self.assertEqual(tuple(actions["ability"].shape), (2, 4))
+        self.assertEqual(tuple(actions["kind"].shape), (2, 4))
+        self.assertEqual(tuple(actions["selected_indices"].shape), (2, 4, 128))
+        self.assertEqual(tuple(actions["selected_mask"].shape), (2, 4, 128))
+        self.assertTrue((actions["ability"] < 3).all())
+        self.assertTrue((actions["kind"] < 2).all())
+        self.assertTrue((actions["target_kind"] < 3).all())
+        self.assertTrue((actions["target_unit"] < 5).all())
+        self.assertTrue((actions["delay"] >= 0).all())
+        self.assertTrue((actions["target_point"] >= 0).all())
+        self.assertTrue((actions["target_point"] <= 1).all())
+
+    def test_all_inactive_heads_contribute_zero(self):
+        model = build_bc_model(make_cache(), {})
+        batch = make_batch()
+        batch["targets"]["selected_mask"] = torch.zeros_like(batch["targets"]["selected_mask"])
+        batch["targets"]["selected_indices"] = torch.zeros_like(
+            batch["targets"]["selected_indices"]
+        )
+        batch["targets"]["target_kind"] = torch.zeros_like(batch["targets"]["target_kind"])
+        batch["targets"]["queue_mask"] = torch.zeros_like(batch["targets"]["queue_mask"])
+        batch["targets"]["delay_mask"] = torch.zeros_like(batch["targets"]["delay_mask"])
+        outputs = model(batch)
+        losses = bc_loss(outputs, batch["targets"])
+        self.assertEqual(losses["counts"]["target_unit"], 0)
+        self.assertEqual(losses["counts"]["target_point"], 0)
+        self.assertEqual(losses["counts"]["queue"], 0)
+        self.assertEqual(losses["counts"]["delay"], 0)
+        self.assertEqual(float(losses["target_unit"].detach()), 0.0)
+        self.assertEqual(float(losses["target_point"].detach()), 0.0)
+        self.assertEqual(float(losses["queue"].detach()), 0.0)
+        self.assertEqual(float(losses["delay"].detach()), 0.0)
+        self.assertEqual(losses["counts"]["selection"], 8)
+        self.assertTrue(torch.isfinite(losses["total"]))
+
+    def test_config_validation(self):
+        with self.assertRaises(ValueError):
+            build_bc_model({**make_cache(), "catalog": {"ability_ids": []}}, {})
+        bad = copy.deepcopy(make_cache())
+        bad["normalization"]["entity_mean"] = [0.0]
+        with self.assertRaises(ValueError):
+            build_bc_model(bad, {})
+
+
+if __name__ == "__main__":
+    unittest.main()

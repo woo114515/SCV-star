@@ -9,13 +9,14 @@
 - [M2 数据契约与验收](docs/REPLAY_ALIGNMENT.md)：实现、命令、覆盖范围和限制。
 - [数据总览](docs/DATASET_OVERVIEW.md)：3,077 个原始文件、835 个轻筛合格候选；1,000 场是其中已验收子集。
 - [最终验收摘要](docs/experiments/M2_READY_2026-10-21.json)：实际样本量、配对率、依赖、GPU 和存储。
-- [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)：Linux GPU／PyTorch、110 项测试（109 通过／1 跳过）和 BC 集合读取；不含 BC 训练。
+- [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)：Linux GPU／PyTorch、环境验收与集合读取。
+- [M4 BC v1](docs/experiments/20261108_M4_bc86383_seed20261108.md)：86383 首次 BC 的缓存、模型、掩码损失、训练与恢复记录。
 
 M0 历史验收包含国服 97579、战争迷雾和真人操作，见[M0记录](docs/experiments/M0_2026-09-29.md)。10月8日旧97579启动回归失败；10月12日用户重新安装国服，本机清单为5.0.17.98370，新安装的API尚未验收；最终新版RL和真人部署必须重新验收。旧版BC数据就绪不替代这一要求。
 
-M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop**；Windows 环境已通过，Ubuntu 24.04 离线环境于 2026-11-08 通过同类 GPU 探针、110 项单元测试（109 通过／1 项 Windows 专用跳过）及 1,000 场集合读取。Windows 侧项目约 102.40 GB（M2 扩容轮 150 GB 授权内，未声称回到 100 GB）；Ubuntu 侧环境约 4.8 GB，另链接本机已冻结数据 4.6 GB。原始录像与派生数据仅留本机；GitHub 不保存录像、玩家详情或逐场清单。
+M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop**；Windows 环境已通过，Ubuntu 24.04 离线环境于 2026-11-08 通过同类 GPU 探针；当前分支 135 项单元测试（134 通过／1 项 Windows 专用跳过）及 1,000 场集合读取。Windows 侧项目约 102.40 GB（M2 扩容轮 150 GB 授权内，未声称回到 100 GB）；Ubuntu 侧环境约 4.8 GB，另链接本机已冻结数据 4.6 GB。原始录像与派生数据仅留本机；GitHub 不保存录像、玩家详情或逐场清单。
 
-下一阶段是 M4 首个 BC 网络与可恢复训练器；该实施尚未获授权。M3 在线动作合法性及闭环执行仍需在 Windows 补齐。当前 GPU 检查只验证数据可读、探针前后向和恢复链路，不代表策略已训练或达到任何段位。
+M4 v1 的数据缓存、模型、可恢复训练器和 135 项单元测试已实现；小样本过拟合、2 小时训练及最终测试待续（M4 计划已获批准）。M3 在线动作合法性及闭环执行仍需在 Windows 补齐。当前 GPU 检查只验证数据可读、探针前后向和恢复链路，不代表策略已训练或达到任何段位。
 
 ## 基本结构
 
@@ -24,12 +25,12 @@ M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop*
 | `src/scv_star/` | 数据、环境、观测、动作、模型、训练、联赛、评测与推理模块 |
 | `configs/` | 项目、机器和实验配置模板；真实本机配置不提交 |
 | `scripts/` | M0 本机运行入口与脚本约定 |
-| `tests/` | 版本、地图、协议异常和观测配置的单元测试；其他能力待实现 |
+| `tests/` | 版本、地图、协议、M2 数据、M4 BC 缓存／模型／训练器与客户端守护的单元测试 |
 | `data/` | 原始录像、中间结果、训练分片和清单，仅保留目录占位 |
 | `artifacts/` | 检查点、运行记录和评测输出，仅保留目录占位 |
 | `docs/` | 架构、开发、调研、许可、里程碑和实验记录 |
 
-完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1`/`m2` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存阶段依赖和开发工具锁。Ubuntu 侧新增 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合锁）；Windows 侧继续使用各自阶段锁。M2／M4 尚未提供正式训练 CLI。
+完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1`/`m2` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存阶段依赖和开发工具锁。Ubuntu 侧新增 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合锁）；Windows 侧继续使用各自阶段锁。M2 尚无正式训练 CLI；M4 提供 `scv-bc`／`scv-bc-cache`。
 
 ## 本地命令
 
@@ -60,6 +61,15 @@ Ubuntu 24.04 离线环境（已验收，仅环境与读取检查；不启动游�
 
 数据保存在本机 `SCV-star/dataset` 并链接到 `data/processed/`，不提交 Git；固定步骤与结果见 [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)。
 
+M4 BC v1（缓存已生成；`<新目录>` 必须不存在）：
+
+```bash
+.venv/bin/python -m scv_star.data.bc_cache --collection data/processed/m2-expand-2026-10-19/collection.json --build 86383 --output data/interim/bc-86383-v1 --splits train validation
+.venv/bin/python -m scv_star.training.bc --config configs/experiments/bc-86383-v1.json --output artifacts/runs/<新目录> --device cuda
+```
+
+完整设计、过拟合／恢复和最终测试命令见 [M4 BC v1](docs/experiments/20261108_M4_bc86383_seed20261108.md)。
+
 ## 目标与约束
 
 - 最终支持开发、验收时确认的 SC2 最新正式版；每轮实验固定准确 build、数据、地图及依赖版本。
@@ -76,7 +86,8 @@ Ubuntu 24.04 离线环境（已验收，仅环境与读取检查；不启动游�
 - [开发说明](docs/DEVELOPMENT.md)：当前可执行检查与后续环境验证。
 - [里程碑](docs/MILESTONES.md)：实际状态与验收标准。
 - [实验记录](docs/experiments/README.md)：受控实验与结果模板。
-- [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)：Linux GPU／PyTorch、110 项测试（109 通过／1 跳过）与集合读取记录。
+- [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)：Linux GPU／PyTorch、环境验收与集合读取记录。
+- [M4 BC v1](docs/experiments/20261108_M4_bc86383_seed20261108.md)：86383 首次 BC 的缓存、模型、掩码损失与训练恢复。
 - [调研与技术方案](docs/SC2_TVT_RESEARCH_PLAN.md)：源码审计、数据流程、模型、迁移、里程碑及评测。
 - [许可要求整理](docs/SC2_LICENSE_REQUIREMENTS.md)：暴雪 AI 许可与 DI-star Apache 2.0 的适用范围和待核查事项。
 - [Git 工作流程](docs/GIT_WORKFLOW.md)：本地提交、同步及分支协作。
