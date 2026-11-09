@@ -53,9 +53,9 @@
 - 环境：Ubuntu 24.04.5 LTS、Python 3.11.16、torch 2.13.0+cu130、RTX 5070 Ti Laptop 12,227 MiB、驱动 595.99.02；依赖锁 `requirements/bc-linux-py311-cu130.txt`（SHA-256 `df9b497ae2bb56c7697406de7e405004aebb001bc8bd6a84a94af80a934c98a2`）。Windows 与 Ubuntu 环境互不复制。
 - 数据：本机 `SCV-star/dataset`（仓库父目录，不提交）链接到 `data/processed/`，入口 `data/manifests/training-current.json`；集合 SHA-256 `373cfc6f4a267130e5e2259f8bd3f2e109fa35536d7cb8745c6061b690a897da`、入口 SHA-256 `79390eea6ed18a7039e7a5d88457fcedb3b5b4b8ff6ce243ae185bc26ccfbc98`；1,000 场／2,000 视角／2,467,676 行。
 - 验收：环境验收时 110 项，M4 v1 后当前 146 项（145 通过／1 项 Windows 专用跳过）；Ruff 通过；M1 GPU 探针 FP32／FP16／BF16 与恢复逐位一致；`bc_reader_check` 15 案例、11 版本、最大 531 实体、优化器更新 0。证据 `artifacts/runs/m1-gpu-linux-20261108/report.json`（SHA-256 `caa968fd14bdcfdf17265d97290e0353839be9af4cbc6f03bf4005904a12a054`）与 `artifacts/runs/m2-linux-reader-check-20261108/gpu-check.json`（SHA-256 `d48baddcc047eae94177b52d13ca26b677c7a6175a82afdf6f8958ce8ed7a785`）；记录见 [M1 Linux 环境验收](experiments/M1_LINUX_2026-11-08.md)。
-- 限制：M4 v1 缓存／模型／APM 加权训练器已实现，但小样本过拟合、2 小时训练和最终测试尚未运行；M3 在线动作／最新版 API 仍需 Windows。现有 `m1.py` 是 Windows 入口，报告中的 `dependency_lock_sha256` 字段仍指 Windows 锁 `6db46834531e1fd871e1417c186cc42a2d252a55c974d9fd2c552b1e47cdea51`，实际 Linux 锁以本条为准。
+- 限制：M4 v1 缓存／模型／APM 加权训练器已实现，2 小时训练在进行中，最终测试尚未运行；M3 在线动作／最新版 API 仍需 Windows。现有 `m1.py` 是 Windows 入口，报告中的 `dependency_lock_sha256` 字段仍指 Windows 锁 `6db46834531e1fd871e1417c186cc42a2d252a55c974d9fd2c552b1e47cdea51`，实际 Linux 锁以本条为准。
 - Windows 工作副本：存在未提交的 APM 质量代码／测试／文档（`bc_quality.py` 等）；截至本记录其描述的质量清单在当前数据入口中不存在。该工作由用户稍后提交；Ubuntu 侧未合并、未改写，不要覆盖。
-- 下一步：完成 M4 v1 小样本过拟合与断点恢复、2 小时训练和最终测试；首轮固定 86383 单 build，验证／测试集保持隔离。
+- 下一步：收尾 M4 v1 的 2 小时训练（测试集只评估一次、补记结果）；过拟合门未达标，后续单独排查欠拟合原因，再决定多 build／多 seed 或特征扩展。首轮固定 86383 单 build，验证／测试集保持隔离。
 
 ## M4 v1 实现与暂停（2026-11-08）
 
@@ -64,5 +64,7 @@
 - 测试：146 项单元测试（145 通过／1 项 Windows 专用跳过），Ruff 通过；覆盖词表、缓存、模型、掩码损失、检查点、指标、APM 标注与加权采样。
 - 数据：86383 训练／验证张量缓存位于 `data/interim/bc-86383-v1/`（派生数据，不提交），带 per-view APM 标签：训练 10,546 序列／326,361 行／22 分片，验证 1,197／36,694／3；APM 清单 SHA-256 `f15141e…c436`；86383 的 300 个视角中，训练 152 high／34 medium／56 low。配置固定种子 `20261108`、batch 2×32、FP32、AdamW 1e-4、2 小时预算、验证每 5,000 次更新（计划为 1,000，偏差理由见实验记录）；`sampling_weights` high 3.0／medium 2.0／low 1.0。
 - 真实数据触发：ability 316 同时为 command／autocast，v1 使用独立 2 类 kind 头；原“由 ability 推导 kind”不成立。实验记录：`docs/experiments/20261108_M4_bc86383_seed20261108.md`。
-- 待续（下次会话）：小样本过拟合（1—2 场、500 次更新、各头损失下降与训练子集能力 top-1 ≥ 0.9）、保存／恢复下一步逐位比较、2 小时全量训练、训练后构建 test 缓存并用 `best.pt` 只评估一次、补全记录与状态文档。
-- 暂停前最后一个任务（缓存构建）已完成；没有运行 BC 优化器。Windows 工作副本的未提交 APM 质量代码／文档仍未合并、未改写；其质量清单目前不存在。
+- 过拟合探测（2026-11-09）：2 场高 APM 录像、500 次更新训练子集能力 top-1 0.532，2,000 次 0.552（验证 0.511），选择 F1 0.290，未达计划的 0.90，**门未通过**；全掩码实体步曾使 Transformer 输出 NaN，已用 `nan_to_num`、非有限损失守卫并下调学习率至 1e-4 修复。门未通过作为首轮限制记录，不阻塞 2 小时基线。
+- 2 小时训练（2026-11-09 16:12 UTC 启动，**暂停会话时仍在独立进程运行**）：输出 `artifacts/runs/bc-86383-v1-apm-20261109T161217Z`，日志 `/tmp/full_run_log.txt`；暂停时 27,722 次更新／2,285 训练秒（预算 7,200 秒），验证损失 5.83（5k）→5.60（10k）→5.21（15k）→4.89（20k）→4.83（25k），能力 top-1 0.524→0.575，`best.pt`／`last.pt` 已按 900 秒写入 `checkpoints/`。首次尝试 `…T160631Z` 在第 501 次更新被外部终止、无异常栈，故重跑且不续训。
+- 下一次会话的收尾步骤：确认 `report.json` 生成（或进程已退出）；用 `best.pt` 对测试集只评估一次；把验证／测试指标、吞吐、显存与检查点 SHA 补进实验记录和本文档，然后提交推送。命令见实验记录的“复现命令”，评估输出目录必须是新目录。
+- Windows 工作副本的未提交 APM 质量代码／文档仍未合并、未改写；其质量清单目前不存在。
