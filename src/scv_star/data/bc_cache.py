@@ -10,6 +10,7 @@ from pathlib import Path
 
 import torch
 
+from scv_star.data.bc_apm import load_apm_labels
 from scv_star.data.bc_catalog import build_ability_catalog, catalog_digest, sha256_file
 from scv_star.data.bc_collection import iter_collection_rows
 from scv_star.data.bc_dataset import collate, iter_sequences
@@ -120,6 +121,7 @@ def _sequence_to_tensors(
     stats,
     unit_types,
     ability_kinds,
+    quality=None,
 ):
     ability_ids = [int(value) for value in catalog["ability_ids"]]
     vocabulary = {ability: index for index, ability in enumerate(ability_ids)}
@@ -159,6 +161,8 @@ def _sequence_to_tensors(
         "key": key,
         "split": first["split"],
         "length": len(rows),
+        "quality_label": quality["quality_label"] if quality is not None else None,
+        "player_apm": int(quality["player_apm"]) if quality is not None else None,
         "entities": entities.to(torch.float32).contiguous(),
         "entity_mask": entity_mask.contiguous(),
         "stale": stale.contiguous(),
@@ -216,6 +220,7 @@ def build_cache(
     sequence_length=32,
     shard_sequences=500,
     reference_cache=None,
+    apm_manifest=None,
 ):
     """Build an immutable tensor cache; only train rows contribute statistics."""
     collection = Path(collection).resolve()
@@ -244,6 +249,21 @@ def build_cache(
     elif "train" not in splits:
         raise ValueError("Training statistics require the train split")
 
+    apm_doc, apm_labels, apm_path = None, {}, None
+    apm_manifest_sha256 = None
+    quality_stats = {}
+    if apm_manifest is not None:
+        apm_doc, apm_labels, apm_path = load_apm_labels(apm_manifest)
+        if apm_doc.get("collection_sha256") != collection_sha:
+            raise ValueError("APM manifest was built from a different collection")
+        apm_manifest_sha256 = _sha256(apm_path)
+        for record in apm_doc["records"]:
+            if record["split"] in splits and int(record["base_build"]) == int(build):
+                entry = quality_stats.setdefault(record["split"], {}).setdefault(
+                    record["quality_label"], {"sequences": 0, "rows": 0, "views": 0}
+                )
+                entry["views"] += 1
+
     output.mkdir(parents=True, exist_ok=False)
     stats = _new_stats()
     unit_types = set()
@@ -263,6 +283,18 @@ def build_cache(
             for rows in iter_sequences(
                 iter_collection_rows(collection, split, builds={build}), sequence_length
             ):
+                quality = (
+                    apm_labels.get((rows[0]["replay_sha256"], int(rows[0]["player_id"])))
+                    if apm_labels
+                    else None
+                )
+                if apm_labels and quality is None:
+                    raise ValueError(
+                        "Missing APM label for "
+                        f"{rows[0]['replay_sha256']} player {rows[0]['player_id']}"
+                    )
+                if quality is not None and quality["split"] != split:
+                    raise ValueError("APM label split disagrees with the cache split")
                 sequence = _sequence_to_tensors(
                     rows,
                     catalog,
@@ -270,7 +302,12 @@ def build_cache(
                     stats=stats,
                     unit_types=unit_types,
                     ability_kinds=ability_kinds,
+                    quality=quality,
                 )
+                if quality is not None:
+                    entry = quality_stats[split][quality["quality_label"]]
+                    entry["sequences"] += 1
+                    entry["rows"] += sequence["length"]
                 pending.append(sequence)
                 split_rows += sequence["length"]
                 split_sequences += 1
@@ -325,6 +362,19 @@ def build_cache(
             "unit_type_vocab": unit_type_vocab,
             "ability_kinds": ability_kinds_list,
             "reference_cache_sha256": _sha256(reference_path) if reference_path else None,
+            "apm_manifest": _relative(apm_manifest, ROOT) if apm_manifest else None,
+            "apm_manifest_sha256": apm_manifest_sha256,
+            "quality_summary": (
+                {
+                    "apm_manifest_sha256": apm_manifest_sha256,
+                    "splits": {
+                        split: {label: dict(values) for label, values in sorted(labels.items())}
+                        for split, labels in sorted(quality_stats.items())
+                    },
+                }
+                if apm_labels
+                else None
+            ),
             "build_seconds": time.monotonic() - started,
             "cache_bytes": total_bytes,
         }
@@ -377,6 +427,7 @@ def main():
     parser.add_argument("--sequence-length", type=int, default=32)
     parser.add_argument("--shard-sequences", type=int, default=500)
     parser.add_argument("--reference-cache", type=Path)
+    parser.add_argument("--apm-manifest", type=Path)
     args = parser.parse_args()
     cache, cache_path = build_cache(
         collection=args.collection,
@@ -386,6 +437,7 @@ def main():
         sequence_length=args.sequence_length,
         shard_sequences=args.shard_sequences,
         reference_cache=args.reference_cache,
+        apm_manifest=args.apm_manifest,
     )
     print(
         json.dumps(

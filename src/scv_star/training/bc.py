@@ -8,11 +8,13 @@ import os
 import platform
 import subprocess
 import time
+from collections import Counter
 from pathlib import Path
 
 import torch
 from torch import nn
 
+from scv_star.data.bc_apm import QUALITY_LABELS, load_apm_labels
 from scv_star.data.bc_cache import load_cache
 from scv_star.data.bc_catalog import sha256_file
 from scv_star.models.bc import (
@@ -47,6 +49,7 @@ REQUIRED_KEYS = (
     "head_weights",
 )
 SOURCE_FILES = (
+    "src/scv_star/data/bc_apm.py",
     "src/scv_star/data/bc_catalog.py",
     "src/scv_star/data/bc_cache.py",
     "src/scv_star/data/bc_features.py",
@@ -90,6 +93,17 @@ def load_config(path):
     config["replays"] = [str(value) for value in config.get("replays", [])]
     config["max_sequences"] = config.get("max_sequences")
     config["cache_sha256"] = config.get("cache_sha256")
+    config["apm_manifest"] = config.get("apm_manifest")
+    config["apm_manifest_sha256"] = config.get("apm_manifest_sha256")
+    config["sampling_weights"] = config.get("sampling_weights")
+    if config["sampling_weights"] is not None:
+        sampling_weights = config["sampling_weights"]
+        if set(sampling_weights) - set(QUALITY_LABELS):
+            raise ValueError("Unknown quality label in sampling_weights")
+        if any(float(value) <= 0 for value in sampling_weights.values()):
+            raise ValueError("sampling_weights must be positive")
+        if config["apm_manifest"] is None:
+            raise ValueError("sampling_weights require apm_manifest")
     return config, path
 
 
@@ -109,6 +123,17 @@ def verify_cache(config, cache, cache_path):
     cache_sha = _digest(Path(cache_path) / "cache.json")
     if config["cache_sha256"] and config["cache_sha256"] != cache_sha:
         raise ValueError("Configured cache hash mismatch")
+    if config.get("apm_manifest"):
+        apm_doc, _, apm_path = load_apm_labels(_resolve(config["apm_manifest"]))
+        if apm_doc.get("collection_sha256") != config["collection_sha256"]:
+            raise ValueError("APM manifest collection mismatch")
+        apm_sha = _digest(apm_path)
+        if cache.get("apm_manifest_sha256") != apm_sha:
+            raise ValueError("Cache APM manifest hash mismatch")
+        if config.get("apm_manifest_sha256") and config["apm_manifest_sha256"] != apm_sha:
+            raise ValueError("Configured APM manifest hash mismatch")
+    elif config.get("sampling_weights"):
+        raise ValueError("sampling_weights require apm_manifest")
     return cache_sha
 
 
@@ -203,17 +228,31 @@ def collate_sequences(sequences, device):
 class SequenceSampler:
     """Seeded epoch permutation with an exact epoch/index data cursor."""
 
-    def __init__(self, sequences, seed, batch_size):
+    def __init__(self, sequences, seed, batch_size, weights=None):
         self.sequences = list(sequences)
         self.seed = int(seed)
         self.batch_size = int(batch_size)
+        if weights is not None:
+            if len(weights) != len(self.sequences):
+                raise ValueError("Sampler weights length mismatch")
+            weights = [float(weight) for weight in weights]
+            if any(weight <= 0 for weight in weights):
+                raise ValueError("Sampler weights must be positive")
+        self.weights = weights
         self.epoch = 0
         self.index = 0
         self._permutation = None
 
     def _permute(self):
         generator = torch.Generator().manual_seed(self.seed + self.epoch)
-        return torch.randperm(len(self.sequences), generator=generator).tolist()
+        if self.weights is None:
+            return torch.randperm(len(self.sequences), generator=generator).tolist()
+        return torch.multinomial(
+            torch.tensor(self.weights, dtype=torch.float64),
+            num_samples=len(self.sequences),
+            replacement=True,
+            generator=generator,
+        ).tolist()
 
     def next_batch(self):
         if self._permutation is None:
@@ -255,6 +294,8 @@ def evaluate_sequences(model, sequences, batch_size, device, weights, train_abil
             batch = collate_sequences(sequences[start : start + batch_size], device)
             outputs = model(batch)
             result = bc_loss(outputs, batch["targets"], weights)
+            if not torch.isfinite(result["total"]):
+                raise ValueError("Non-finite evaluation loss")
             metrics.update(outputs, batch["targets"])
             for name in (*HEAD_NAMES, "total"):
                 losses[name] += float(result[name].detach())
@@ -267,6 +308,17 @@ def evaluate_sequences(model, sequences, batch_size, device, weights, train_abil
             result["ability"]["rows"], 1
         )
     return result
+
+
+def _quality_breakdown(model, sequences, batch_size, device, weights, train_ability):
+    breakdown = {}
+    for label in QUALITY_LABELS:
+        subset = [sequence for sequence in sequences if sequence.get("quality_label") == label]
+        if subset:
+            breakdown[label] = evaluate_sequences(
+                model, subset, batch_size, device, weights, train_ability
+            )
+    return breakdown
 
 
 def _state_hashes(config, config_path, cache_path):
@@ -379,7 +431,18 @@ def run_training(
         weight_decay=float(config["weight_decay"]),
         foreach=False,
     )
-    sampler = SequenceSampler(train_sequences, config["seed"], config["batch_size"])
+    sampling_weights = config.get("sampling_weights")
+    sequence_weights = None
+    if sampling_weights:
+        if any(sequence.get("quality_label") is None for sequence in train_sequences):
+            raise ValueError("sampling_weights require APM labels on every train sequence")
+        sequence_weights = [
+            float(sampling_weights.get(sequence["quality_label"], 1.0))
+            for sequence in train_sequences
+        ]
+    sampler = SequenceSampler(
+        train_sequences, config["seed"], config["batch_size"], weights=sequence_weights
+    )
     weights = {name: float(config["head_weights"][name]) for name in HEAD_NAMES}
     hashes = _state_hashes(config, config_path, cache_path)
     environment = _environment(config, config_path, cache_path)
@@ -413,6 +476,7 @@ def run_training(
     started = time.monotonic()
     last_checkpoint = time.monotonic()
     peak_cuda = 0
+    sampled_quality = Counter()
     try:
         model.train()
         while training_seconds < float(config["training_budget_seconds"]):
@@ -420,9 +484,12 @@ def run_training(
                 break
             update_started = time.monotonic()
             sequences = sampler.next_batch()
+            sampled_quality.update(sequence.get("quality_label") for sequence in sequences)
             batch = collate_sequences(sequences, chosen_device)
             outputs = model(batch)
             losses = bc_loss(outputs, batch["targets"], weights)
+            if not torch.isfinite(losses["total"]):
+                raise ValueError(f"Non-finite training loss at update {updates + 1}")
             optimizer.zero_grad(set_to_none=True)
             losses["total"].backward()
             grad_norm = nn.utils.clip_grad_norm_(model.parameters(), float(config["grad_clip"]))
@@ -451,6 +518,14 @@ def run_training(
             metrics_stream.flush()
             if updates % int(config["validation_interval"]) == 0 and validation_sequences:
                 validation = evaluate_sequences(
+                    model,
+                    validation_sequences,
+                    int(config["batch_size"]),
+                    chosen_device,
+                    weights,
+                    train_ability,
+                )
+                validation["by_quality"] = _quality_breakdown(
                     model,
                     validation_sequences,
                     int(config["batch_size"]),
@@ -506,6 +581,15 @@ def run_training(
             if validation_sequences
             else None
         )
+        if final_metrics is not None:
+            final_metrics["by_quality"] = _quality_breakdown(
+                model,
+                validation_sequences,
+                int(config["batch_size"]),
+                chosen_device,
+                weights,
+                train_ability,
+            )
         if final_metrics is not None and final_metrics["loss"]["total"] < best_loss:
             best_loss = float(final_metrics["loss"]["total"])
             best_update = updates
@@ -522,6 +606,15 @@ def run_training(
             if train_metrics
             else None
         )
+        if train_subset_metrics is not None:
+            train_subset_metrics["by_quality"] = _quality_breakdown(
+                model,
+                train_sequences,
+                int(config["batch_size"]),
+                chosen_device,
+                weights,
+                train_ability,
+            )
         state = _checkpoint_state(
             model,
             optimizer,
@@ -562,12 +655,20 @@ def run_training(
             },
             "final": final_metrics,
             "train_metrics": train_subset_metrics,
+            "quality": {
+                "cache": cache.get("quality_summary"),
+                "sampling_weights": sampling_weights,
+                "sampled_by_quality": {
+                    label: count for label, count in sampled_quality.items() if label is not None
+                },
+            },
             "peak_cuda_bytes": peak_cuda,
             "limitations": [
                 "single build 86383",
                 "entity + scalar inputs only; orders/addons/buffs/upgrades/spatial layers deferred",
                 "LSTM state resets every 32-step sequence chunk",
                 "no M3 online legality or full-game execution",
+                "APM sampling weights use per-view APM as a user-selected quality proxy",
             ],
         }
         (output / "report.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
@@ -594,6 +695,10 @@ def run_evaluation(config, config_path, output, checkpoint, test_cache, *, devic
         raise ValueError("Test cache catalog mismatch")
     if test_document.get("normalization") != cache["normalization"]:
         raise ValueError("Test cache normalization differs from the training cache")
+    if config.get("apm_manifest") and test_document.get("apm_manifest_sha256") != cache.get(
+        "apm_manifest_sha256"
+    ):
+        raise ValueError("Test cache APM labels differ from the training cache")
     chosen_device = _device(device)
     set_determinism(config["seed"])
     model = build_bc_model(cache, config["model"]).to(chosen_device)
@@ -605,6 +710,14 @@ def run_evaluation(config, config_path, output, checkpoint, test_cache, *, devic
     weights = {name: float(config["head_weights"][name]) for name in HEAD_NAMES}
     train_ability = _most_frequent_ability(data["train"], len(cache["catalog"]["ability_ids"]))
     metrics = evaluate_sequences(
+        model,
+        test_data["test"],
+        int(config["batch_size"]),
+        chosen_device,
+        weights,
+        train_ability,
+    )
+    metrics["by_quality"] = _quality_breakdown(
         model,
         test_data["test"],
         int(config["batch_size"]),
@@ -628,8 +741,13 @@ def run_evaluation(config, config_path, output, checkpoint, test_cache, *, devic
         "test_sequences": len(test_data["test"]),
         "train_most_frequent_ability": train_ability,
         "metrics": metrics,
+        "quality": {
+            "test": test_document.get("quality_summary"),
+            "sampling_weights": config.get("sampling_weights"),
+        },
         "limitations": [
             "single final test evaluation; no test-set tuning",
+            "APM test breakdown uses the cached APM labels",
             "single build 86383; deferred features as in training",
         ],
     }

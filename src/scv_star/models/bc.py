@@ -178,6 +178,7 @@ class BCModel(nn.Module):
         features = torch.cat((numeric, booleans), dim=-1)
         encoded = self.entity_norm(self.numeric(features) + categorical)
         encoded = self.transformer(encoded, src_key_padding_mask=~mask)
+        encoded = torch.nan_to_num(encoded, nan=0.0, posinf=0.0, neginf=0.0)
         encoded = encoded * mask.unsqueeze(-1)
         pooled = encoded.sum(1) / mask.sum(1, keepdim=True).clamp(min=1)
         scalar_input = (scalars.reshape(batch * steps, -1) - self.scalar_mean) / self.scalar_std

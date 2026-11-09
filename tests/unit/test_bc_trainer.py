@@ -8,9 +8,9 @@ from scv_star.training.bc import load_config, run_training
 from scv_star.training.checkpoint import assert_state_equal, load_checkpoint
 
 try:
-    from tests.unit.test_bc_cache import CacheFixture
+    from tests.unit.test_bc_cache import CacheFixture, digest, write_apm
 except ImportError:  # unittest discover puts tests/unit on sys.path
-    from test_bc_cache import CacheFixture
+    from test_bc_cache import CacheFixture, digest, write_apm
 
 
 def make_config(fixture, cache_document, cache_dir, root):
@@ -98,6 +98,77 @@ class TrainerTests(unittest.TestCase):
             right = load_checkpoint(uninterrupted / "checkpoints" / "last.pt")
             for key in ("model", "optimizer", "rng", "sampler", "updates", "best_loss"):
                 assert_state_equal(left[key], right[key], key)
+
+    def test_apm_weighted_sampling_and_resume(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            apm = write_apm(
+                root,
+                fixture.collection,
+                [
+                    {
+                        "replay_sha256": "a" * 64,
+                        "base_build": 86383,
+                        "player_id": 1,
+                        "split": "train",
+                        "quality_label": "high",
+                        "player_apm": 300,
+                        "rows": 4,
+                    },
+                    {
+                        "replay_sha256": "b" * 64,
+                        "base_build": 86383,
+                        "player_id": 1,
+                        "split": "validation",
+                        "quality_label": "medium",
+                        "player_apm": 200,
+                        "rows": 2,
+                    },
+                ],
+            )
+            cache_dir = root / "cache"
+            cache_document, _ = build_cache(fixture.collection, 86383, cache_dir, apm_manifest=apm)
+            config = make_config(fixture, cache_document, cache_dir, root)
+            config["apm_manifest"] = str(apm)
+            config["apm_manifest_sha256"] = digest(apm)
+            config["sampling_weights"] = {"high": 3.0, "medium": 2.0, "low": 1.0}
+            config_path = root / "config.json"
+            config_path.write_text(json.dumps(config), encoding="utf-8")
+            loaded, path = load_config(config_path)
+            first = root / "run-a"
+            report = run_training(loaded, path, first, max_updates=2, device="cpu")
+            self.assertEqual(report["quality"]["sampled_by_quality"].get("high", 0), 4)
+            self.assertIn("medium", report["final"]["by_quality"])
+            resumed = root / "run-b"
+            run_training(loaded, path, resumed, max_updates=2, device="cpu")
+            run_training(
+                loaded,
+                path,
+                resumed,
+                resume=resumed / "checkpoints" / "last.pt",
+                max_updates=3,
+                device="cpu",
+            )
+            uninterrupted = root / "run-c"
+            run_training(loaded, path, uninterrupted, max_updates=3, device="cpu")
+            left = load_checkpoint(resumed / "checkpoints" / "last.pt")
+            right = load_checkpoint(uninterrupted / "checkpoints" / "last.pt")
+            for key in ("model", "optimizer", "rng", "sampler", "updates", "best_loss"):
+                assert_state_equal(left[key], right[key], key)
+
+    def test_sampling_weights_require_apm_manifest(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            cache_dir = root / "cache"
+            cache_document, _ = build_cache(fixture.collection, 86383, cache_dir)
+            config = make_config(fixture, cache_document, cache_dir, root)
+            config["sampling_weights"] = {"high": 3.0}
+            config_path = root / "config.json"
+            config_path.write_text(json.dumps(config), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "require apm_manifest"):
+                load_config(config_path)
 
     def test_test_split_is_not_a_training_split(self):
         with tempfile.TemporaryDirectory() as temporary:

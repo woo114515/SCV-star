@@ -4,7 +4,7 @@
 
 M2训练数据实现位于`data/bc_schema.py`（合法观测白名单与RAW动作转换）、`bc_extract.py`（完整同遍提取）、`bc_repack.py`（冻结前无损压缩）、`bc_storage.py`（gzip／XZ统一读取）、`bc_accept.py`（全分片验收）、`bc_dataset.py`（哈希校验、流式序列和张量批次）。这些是源码模块；实际训练数据仍放根目录`data/processed/`，不提交Git。
 
-M4 BC v1数据与训练实现位于`data/bc_catalog.py`（按build规范能力词表）、`data/bc_cache.py`（张量化序列缓存）、`data/bc_features.py`（字段分组）、`models/bc.py`（实体／标量编码、两层LSTM、8个动作头）、`training/bc.py`（可恢复训练器）、`training/checkpoint.py`（原子检查点）和`training/metrics.py`（分头指标）。缓存写入`data/interim/`，训练产物写入`artifacts/runs/`，均不提交Git。
+M4 BC v1数据、APM标注与训练实现位于`data/bc_catalog.py`（按build规范能力词表）、`data/bc_cache.py`（张量化序列缓存）、`data/bc_features.py`（字段分组）、`data/bc_apm.py`（APM 质量标注与加权清单）、`models/bc.py`（实体／标量编码、两层LSTM、8个动作头）、`training/bc.py`（可恢复训练器）、`training/checkpoint.py`（原子检查点）和`training/metrics.py`（分头指标）。缓存写入`data/interim/`，训练产物写入`artifacts/runs/`，均不提交Git。
 
 ```text
 SCV-star/

@@ -8,7 +8,7 @@
 | `local.example.json` | 已提供的 Windows 安装路径及待确认的解释器路径 |
 | `local/machine.json` | 未来填写的本机配置，不提交 Git；当前尚未创建 |
 | `experiments/bc.example.json` | 随机初始化行为克隆与数据清单引用 |
-| `experiments/bc-86383-v1.json` | M4 BC v1 实际实验配置：86383、缓存、种子、模型与损失权重 |
+| `experiments/bc-86383-v1.json` | M4 BC v1 实际实验配置：86383、缓存、种子、模型、损失权重与 APM 加权 |
 | `experiments/rl.example.json` | 新版胜负 RL 基线及引擎固定信息 |
 | `experiments/evaluation.example.json` | 冻结模型、评测条件和样本预算 |
 | `m0.example.json` | M0 脚本所需安装路径、build、地图路径与哈希 |

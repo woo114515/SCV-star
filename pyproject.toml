@@ -27,6 +27,7 @@ scv-m0 = "scv_star.runtime.m0:main"
 scv-m1 = "scv_star.runtime.m1:main"
 scv-bc = "scv_star.training.bc:main"
 scv-bc-cache = "scv_star.data.bc_cache:main"
+scv-apm = "scv_star.data.bc_apm:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

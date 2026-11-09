@@ -8,14 +8,14 @@
   "collection_sha256": "373cfc6f4a267130e5e2259f8bd3f2e109fa35536d7cb8745c6061b690a897da",
   "catalog_digest": "670c1c706ac6a5149bbef712f33534257bfdd99ba0f4afc951295a0179b4b728",
   "cache": "data/interim/bc-86383-v1",
-  "cache_sha256": "bb141682cecc37c9b2057294eecc89dc115077975936db9acf8bcaf658a80a88",
+  "cache_sha256": "c3a87f0350a7c7a904e379bb5b6d4e668420cf251f043d4811726eca5f2a1c33",
   "seed": 20261108,
   "batch_size": 2,
   "sequence_length": 32,
   "training_budget_seconds": 7200,
-  "validation_interval": 1000,
+  "validation_interval": 5000,
   "checkpoint_interval_seconds": 900,
-  "learning_rate": 0.0002,
+  "learning_rate": 0.0001,
   "weight_decay": 0.0001,
   "grad_clip": 1.0,
   "precision": "fp32",
@@ -43,5 +43,12 @@
     "target_point": 0.5,
     "queue": 0.25,
     "delay": 0.25
+  },
+  "apm_manifest": "data/manifests/quality-current.json",
+  "apm_manifest_sha256": "f15141e41b2c9ca08bd145e8b757b27d570d9e6c163ef45492556578b789c436",
+  "sampling_weights": {
+    "high": 3.0,
+    "medium": 2.0,
+    "low": 1.0
   }
 }

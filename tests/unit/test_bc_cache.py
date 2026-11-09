@@ -223,6 +223,17 @@ class CacheFixture:
         )
 
 
+def write_apm(root, collection, records):
+    return write_json(
+        root / "apm.json",
+        {
+            "schema": "tvt-bc-apm-v1",
+            "collection_sha256": digest(collection),
+            "records": records,
+        },
+    )
+
+
 class CacheTests(unittest.TestCase):
     def test_build_and_load_train_validation(self):
         with tempfile.TemporaryDirectory() as temporary:
@@ -284,6 +295,107 @@ class CacheTests(unittest.TestCase):
             self.assertEqual(test["splits"]["test"]["rows"], 2)
             _, sequences = load_cache(test_path)
             self.assertEqual(sequences["test"][0]["length"], 2)
+
+    def test_apm_labels_and_quality_summary(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            apm = write_apm(
+                root,
+                fixture.collection,
+                [
+                    {
+                        "replay_sha256": "a" * 64,
+                        "base_build": 86383,
+                        "player_id": 1,
+                        "split": "train",
+                        "quality_label": "high",
+                        "player_apm": 300,
+                        "rows": 4,
+                    },
+                    {
+                        "replay_sha256": "b" * 64,
+                        "base_build": 86383,
+                        "player_id": 1,
+                        "split": "validation",
+                        "quality_label": "medium",
+                        "player_apm": 200,
+                        "rows": 2,
+                    },
+                    {
+                        "replay_sha256": "c" * 64,
+                        "base_build": 86383,
+                        "player_id": 1,
+                        "split": "test",
+                        "quality_label": "low",
+                        "player_apm": 100,
+                        "rows": 2,
+                    },
+                ],
+            )
+            cache, cache_path = build_cache(
+                fixture.collection, 86383, root / "cache", apm_manifest=apm
+            )
+            self.assertEqual(cache["apm_manifest_sha256"], digest(apm))
+            self.assertEqual(
+                cache["quality_summary"]["splits"]["train"]["high"],
+                {"sequences": 2, "rows": 4, "views": 1},
+            )
+            self.assertEqual(
+                cache["quality_summary"]["splits"]["validation"]["medium"],
+                {"sequences": 1, "rows": 2, "views": 1},
+            )
+            _, sequences = load_cache(cache_path)
+            self.assertEqual(sequences["train"][0]["quality_label"], "high")
+            self.assertEqual(sequences["train"][0]["player_apm"], 300)
+            test, test_path = build_cache(
+                fixture.collection,
+                86383,
+                root / "test-cache",
+                splits=("test",),
+                reference_cache=root / "cache",
+                apm_manifest=apm,
+            )
+            self.assertEqual(
+                test["quality_summary"]["splits"]["test"]["low"],
+                {"sequences": 1, "rows": 2, "views": 1},
+            )
+            self.assertEqual(test["apm_manifest_sha256"], cache["apm_manifest_sha256"])
+            _, test_sequences = load_cache(test_path)
+            self.assertEqual(test_sequences["test"][0]["quality_label"], "low")
+
+    def test_apm_missing_label_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            apm = write_apm(
+                root,
+                fixture.collection,
+                [
+                    {
+                        "replay_sha256": "a" * 64,
+                        "base_build": 86383,
+                        "player_id": 1,
+                        "split": "train",
+                        "quality_label": "high",
+                        "player_apm": 300,
+                        "rows": 4,
+                    }
+                ],
+            )
+            with self.assertRaisesRegex(ValueError, "Missing APM label"):
+                build_cache(fixture.collection, 86383, root / "cache", apm_manifest=apm)
+
+    def test_apm_collection_mismatch_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            apm = write_json(
+                root / "apm.json",
+                {"schema": "tvt-bc-apm-v1", "collection_sha256": "0" * 64, "records": []},
+            )
+            with self.assertRaisesRegex(ValueError, "different collection"):
+                build_cache(fixture.collection, 86383, root / "cache", apm_manifest=apm)
 
     def test_output_must_be_new(self):
         with tempfile.TemporaryDirectory() as temporary:

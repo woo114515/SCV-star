@@ -14,9 +14,9 @@
 
 M0 历史验收包含国服 97579、战争迷雾和真人操作，见[M0记录](docs/experiments/M0_2026-09-29.md)。10月8日旧97579启动回归失败；10月12日用户重新安装国服，本机清单为5.0.17.98370，新安装的API尚未验收；最终新版RL和真人部署必须重新验收。旧版BC数据就绪不替代这一要求。
 
-M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop**；Windows 环境已通过，Ubuntu 24.04 离线环境于 2026-11-08 通过同类 GPU 探针；当前分支 135 项单元测试（134 通过／1 项 Windows 专用跳过）及 1,000 场集合读取。Windows 侧项目约 102.40 GB（M2 扩容轮 150 GB 授权内，未声称回到 100 GB）；Ubuntu 侧环境约 4.8 GB，另链接本机已冻结数据 4.6 GB。原始录像与派生数据仅留本机；GitHub 不保存录像、玩家详情或逐场清单。
+M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop**；Windows 环境已通过，Ubuntu 24.04 离线环境于 2026-11-08 通过同类 GPU 探针；当前分支 146 项单元测试（145 通过／1 项 Windows 专用跳过）及 1,000 场集合读取。Windows 侧项目约 102.40 GB（M2 扩容轮 150 GB 授权内，未声称回到 100 GB）；Ubuntu 侧环境约 4.8 GB，另链接本机已冻结数据 4.6 GB。原始录像与派生数据仅留本机；GitHub 不保存录像、玩家详情或逐场清单。
 
-M4 v1 的数据缓存、模型、可恢复训练器和 135 项单元测试已实现；小样本过拟合、2 小时训练及最终测试待续（M4 计划已获批准）。M3 在线动作合法性及闭环执行仍需在 Windows 补齐。当前 GPU 检查只验证数据可读、探针前后向和恢复链路，不代表策略已训练或达到任何段位。
+M4 v1 的数据缓存、模型、可恢复训练器、APM 加权采样和 146 项单元测试已实现；小样本过拟合、2 小时训练及最终测试待续。M3 在线动作合法性及闭环执行仍需在 Windows 补齐。当前 GPU 检查只验证数据可读、探针前后向和恢复链路，不代表策略已训练或达到任何段位。
 
 ## 基本结构
 
@@ -30,7 +30,7 @@ M4 v1 的数据缓存、模型、可恢复训练器和 135 项单元测试已实
 | `artifacts/` | 检查点、运行记录和评测输出，仅保留目录占位 |
 | `docs/` | 架构、开发、调研、许可、里程碑和实验记录 |
 
-完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1`/`m2` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存阶段依赖和开发工具锁。Ubuntu 侧新增 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合锁）；Windows 侧继续使用各自阶段锁。M2 尚无正式训练 CLI；M4 提供 `scv-bc`／`scv-bc-cache`。
+完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1`/`m2` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存阶段依赖和开发工具锁。Ubuntu 侧新增 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合锁）；Windows 侧继续使用各自阶段锁。M2 尚无正式训练 CLI；M4 提供 `scv-bc`／`scv-bc-cache`／`scv-apm`。
 
 ## 本地命令
 
@@ -64,7 +64,8 @@ Ubuntu 24.04 离线环境（已验收，仅环境与读取检查；不启动游�
 M4 BC v1（缓存已生成；`<新目录>` 必须不存在）：
 
 ```bash
-.venv/bin/python -m scv_star.data.bc_cache --collection data/processed/m2-expand-2026-10-19/collection.json --build 86383 --output data/interim/bc-86383-v1 --splits train validation
+.venv/bin/python -m scv_star.data.bc_cache --collection data/processed/m2-expand-2026-10-19/collection.json --build 86383 --output data/interim/bc-86383-v1 --splits train validation \
+  --apm-manifest data/manifests/quality-current.json
 .venv/bin/python -m scv_star.training.bc --config configs/experiments/bc-86383-v1.json --output artifacts/runs/<新目录> --device cuda
 ```
 
