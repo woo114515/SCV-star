@@ -22,6 +22,7 @@ from scv_star.models.bc import (
     bc_loss,
     build_bc_model,
     model_config_dict,
+    model_config_matches,
 )
 from scv_star.training.checkpoint import CHECKPOINT_SCHEMA, load_checkpoint, save_checkpoint
 from scv_star.training.metrics import MetricsAccumulator
@@ -453,7 +454,7 @@ def run_training(
     best_metrics = None
     if resume:
         state = load_checkpoint(resume, expected_hashes=hashes)
-        if state.get("model_config") != model_config_dict(model.config):
+        if not model_config_matches(state.get("model_config"), model.config):
             raise ValueError("Checkpoint model config mismatch")
         model.load_state_dict(state["model"])
         optimizer.load_state_dict(state["optimizer"])
@@ -708,7 +709,7 @@ def run_evaluation(config, config_path, output, checkpoint, test_cache, *, devic
     model = build_bc_model(cache, config["model"]).to(chosen_device)
     hashes = _state_hashes(config, config_path, cache_path)
     state = load_checkpoint(checkpoint, expected_hashes=hashes)
-    if state.get("model_config") != model_config_dict(model.config):
+    if not model_config_matches(state.get("model_config"), model.config):
         raise ValueError("Checkpoint model config mismatch")
     model.load_state_dict(state["model"])
     weights = {name: float(config["head_weights"][name]) for name in HEAD_NAMES}

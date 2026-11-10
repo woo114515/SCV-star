@@ -20,6 +20,7 @@
 | [观测—动作对齐与训练数据](REPLAY_ALIGNMENT.md) | M2时间语义、完整提取、RAW标签、训练读取与验收状态 |
 | [数据集总览与统一清单](DATASET_OVERVIEW.md) | 公开与本机合并统计、处理队列、版本隔离和本地清单入口 |
 | [M4 BC v1 实验记录](experiments/20261108_M4_bc86383_seed20261108.md) | 86383 首次 BC：APM 加权、缓存、模型、掩码损失、训练与恢复 |
+| [M4 BC 诊断记录](experiments/20261110_M4_bc_diagnosis.md) | 表示探针与受控对照：定位线性能力头、批 2 与梯度裁剪三个缺陷 |
 | [实验记录约定](experiments/README.md) | 记录版本、预算、结果与可复现证据 |
 | [配置模板说明](../configs/README.md) | 区分项目默认值、实验配置和本机配置 |
 | [测试规划](../tests/README.md) | 区分单元、集成与需要实际环境的验证 |

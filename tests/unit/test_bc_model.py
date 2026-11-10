@@ -3,7 +3,12 @@ import unittest
 
 import torch
 
-from scv_star.models.bc import bc_loss, build_bc_model
+from scv_star.models.bc import (
+    BCModelConfig,
+    bc_loss,
+    build_bc_model,
+    model_config_matches,
+)
 
 
 def make_cache():
@@ -130,6 +135,35 @@ class ModelTests(unittest.TestCase):
         self.assertEqual(float(losses["delay"].detach()), 0.0)
         self.assertEqual(losses["counts"]["selection"], 8)
         self.assertTrue(torch.isfinite(losses["total"]))
+
+    def test_wide_ability_head_uses_encoder_skip(self):
+        plain = build_bc_model(make_cache(), {})
+        wide = build_bc_model(make_cache(), {"ability_head_hidden": 64})
+        state = torch.zeros(2, 256)
+        pooled = torch.zeros(2, 128)
+        self.assertEqual(plain._ability_input(state, pooled).shape[-1], 256)
+        self.assertEqual(wide._ability_input(state, pooled).shape[-1], 384)
+        outputs = wide(make_batch())
+        self.assertEqual(outputs["ability"].shape, (2, 4, 3))
+
+    def test_old_checkpoint_config_still_matches(self):
+        old = {
+            "entity_width": 128,
+            "entity_layers": 2,
+            "entity_heads": 4,
+            "entity_ff": 512,
+            "dropout": 0.1,
+            "scalar_width": 128,
+            "lstm_hidden": 256,
+            "lstm_layers": 2,
+            "selection_hidden": 128,
+            "max_selection_steps": 128,
+        }
+        self.assertTrue(model_config_matches(old, BCModelConfig(**old)))
+        wide = BCModelConfig(**dict(old, ability_head_hidden=64))
+        self.assertFalse(model_config_matches(old, wide))
+        self.assertFalse(model_config_matches(None, BCModelConfig(**old)))
+        self.assertFalse(model_config_matches(dict(old, bogus=1), BCModelConfig(**old)))
 
     def test_config_validation(self):
         with self.assertRaises(ValueError):

@@ -11,12 +11,13 @@
 - [最终验收摘要](docs/experiments/M2_READY_2026-10-21.json)：实际样本量、配对率、依赖、GPU 和存储。
 - [Ubuntu 环境验收](docs/experiments/M1_LINUX_2026-11-08.md)：Linux GPU／PyTorch、环境验收与集合读取。
 - [M4 BC v1](docs/experiments/20261108_M4_bc86383_seed20261108.md)：86383 首次 BC 的缓存、模型、掩码损失、训练与恢复记录。
+- [M4 BC 诊断](docs/experiments/20261110_M4_bc_diagnosis.md)：用表示探针与受控对照定位 v1 停在 0.60 的三个实现缺陷。
 
 M0 历史验收包含国服 97579、战争迷雾和真人操作，见[M0记录](docs/experiments/M0_2026-09-29.md)。10月8日旧97579启动回归失败；10月12日用户重新安装国服，本机清单为5.0.17.98370，新安装的API尚未验收；最终新版RL和真人部署必须重新验收。旧版BC数据就绪不替代这一要求。
 
-M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop**；Windows 环境已通过，Ubuntu 24.04 离线环境于 2026-11-08 通过同类 GPU 探针；当前分支 147 项单元测试（146 通过／1 项 Windows 专用跳过）及 1,000 场集合读取。Windows 侧项目约 102.40 GB（M2 扩容轮 150 GB 授权内，未声称回到 100 GB）；Ubuntu 侧环境约 4.8 GB，另链接本机已冻结数据 4.6 GB。原始录像与派生数据仅留本机；GitHub 不保存录像、玩家详情或逐场清单。
+M1 使用 Python 3.11.16、PyTorch 2.13.0+cu130 与 **NVIDIA RTX 5070 Ti Laptop**；Windows 环境已通过，Ubuntu 24.04 离线环境于 2026-11-08 通过同类 GPU 探针；当前分支 151 项单元测试（150 通过／1 项 Windows 专用跳过）及 1,000 场集合读取。Windows 侧项目约 102.40 GB（M2 扩容轮 150 GB 授权内，未声称回到 100 GB）；Ubuntu 侧环境约 4.8 GB，另链接本机已冻结数据 4.6 GB。原始录像与派生数据仅留本机；GitHub 不保存录像、玩家详情或逐场清单。
 
-M4 v1 的数据缓存、模型、可恢复训练器、APM 加权采样与 147 项单元测试已实现；2 小时训练（87,755 次更新）与最终测试已完成，验证损失 5.83→4.45、能力 top-1 0.524→0.598，但小样本过拟合门未达标、选择与延迟头不可用，结论按欠拟合记录，不宣称段位。M3 在线动作合法性及闭环执行仍需在 Windows 补齐。
+M4 v1 的数据缓存、模型、可恢复训练器、APM 加权采样与 151 项单元测试已实现；2 小时训练（87,755 次更新）与最终测试已完成，验证损失 5.83→4.45、能力 top-1 0.524→0.598，但小样本过拟合门未达标、选择与延迟头不可用，结论按欠拟合记录，不宣称段位。M3 在线动作合法性及闭环执行仍需在 Windows 补齐。
 
 ## 基本结构
 
@@ -30,7 +31,7 @@ M4 v1 的数据缓存、模型、可恢复训练器、APM 加权采样与 147 �
 | `artifacts/` | 检查点、运行记录和评测输出，仅保留目录占位 |
 | `docs/` | 架构、开发、调研、许可、里程碑和实验记录 |
 
-完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1`/`m2` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存阶段依赖和开发工具锁。Ubuntu 侧新增 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合锁）；Windows 侧继续使用各自阶段锁。M2 尚无正式训练 CLI；M4 提供 `scv-bc`／`scv-bc-cache`／`scv-apm`。
+完整目录树见[结构说明](docs/PROJECT_STRUCTURE.md)。`pyproject.toml` 声明 Python 3.11+、`m0`/`m1`/`m2` 可选依赖及 `scv-m0`/`scv-m1` 入口；`requirements/` 分别保存阶段依赖和开发工具锁。Ubuntu 侧新增 `requirements/bc-linux-py311-cu130.txt`（m0+m1+m2+dev 组合锁）；Windows 侧继续使用各自阶段锁。M2 尚无正式训练 CLI；M4 提供 `scv-bc`／`scv-bc-cache`／`scv-apm`／`scv-bc-probe`。
 
 ## 本地命令
 

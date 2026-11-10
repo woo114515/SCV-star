@@ -52,6 +52,7 @@ class BCModelConfig:
     lstm_layers: int = 2
     selection_hidden: int = 128
     max_selection_steps: int = 128
+    ability_head_hidden: int = 0
 
 
 class BCModel(nn.Module):
@@ -120,7 +121,15 @@ class BCModel(nn.Module):
             dropout=config.dropout if config.lstm_layers > 1 else 0.0,
         )
         self.ability_embed = nn.Embedding(self.ability_count, width)
-        self.ability_head = nn.Linear(config.lstm_hidden, self.ability_count)
+        head_width = config.lstm_hidden + (width if config.ability_head_hidden else 0)
+        if config.ability_head_hidden:
+            self.ability_head = nn.Sequential(
+                nn.Linear(head_width, config.ability_head_hidden),
+                nn.GELU(),
+                nn.Linear(config.ability_head_hidden, self.ability_count),
+            )
+        else:
+            self.ability_head = nn.Linear(head_width, self.ability_count)
         self.kind_embed = nn.Embedding(2, width)
         self.kind_head = nn.Linear(config.lstm_hidden, 2)
         self.selection_init = nn.Linear(config.lstm_hidden + 2 * width, config.selection_hidden)
@@ -191,7 +200,14 @@ class BCModel(nn.Module):
     def recurrent(self, entities, entity_mask, stale, scalars):
         entity_emb, pooled, scalar_input = self.encode(entities, entity_mask, stale, scalars)
         state = self.lstm(torch.cat((pooled, self.scalar_encoder(scalar_input)), dim=-1))[0]
-        return entity_emb, state
+        return entity_emb, state, pooled
+
+    def _ability_input(self, state, pooled):
+        if self.config.ability_head_hidden:
+            # Keep the per-step encoder representation next to the recurrent
+            # summary: the LSTM compresses it and a linear head cannot recover it.
+            return torch.cat((state, pooled), dim=-1)
+        return state
 
     def _selected_summary(self, entity_emb, indices, selected_mask):
         batch, steps, count, width = entity_emb.shape
@@ -245,9 +261,9 @@ class BCModel(nn.Module):
         stale = batch["stale"]
         scalars = batch["scalars"]
         targets = batch["targets"]
-        entity_emb, state = self.recurrent(entities, entity_mask, stale, scalars)
+        entity_emb, state, pooled = self.recurrent(entities, entity_mask, stale, scalars)
         batch_size, steps = targets["ability"].shape
-        ability_logits = self.ability_head(state)
+        ability_logits = self.ability_head(self._ability_input(state, pooled))
         kind_logits = self.kind_head(state)
         ability_emb = self.ability_embed(targets["ability"])
         kind_emb = self.kind_embed(targets["kind"])
@@ -294,7 +310,7 @@ class BCModel(nn.Module):
         entity_mask = batch["entity_mask"]
         stale = batch["stale"]
         scalars = batch["scalars"]
-        entity_emb, state = self.recurrent(entities, entity_mask, stale, scalars)
+        entity_emb, state, pooled = self.recurrent(entities, entity_mask, stale, scalars)
         batch_size, steps, count = entity_mask.shape
         rows = batch_size * steps
         flat_state = state.reshape(rows, -1)
@@ -487,3 +503,14 @@ def bc_loss(outputs, targets, weights=None):
 
 def model_config_dict(config):
     return asdict(config)
+
+
+def model_config_matches(stored, config):
+    """Compare a checkpoint's model config, filling dataclass defaults for older runs."""
+    if not isinstance(stored, dict):
+        return False
+    current = model_config_dict(config)
+    if set(stored) - set(current):
+        return False
+    defaults = model_config_dict(BCModelConfig())
+    return {key: stored.get(key, defaults[key]) for key in current} == current

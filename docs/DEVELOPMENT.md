@@ -2,7 +2,7 @@
 
 ## 当前可用范围
 
-当前提供 M0 SC2 通信与真人检查、M1 GPU 与恢复检查、M2 元数据扫描、固定版本完整回放、同遍观测—动作提取及训练分片验收。Ubuntu 24.04 离线训练环境已于 2026-11-08 通过 GPU、单元测试和集合读取检查；M4 v1 的 BC 缓存、模型、APM 加权采样与可恢复训练器已实现，2 小时训练与最终测试已完成（结果按欠拟合记录）。RL 学习器、联赛和在线执行仍为占位，不提供尚不存在的在线 `play` 命令。数据入口和命令见[对齐与训练数据](REPLAY_ALIGNMENT.md)。
+当前提供 M0 SC2 通信与真人检查、M1 GPU 与恢复检查、M2 元数据扫描、固定版本完整回放、同遍观测—动作提取及训练分片验收。Ubuntu 24.04 离线训练环境已于 2026-11-08 通过 GPU、单元测试和集合读取检查；M4 v1 的 BC 缓存、模型、APM 加权采样与可恢复训练器已实现，2 小时训练与最终测试已完成（结果按欠拟合记录）；诊断轮用表示探针定位了三处实现缺陷，v2 修复后训练中。RL 学习器、联赛和在线执行仍为占位，不提供尚不存在的在线 `play` 命令。数据入口和命令见[对齐与训练数据](REPLAY_ALIGNMENT.md)。
 
 Windows 与 Ubuntu 分别使用项目内独立环境：Windows 为 `.venv/Scripts/python.exe`（Python 3.11.16），Ubuntu 为 `.venv/bin/python`（uv 管理的 Python 3.11.16）；通信、GPU 和开发工具依赖各自保存哈希锁，不跨系统复用。M1 已在 Windows 上通过 PyTorch 2.13.0+cu130 的小型验证；Ubuntu 2026-11-08 复跑了同类 GPU 探针并通过，详见 [M1 验证命令](M1_ACCEPTANCE.md)、[M0 部署与命令](M0_ACCEPTANCE.md)和[Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。未运行正式 BC／RL 训练。
 
@@ -68,7 +68,7 @@ Ubuntu 24.04 使用独立环境执行同类检查：
 .venv/bin/python -m scv_star.runtime.bc_reader_check --collection data/processed/m2-expand-2026-10-19/collection.json --output artifacts/runs/<新目录>/gpu-check.json
 ```
 
-Linux 结果与 Windows 分开记录；当前 147 项中 1 项 Windows 专用测试在 Linux 按设计跳过。详见 [Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
+Linux 结果与 Windows 分开记录；当前 151 项中 1 项 Windows 专用测试在 Linux 按设计跳过。详见 [Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
 
 M4 BC v1 入口（缓存已生成；`<新目录>` 必须不存在）：
 
