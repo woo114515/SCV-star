@@ -99,6 +99,42 @@ class TrainerTests(unittest.TestCase):
             for key in ("model", "optimizer", "rng", "sampler", "updates", "best_loss"):
                 assert_state_equal(left[key], right[key], key)
 
+    def test_best_checkpoint_matches_reported_best(self):
+        # The final validation runs after the last periodic update, so it can
+        # improve on the periodic best. best.pt must be rewritten in that case
+        # or the report and the checkpoint disagree about which weights are best.
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            cache_dir = root / "cache"
+            cache_document, _ = build_cache(fixture.collection, 86383, cache_dir)
+            config = make_config(fixture, cache_document, cache_dir, root)
+            config["learning_rate"] = 0.001
+            config["validation_interval"] = 1000
+            config_path = root / "config.json"
+            config_path.write_text(json.dumps(config), encoding="utf-8")
+            loaded, path = load_config(config_path)
+            output = root / "run"
+            run_training(loaded, path, output, max_updates=1, device="cpu")
+            best_before = load_checkpoint(output / "checkpoints" / "best.pt")
+            self.assertEqual(best_before["updates"], 1)
+            report = run_training(
+                loaded,
+                path,
+                output,
+                resume=output / "checkpoints" / "last.pt",
+                max_updates=41,
+                device="cpu",
+            )
+            # The final validation at update 41 improves on the update-1 best,
+            # so the reported best and best.pt must both point at update 41.
+            self.assertEqual(report["best"]["update"], 41)
+            best = load_checkpoint(output / "checkpoints" / "best.pt")
+            self.assertEqual(best["updates"], report["best"]["update"])
+            self.assertAlmostEqual(
+                float(best["best_loss"]), float(report["best"]["loss"]), places=5
+            )
+
     def test_apm_weighted_sampling_and_resume(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

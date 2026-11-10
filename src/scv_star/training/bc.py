@@ -628,9 +628,13 @@ def run_training(
         )
         state["best_metrics"] = best_metrics
         save_checkpoint(checkpoints / "last.pt", state)
-        if best_metrics is not None:
-            if not (checkpoints / "best.pt").exists():
-                save_checkpoint(checkpoints / "best.pt", state)
+        if best_metrics is not None and (
+            best_update == updates or not (checkpoints / "best.pt").exists()
+        ):
+            # The final validation can improve on the last periodic one; that
+            # improvement must reach best.pt or the report and the checkpoint
+            # disagree about which weights are best.
+            save_checkpoint(checkpoints / "best.pt", state)
         report = {
             "schema": RUN_SCHEMA,
             "kind": "behavior_cloning",
