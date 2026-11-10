@@ -68,7 +68,7 @@ Ubuntu 24.04 使用独立环境执行同类检查：
 .venv/bin/python -m scv_star.runtime.bc_reader_check --collection data/processed/m2-expand-2026-10-19/collection.json --output artifacts/runs/<新目录>/gpu-check.json
 ```
 
-Linux 结果与 Windows 分开记录；当前 151 项中 1 项 Windows 专用测试在 Linux 按设计跳过。详见 [Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
+Linux 结果与 Windows 分开记录；当前 152 项中 1 项 Windows 专用测试在 Linux 按设计跳过。详见 [Ubuntu 环境验收](experiments/M1_LINUX_2026-11-08.md)。
 
 M4 BC v1 入口（缓存已生成；`<新目录>` 必须不存在）：
 

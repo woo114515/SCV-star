@@ -316,7 +316,7 @@ class BCModel(nn.Module):
         flat_state = state.reshape(rows, -1)
         flat_entities = entity_emb.reshape(rows, count, self.entity_width)
         flat_mask = entity_mask.reshape(rows, count)
-        ability_logits = self.ability_head(state).reshape(rows, -1)
+        ability_logits = self.ability_head(self._ability_input(state, pooled)).reshape(rows, -1)
         ability = torch.distributions.Categorical(logits=ability_logits).sample()
         ability_emb = self.ability_embed(ability)
         kind_logits = self.kind_head(state).reshape(rows, -1)

@@ -52,7 +52,7 @@
 - 分支：`chore/ubuntu-training-env`（基于 `a24412a`），只在该侧分支提交，不直接改 `main`；本补充的锁文件和文档改动尚未合并。
 - 环境：Ubuntu 24.04.5 LTS、Python 3.11.16、torch 2.13.0+cu130、RTX 5070 Ti Laptop 12,227 MiB、驱动 595.99.02；依赖锁 `requirements/bc-linux-py311-cu130.txt`（SHA-256 `df9b497ae2bb56c7697406de7e405004aebb001bc8bd6a84a94af80a934c98a2`）。Windows 与 Ubuntu 环境互不复制。
 - 数据：本机 `SCV-star/dataset`（仓库父目录，不提交）链接到 `data/processed/`，入口 `data/manifests/training-current.json`；集合 SHA-256 `373cfc6f4a267130e5e2259f8bd3f2e109fa35536d7cb8745c6061b690a897da`、入口 SHA-256 `79390eea6ed18a7039e7a5d88457fcedb3b5b4b8ff6ce243ae185bc26ccfbc98`；1,000 场／2,000 视角／2,467,676 行。
-- 验收：环境验收时 110 项，M4 v1 后当前 151 项（150 通过／1 项 Windows 专用跳过）；Ruff 通过；M1 GPU 探针 FP32／FP16／BF16 与恢复逐位一致；`bc_reader_check` 15 案例、11 版本、最大 531 实体、优化器更新 0。证据 `artifacts/runs/m1-gpu-linux-20261108/report.json`（SHA-256 `caa968fd14bdcfdf17265d97290e0353839be9af4cbc6f03bf4005904a12a054`）与 `artifacts/runs/m2-linux-reader-check-20261108/gpu-check.json`（SHA-256 `d48baddcc047eae94177b52d13ca26b677c7a6175a82afdf6f8958ce8ed7a785`）；记录见 [M1 Linux 环境验收](experiments/M1_LINUX_2026-11-08.md)。
+- 验收：环境验收时 110 项，M4 v1 后当前 152 项（151 通过／1 项 Windows 专用跳过）；Ruff 通过；M1 GPU 探针 FP32／FP16／BF16 与恢复逐位一致；`bc_reader_check` 15 案例、11 版本、最大 531 实体、优化器更新 0。证据 `artifacts/runs/m1-gpu-linux-20261108/report.json`（SHA-256 `caa968fd14bdcfdf17265d97290e0353839be9af4cbc6f03bf4005904a12a054`）与 `artifacts/runs/m2-linux-reader-check-20261108/gpu-check.json`（SHA-256 `d48baddcc047eae94177b52d13ca26b677c7a6175a82afdf6f8958ce8ed7a785`）；记录见 [M1 Linux 环境验收](experiments/M1_LINUX_2026-11-08.md)。
 - 限制：M4 v1 已完成单 build、单种子的 2 小时训练与一次最终测试，但过拟合门未达标、选择头与延迟头不可用，结论按欠拟合记录，不能宣称段位或完整 M4 完成；M3 在线动作／最新版 API 仍需 Windows。现有 `m1.py` 是 Windows 入口，报告中的 `dependency_lock_sha256` 字段仍指 Windows 锁 `6db46834531e1fd871e1417c186cc42a2d252a55c974d9fd2c552b1e47cdea51`，实际 Linux 锁以本条为准。
 - Windows 工作副本：存在未提交的 APM 质量代码／测试／文档（`bc_quality.py` 等）；截至本记录其描述的质量清单在当前数据入口中不存在。该工作由用户稍后提交；Ubuntu 侧未合并、未改写，不要覆盖。
 - 下一步：M4 v1 基线已完成并记录；后续先排查欠拟合与选择／延迟头，再做 APM 加权与无权重的单变量对照，多 build／多 seed 待单变量结论后决定。首轮固定 86383 单 build，验证／测试集保持隔离。
@@ -61,7 +61,7 @@
 
 - 分支：`feat/m4-bc-v1`，基于 `chore/ubuntu-training-env`／`135531e`；实现与实验计划提交见该分支，`main` 未改。
 - 代码：`data/bc_catalog.py`（按 build 规范词表）、`data/bc_cache.py`（张量化序列缓存）、`data/bc_features.py`、`models/bc.py`（实体／标量、两层 LSTM、8 个动作头）、`training/bc.py`（可恢复训练器）、`training/checkpoint.py`、`training/metrics.py`；命令入口 `scv-bc`／`scv-bc-cache`。
-- 测试：151 项单元测试（150 通过／1 项 Windows 专用跳过），Ruff 通过；覆盖词表、缓存、模型、掩码损失、检查点、指标、APM 标注、加权采样、best 检查点一致性、宽能力头兼容与表示探针。
+- 测试：152 项单元测试（151 通过／1 项 Windows 专用跳过），Ruff 通过；覆盖词表、缓存、模型、掩码损失、检查点、指标、APM 标注、加权采样、best 检查点一致性、宽能力头兼容与表示探针。
 - 数据：86383 训练／验证张量缓存位于 `data/interim/bc-86383-v1/`（派生数据，不提交），带 per-view APM 标签：训练 10,546 序列／326,361 行／22 分片，验证 1,197／36,694／3；APM 清单 SHA-256 `f15141e…c436`；86383 的 300 个视角中，训练 152 high／34 medium／56 low。配置固定种子 `20261108`、batch 2×32、FP32、AdamW 1e-4、2 小时预算、验证每 5,000 次更新（计划为 1,000，偏差理由见实验记录）；`sampling_weights` high 3.0／medium 2.0／low 1.0。
 - 真实数据触发：ability 316 同时为 command／autocast，v1 使用独立 2 类 kind 头；原“由 ability 推导 kind”不成立。实验记录：`docs/experiments/20261108_M4_bc86383_seed20261108.md`。
 - 过拟合探测（2026-11-09）：2 场高 APM 录像、500 次更新训练子集能力 top-1 0.532，2,000 次 0.552（验证 0.511），选择 F1 0.290，未达计划的 0.90，**门未通过**；全掩码实体步曾使 Transformer 输出 NaN，已用 `nan_to_num`、非有限损失守卫并下调学习率至 1e-4 修复。门未通过作为首轮限制记录，不阻塞 2 小时基线。
@@ -78,5 +78,7 @@
 - 诊断结论（全部为训练集内样本，不代表泛化）：64 维手工聚合特征用两层 MLP 可达 0.838，说明信息在特征里；编码器 pooled 表示用 MLP 可达 0.905，但 LSTM 状态只有 0.713，v1 的线性头在状态上仅 0.615，端到端 0.56。受控对照显示批 2 序列（64 行）拟合 4,119 类时梯度噪声过大是主因：批 8＋学习率 1e-3＋不裁剪＋宽头在同一批行上 6,000 次更新达到 0.998（96/96 类全对）。
 - 代码改动（向后兼容）：`BCModelConfig.ability_head_hidden`（默认 0 保持 v1 线性头与旧检查点可加载）；`model_config_matches` 用 dataclass 默认值补齐旧检查点的模型配置，避免宽头误加载线性头权重。新增 `data/bc_probe.py` 与 `scv-bc-probe` 入口，把表示探针固化为可复现命令。
 - v2 配置 `configs/experiments/bc-86383-v2.json`：宽头 512、批 8、lr 1e-3、`grad_clip` 100，其余与 v1 相同（同一缓存、APM 加权、种子、dropout 0.1、7,200 秒预算）。这是一次修复轮，不是单变量实验：三项改动各自被单独否证过。
-- 状态：2 小时训练运行中（`artifacts/runs/bc-86383-v2-<UTC>`），完成后按 v1 同样口径只做一次测试评估，再补记结果。
+- v2 结果：`artifacts/runs/bc-86383-v2-20261110T081643Z`，20,602 次更新／7,200.1 训练秒／峰值显存 3.23 GiB；验证损失 16,000 步见底 4.6522，之后回升，`best.pt` 停在 16,000。验证 top-1 0.6053／top-5 0.9494、训练子集 0.6726（v1 0.6306），能力损失与 top-5 在验证和测试上都优于 v1，目标单位略好；但选择 F1（测试 0.3991 vs 0.4225）、目标点 MAE（13.11 vs 11.69）与总损失（测试 4.8948 vs 4.7140）变差。原因是批 8 把优化步数从 87,755 压到 20,602，自回归选择与指针头先受损。**结论：v2 不是更好的端到端模型，v1 仍是最好的整体基线**；v2 证明了诊断与修复方向正确，下一轮应解耦批大小与更新次数。
+- v2 测试：`artifacts/runs/bc-86383-v2-test-20261110T102940Z`（检查点 16,000，按“验证损失最低”事前规则选出，只评估一次）。
+- 推理缺陷已修：`BCModel.act()` 在宽头配置下把 256 维状态送进期望 384 维的能力头；已改走 `_ability_input(state, pooled)` 并加 `act` 回归测试（修复前报 `mat1 and mat2 shapes cannot be multiplied (8x256 and 384x64)`）。训练／验证／测试走 `forward`，不受影响。当前 152 项单元测试通过。
 

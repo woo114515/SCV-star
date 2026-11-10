@@ -110,6 +110,15 @@ class ModelTests(unittest.TestCase):
         self.assertTrue((actions["target_kind"] < 3).all())
         self.assertTrue((actions["target_unit"] < 5).all())
         self.assertTrue((actions["delay"] >= 0).all())
+
+    def test_act_uses_the_wide_ability_head(self):
+        model = build_bc_model(make_cache(), {"ability_head_hidden": 64})
+        model.eval()
+        with torch.no_grad():
+            actions = model.act(make_batch())
+        self.assertEqual(tuple(actions["ability"].shape), (2, 4))
+        self.assertTrue((actions["ability"] < 3).all())
+        self.assertEqual(tuple(actions["target_unit"].shape), (2, 4))
         self.assertTrue((actions["target_point"] >= 0).all())
         self.assertTrue((actions["target_point"] <= 1).all())
 
