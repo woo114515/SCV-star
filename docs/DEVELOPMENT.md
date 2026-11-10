@@ -80,6 +80,15 @@ M4 BC v1 入口（缓存已生成；`<新目录>` 必须不存在）：
 
 小样本过拟合、断点恢复、2 小时训练和最终测试的命令与判据见 [M4 BC v1 记录](experiments/20261108_M4_bc86383_seed20261108.md)。
 
+热启动（只加载权重，不带优化器、RNG 和采样游标）用于在既有权重上换超参：
+
+```bash
+.venv/bin/python -m scv_star.training.bc --config configs/experiments/bc-86383-lrscan-1e4.json --output artifacts/runs/<新目录> \
+  --init-from artifacts/runs/bc-86383-v2-<UTC>/checkpoints/best.pt --max-updates 2000
+```
+
+`--init-from` 与 `--resume` 互斥；来源的模型结构必须与当前配置一致，来源路径、摘要和来源步数写入运行目录的 `init.json`。`--resume` 仍然要求整个配置文件摘要一致，只用于同一配置的续训。
+
 ## 代码与文档约定
 
 - Python 使用四空格缩进，JSON 两空格；文件采用 UTF-8，文本默认 LF，见 `.editorconfig` 和 `.gitattributes`。

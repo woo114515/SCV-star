@@ -193,6 +193,92 @@ class TrainerTests(unittest.TestCase):
             for key in ("model", "optimizer", "rng", "sampler", "updates", "best_loss"):
                 assert_state_equal(left[key], right[key], key)
 
+    def test_init_from_warm_starts_weights_only(self):
+        # A warm start copies weights but not optimizer/RNG/cursor state, so a
+        # run started at zero updates must hold exactly the source weights.
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            cache_dir = root / "cache"
+            cache_document, _ = build_cache(fixture.collection, 86383, cache_dir)
+            config_path = root / "config.json"
+            config_path.write_text(
+                json.dumps(make_config(fixture, cache_document, cache_dir, root)),
+                encoding="utf-8",
+            )
+            config, loaded_path = load_config(config_path)
+            source = root / "source"
+            run_training(config, loaded_path, source, max_updates=2, device="cpu")
+            source_checkpoint = source / "checkpoints" / "best.pt"
+            warm = root / "warm"
+            report = run_training(
+                config,
+                loaded_path,
+                warm,
+                init_from=source_checkpoint,
+                max_updates=0,
+                device="cpu",
+            )
+            self.assertEqual(report["updates"], 0)
+            self.assertEqual(report["warm_start"]["source_updates"], 2)
+            self.assertTrue((warm / "init.json").is_file())
+            started = load_checkpoint(warm / "checkpoints" / "last.pt")
+            origin = load_checkpoint(source_checkpoint)
+            assert_state_equal(started["model"], origin["model"], "model")
+            self.assertEqual(started["updates"], 0)
+
+    def test_init_from_rejects_model_config_mismatch(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            cache_dir = root / "cache"
+            cache_document, _ = build_cache(fixture.collection, 86383, cache_dir)
+            config_path = root / "config.json"
+            config_path.write_text(
+                json.dumps(make_config(fixture, cache_document, cache_dir, root)),
+                encoding="utf-8",
+            )
+            config, loaded_path = load_config(config_path)
+            source = root / "source"
+            run_training(config, loaded_path, source, max_updates=1, device="cpu")
+            wide = make_config(fixture, cache_document, cache_dir, root)
+            wide["model"]["ability_head_hidden"] = 64
+            wide_path = root / "wide.json"
+            wide_path.write_text(json.dumps(wide), encoding="utf-8")
+            wide_config, wide_loaded = load_config(wide_path)
+            with self.assertRaisesRegex(ValueError, "model config mismatch"):
+                run_training(
+                    wide_config,
+                    wide_loaded,
+                    root / "warm",
+                    init_from=source / "checkpoints" / "last.pt",
+                    max_updates=0,
+                    device="cpu",
+                )
+
+    def test_resume_and_init_from_are_exclusive(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            cache_dir = root / "cache"
+            cache_document, _ = build_cache(fixture.collection, 86383, cache_dir)
+            config_path = root / "config.json"
+            config_path.write_text(
+                json.dumps(make_config(fixture, cache_document, cache_dir, root)),
+                encoding="utf-8",
+            )
+            config, loaded_path = load_config(config_path)
+            with self.assertRaisesRegex(ValueError, "mutually exclusive"):
+                run_training(
+                    config,
+                    loaded_path,
+                    root / "run",
+                    resume=root / "last.pt",
+                    init_from=root / "last.pt",
+                    max_updates=0,
+                    device="cpu",
+                )
+
     def test_sampling_weights_require_apm_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

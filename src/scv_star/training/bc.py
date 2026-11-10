@@ -396,6 +396,7 @@ def run_training(
     output,
     *,
     resume=None,
+    init_from=None,
     max_updates=None,
     device=None,
     replays=None,
@@ -403,6 +404,8 @@ def run_training(
     train_metrics=False,
 ):
     output = Path(output).absolute()
+    if resume and init_from:
+        raise ValueError("--resume and --init-from are mutually exclusive")
     if not resume and output.exists():
         raise ValueError(f"Output already exists: {output}")
     cache_path = _resolve(config["cache"])
@@ -467,9 +470,25 @@ def run_training(
         best_loss = float(state["best_loss"])
         best_update = int(state["best_update"])
         best_metrics = state.get("best_metrics")
+    warm_start = None
+    if init_from:
+        # Weights-only warm start: the source run keeps its own optimizer, RNG and
+        # data cursor, so this is a fresh run that merely begins from those weights.
+        state = load_checkpoint(init_from)
+        if not model_config_matches(state.get("model_config"), model.config):
+            raise ValueError("Initial checkpoint model config mismatch")
+        model.load_state_dict(state["model"])
+        warm_start = {
+            "path": str(Path(init_from).absolute()),
+            "sha256": _digest(Path(init_from)),
+            "source_updates": int(state.get("updates", 0)),
+            "source_best_loss": float(state.get("best_loss", float("nan"))),
+        }
     output.mkdir(parents=True, exist_ok=True)
     (output / "config.json").write_text(json.dumps(config, indent=2), encoding="utf-8")
     (output / "environment.json").write_text(json.dumps(environment, indent=2), encoding="utf-8")
+    if warm_start:
+        (output / "init.json").write_text(json.dumps(warm_start, indent=2), encoding="utf-8")
     metrics_stream = (output / "metrics.jsonl").open("a", encoding="utf-8")
     validation_stream = (output / "validation.jsonl").open("a", encoding="utf-8")
     checkpoints = output / "checkpoints"
@@ -668,6 +687,7 @@ def run_training(
                 },
             },
             "peak_cuda_bytes": peak_cuda,
+            "warm_start": warm_start,
             "limitations": [
                 "single build 86383",
                 "entity + scalar inputs only; orders/addons/buffs/upgrades/spatial layers deferred",
@@ -765,6 +785,7 @@ def main():
     parser.add_argument("--config", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--resume", type=Path)
+    parser.add_argument("--init-from", type=Path)
     parser.add_argument("--max-updates", type=int)
     parser.add_argument("--device", default=None)
     parser.add_argument("--replays", nargs="+")
@@ -792,6 +813,7 @@ def main():
             config_path,
             args.output,
             resume=args.resume,
+            init_from=args.init_from,
             max_updates=args.max_updates,
             device=args.device,
             replays=args.replays,
