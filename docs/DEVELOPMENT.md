@@ -89,6 +89,14 @@ M4 BC v1 入口（缓存已生成；`<新目录>` 必须不存在）：
 
 `--init-from` 与 `--resume` 互斥；来源的模型结构必须与当前配置一致，来源路径、摘要和来源步数写入运行目录的 `init.json`。`--resume` 仍然要求整个配置文件摘要一致，只用于同一配置的续训。
 
+学习率可按更新次数衰减（`bc-86383-v3.json` 使用余弦）：`learning_rate` 是峰值，附加字段
+
+```json
+"lr_schedule": {"kind": "cosine", "warmup_updates": 500, "total_updates": 107000, "min_learning_rate": 1e-05}
+```
+
+`kind` 省略或为 `constant` 时保持恒定学习率（v1/v2 的行为）。学习率只由更新次数决定、不读墙钟，因此运行可复现、断点续训能自动接上；`total_updates` 用实测每步耗时换算成预算内的步数（起跑后按 `metrics.jsonl` 的 `batch_seconds` 核对），跑完调度后剩余步数按 `min_learning_rate` 继续。
+
 ## 代码与文档约定
 
 - Python 使用四空格缩进，JSON 两空格；文件采用 UTF-8，文本默认 LF，见 `.editorconfig` 和 `.gitattributes`。

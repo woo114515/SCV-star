@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from scv_star.data.bc_cache import build_cache
-from scv_star.training.bc import load_config, run_training
+from scv_star.training.bc import learning_rate_for, load_config, parse_lr_schedule, run_training
 from scv_star.training.checkpoint import assert_state_equal, load_checkpoint
 
 try:
@@ -278,6 +278,90 @@ class TrainerTests(unittest.TestCase):
                     max_updates=0,
                     device="cpu",
                 )
+
+    def test_cosine_schedule_endpoints_and_warmup(self):
+        schedule = parse_lr_schedule(
+            {"kind": "cosine", "warmup_updates": 2, "total_updates": 10, "min_learning_rate": 0.0},
+            1.0,
+        )
+        # Warmup ramps linearly over the first updates, then cosine takes over.
+        self.assertAlmostEqual(learning_rate_for(schedule, 1.0, 0), 0.5)
+        self.assertAlmostEqual(learning_rate_for(schedule, 1.0, 1), 1.0)
+        self.assertAlmostEqual(learning_rate_for(schedule, 1.0, 2), 1.0)
+        self.assertAlmostEqual(learning_rate_for(schedule, 1.0, 6), 0.5)
+        self.assertAlmostEqual(learning_rate_for(schedule, 1.0, 10), 0.0)
+        self.assertAlmostEqual(learning_rate_for(schedule, 1.0, 25), 0.0)
+        self.assertAlmostEqual(learning_rate_for({"kind": "constant"}, 0.3, 7), 0.3)
+
+    def test_invalid_lr_schedule_is_rejected(self):
+        with self.assertRaisesRegex(ValueError, "min_learning_rate"):
+            parse_lr_schedule(
+                {
+                    "kind": "cosine",
+                    "warmup_updates": 0,
+                    "total_updates": 10,
+                    "min_learning_rate": 2.0,
+                },
+                1.0,
+            )
+        with self.assertRaisesRegex(ValueError, "warmup_updates"):
+            parse_lr_schedule({"kind": "cosine", "warmup_updates": 10, "total_updates": 10}, 1.0)
+        with self.assertRaisesRegex(ValueError, "Unsupported"):
+            parse_lr_schedule({"kind": "step"}, 1.0)
+
+    def test_lr_schedule_drives_the_optimizer_and_survives_resume(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            fixture = CacheFixture(root)
+            cache_dir = root / "cache"
+            cache_document, _ = build_cache(fixture.collection, 86383, cache_dir)
+            config = make_config(fixture, cache_document, cache_dir, root)
+            config["learning_rate"] = 0.01
+            config["lr_schedule"] = {
+                "kind": "cosine",
+                "warmup_updates": 1,
+                "total_updates": 4,
+                "min_learning_rate": 0.0,
+            }
+            config_path = root / "config.json"
+            config_path.write_text(json.dumps(config), encoding="utf-8")
+            loaded, path = load_config(config_path)
+            steps = 4
+            first = root / "run-a"
+            run_training(loaded, path, first, max_updates=steps, device="cpu")
+            observed = [
+                json.loads(line)["learning_rate"]
+                for line in (first / "metrics.jsonl").read_text().splitlines()
+            ]
+            expected = [
+                learning_rate_for(loaded["lr_schedule"], loaded["learning_rate"], index)
+                for index in range(steps)
+            ]
+            for got, want in zip(observed, expected):
+                self.assertAlmostEqual(got, want, places=8)
+            self.assertAlmostEqual(observed[0], loaded["learning_rate"], places=8)
+            self.assertLess(observed[-1], loaded["learning_rate"])
+            resumed = root / "run-b"
+            run_training(loaded, path, resumed, max_updates=2, device="cpu")
+            run_training(
+                loaded,
+                path,
+                resumed,
+                resume=resumed / "checkpoints" / "last.pt",
+                max_updates=steps + 1,
+                device="cpu",
+            )
+            uninterrupted = root / "run-c"
+            run_training(loaded, path, uninterrupted, max_updates=steps + 1, device="cpu")
+            left = load_checkpoint(resumed / "checkpoints" / "last.pt")
+            right = load_checkpoint(uninterrupted / "checkpoints" / "last.pt")
+            # best_loss is excluded: the resumed run validates once before the
+            # breakpoint, so its running best can legitimately be lower.
+            for key in ("model", "optimizer", "rng", "sampler", "updates"):
+                assert_state_equal(left[key], right[key], key)
+            report = json.loads((resumed / "report.json").read_text())
+            self.assertEqual(report["lr_schedule"]["kind"], "cosine")
+            self.assertLess(report["final_learning_rate"], loaded["learning_rate"])
 
     def test_sampling_weights_require_apm_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:

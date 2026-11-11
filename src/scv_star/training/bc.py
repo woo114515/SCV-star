@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import platform
 import subprocess
@@ -105,7 +106,60 @@ def load_config(path):
             raise ValueError("sampling_weights must be positive")
         if config["apm_manifest"] is None:
             raise ValueError("sampling_weights require apm_manifest")
+    config["lr_schedule"] = parse_lr_schedule(
+        config.get("lr_schedule"), float(config["learning_rate"])
+    )
     return config, path
+
+
+DEFAULT_LR_SCHEDULE = {"kind": "constant"}
+LR_SCHEDULE_KINDS = ("constant", "cosine")
+
+
+def parse_lr_schedule(schedule, peak):
+    """Validate an optional learning-rate schedule against the peak rate."""
+    if schedule is None:
+        return dict(DEFAULT_LR_SCHEDULE)
+    if not isinstance(schedule, dict):
+        raise ValueError("lr_schedule must be an object")
+    kind = schedule.get("kind", "constant")
+    if kind not in LR_SCHEDULE_KINDS:
+        raise ValueError(f"Unsupported lr_schedule kind: {kind}")
+    if kind == "constant":
+        return {"kind": "constant"}
+    warmup = int(schedule.get("warmup_updates", 0))
+    total = int(schedule.get("total_updates", 0))
+    minimum = float(schedule.get("min_learning_rate", 0.0))
+    if total < 1:
+        raise ValueError("lr_schedule requires a positive total_updates")
+    if warmup < 0 or warmup >= total:
+        raise ValueError("lr_schedule warmup_updates must be smaller than total_updates")
+    if not 0.0 <= minimum <= float(peak):
+        raise ValueError("lr_schedule min_learning_rate must be within [0, learning_rate]")
+    return {
+        "kind": "cosine",
+        "warmup_updates": warmup,
+        "total_updates": total,
+        "min_learning_rate": minimum,
+    }
+
+
+def learning_rate_for(schedule, peak, updates):
+    """Learning rate for the next update; a function of the update count only.
+
+    Depending on `updates` alone keeps runs reproducible and makes the schedule
+    recoverable from a checkpoint, unlike a wall-clock-driven schedule.
+    """
+    peak = float(peak)
+    if schedule.get("kind", "constant") == "constant":
+        return peak
+    warmup = int(schedule["warmup_updates"])
+    total = int(schedule["total_updates"])
+    minimum = float(schedule["min_learning_rate"])
+    if updates < warmup:
+        return peak * (updates + 1) / warmup
+    progress = min(1.0, (updates - warmup) / max(1, total - warmup))
+    return minimum + 0.5 * (peak - minimum) * (1.0 + math.cos(math.pi * progress))
 
 
 def verify_cache(config, cache, cache_path):
@@ -448,6 +502,8 @@ def run_training(
         train_sequences, config["seed"], config["batch_size"], weights=sequence_weights
     )
     weights = {name: float(config["head_weights"][name]) for name in HEAD_NAMES}
+    lr_schedule = config["lr_schedule"]
+    peak_lr = float(config["learning_rate"])
     hashes = _state_hashes(config, config_path, cache_path)
     environment = _environment(config, config_path, cache_path)
     updates = 0
@@ -503,6 +559,9 @@ def run_training(
             if max_updates is not None and updates >= int(max_updates):
                 break
             update_started = time.monotonic()
+            learning_rate = learning_rate_for(lr_schedule, peak_lr, updates)
+            for group in optimizer.param_groups:
+                group["lr"] = learning_rate
             sequences = sampler.next_batch()
             sampled_quality.update(sequence.get("quality_label") for sequence in sequences)
             batch = collate_sequences(sequences, chosen_device)
@@ -688,6 +747,8 @@ def run_training(
             },
             "peak_cuda_bytes": peak_cuda,
             "warm_start": warm_start,
+            "lr_schedule": lr_schedule,
+            "final_learning_rate": float(optimizer.param_groups[0]["lr"]),
             "limitations": [
                 "single build 86383",
                 "entity + scalar inputs only; orders/addons/buffs/upgrades/spatial layers deferred",
