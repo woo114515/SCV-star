@@ -135,6 +135,24 @@ class ModelTests(unittest.TestCase):
                 logits[:, real:], wider["selection"][index][:, -1:], rtol=0, atol=1e-4
             )
 
+    def test_selection_can_condition_on_the_pooled_summary(self):
+        # v4 option: the selection decoder sees the encoder's pooled summary, the
+        # same skip connection that helped the ability head. Default stays off so
+        # earlier checkpoints keep loading.
+        base = build_bc_model(make_cache(), {})
+        expected = base.config.lstm_hidden + 2 * base.entity_width
+        self.assertEqual(base.selection_init.in_features, expected)
+        wide = build_bc_model(make_cache(), {"selection_uses_pooled": True})
+        self.assertEqual(wide.selection_init.in_features, expected + base.entity_width)
+        batch = make_batch()
+        outputs = wide(batch)
+        losses = bc_loss(outputs, batch["targets"])
+        self.assertTrue(torch.isfinite(losses["total"]))
+        losses["total"].backward()
+        self.assertIsNotNone(wide.selection_init.weight.grad)
+        self.assertTrue(torch.isfinite(wide.selection_init.weight.grad).all())
+        self.assertFalse(model_config_matches({"selection_uses_pooled": False}, wide.config))
+
     def test_inference_returns_masked_actions(self):
         model = build_bc_model(make_cache(), {})
         model.eval()

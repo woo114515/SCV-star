@@ -770,7 +770,9 @@ def run_training(
         validation_stream.close()
 
 
-def run_evaluation(config, config_path, output, checkpoint, test_cache, *, device=None):
+def run_evaluation(
+    config, config_path, output, checkpoint, test_cache, *, device=None, batch_size=None
+):
     output = Path(output).absolute()
     if output.exists():
         raise ValueError(f"Output already exists: {output}")
@@ -801,10 +803,15 @@ def run_evaluation(config, config_path, output, checkpoint, test_cache, *, devic
     model.load_state_dict(state["model"])
     weights = {name: float(config["head_weights"][name]) for name in HEAD_NAMES}
     train_ability = _most_frequent_ability(data["train"], len(cache["catalog"]["ability_ids"]))
+    # The batch size only groups rows, but it must be recorded: reported losses
+    # used to depend on it, and re-scoring needs one common value.
+    evaluation_batch = int(config["batch_size"]) if batch_size is None else int(batch_size)
+    if evaluation_batch < 1:
+        raise ValueError("Evaluation batch size must be positive")
     metrics = evaluate_sequences(
         model,
         test_data["test"],
-        int(config["batch_size"]),
+        evaluation_batch,
         chosen_device,
         weights,
         train_ability,
@@ -812,7 +819,7 @@ def run_evaluation(config, config_path, output, checkpoint, test_cache, *, devic
     metrics["by_quality"] = _quality_breakdown(
         model,
         test_data["test"],
-        int(config["batch_size"]),
+        evaluation_batch,
         chosen_device,
         weights,
         train_ability,
@@ -829,6 +836,8 @@ def run_evaluation(config, config_path, output, checkpoint, test_cache, *, devic
         "environment": _environment(config, config_path, cache_path),
         "checkpoint": str(checkpoint),
         "checkpoint_update": int(state["updates"]),
+        "batch_size": evaluation_batch,
+        "batch_size_overridden": batch_size is not None,
         "test_cache": str(test_path),
         "test_sequences": len(test_data["test"]),
         "train_most_frequent_ability": train_ability,
@@ -861,6 +870,7 @@ def main():
     parser.add_argument("--evaluate", action="store_true")
     parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--test-cache", type=Path)
+    parser.add_argument("--evaluate-batch-size", type=int)
     args = parser.parse_args()
     config, config_path = load_config(args.config)
     if args.evaluate:
@@ -873,6 +883,7 @@ def main():
             args.checkpoint,
             args.test_cache,
             device=args.device,
+            batch_size=args.evaluate_batch_size,
         )
     else:
         report = run_training(

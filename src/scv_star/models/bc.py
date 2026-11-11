@@ -53,6 +53,7 @@ class BCModelConfig:
     selection_hidden: int = 128
     max_selection_steps: int = 128
     ability_head_hidden: int = 0
+    selection_uses_pooled: bool = False
 
 
 class BCModel(nn.Module):
@@ -132,7 +133,10 @@ class BCModel(nn.Module):
             self.ability_head = nn.Linear(head_width, self.ability_count)
         self.kind_embed = nn.Embedding(2, width)
         self.kind_head = nn.Linear(config.lstm_hidden, 2)
-        self.selection_init = nn.Linear(config.lstm_hidden + 2 * width, config.selection_hidden)
+        self.selection_context = self.entity_width if config.selection_uses_pooled else 0
+        self.selection_init = nn.Linear(
+            config.lstm_hidden + 2 * width + self.selection_context, config.selection_hidden
+        )
         self.selection_gru = nn.GRUCell(3 * width, config.selection_hidden)
         self.selection_start = nn.Parameter(torch.zeros(width))
         self.selection_stop = nn.Parameter(torch.zeros(config.selection_hidden))
@@ -218,7 +222,15 @@ class BCModel(nn.Module):
         return (gathered * weights).sum(1) / weights.sum(1).clamp(min=1.0)
 
     def _selection_logits(
-        self, entity_emb, state, ability_emb, kind_emb, indices, selected_mask, entity_mask
+        self,
+        entity_emb,
+        state,
+        ability_emb,
+        kind_emb,
+        indices,
+        selected_mask,
+        entity_mask,
+        pooled=None,
     ):
         batch, steps, count, width = entity_emb.shape
         flat = entity_emb.reshape(batch * steps, count, width)
@@ -226,9 +238,10 @@ class BCModel(nn.Module):
         flat_state = state.reshape(batch * steps, -1)
         flat_ability = ability_emb.reshape(batch * steps, -1)
         flat_kind = kind_emb.reshape(batch * steps, -1)
-        hidden = torch.tanh(
-            self.selection_init(torch.cat((flat_state, flat_ability, flat_kind), dim=-1))
-        )
+        init_input = torch.cat((flat_state, flat_ability, flat_kind), dim=-1)
+        if self.selection_context:
+            init_input = torch.cat((init_input, pooled.reshape(-1, self.entity_width)), dim=-1)
+        hidden = torch.tanh(self.selection_init(init_input))
         previous = self.selection_start.expand(batch * steps, -1)
         selection_mask = selected_mask.reshape(batch * steps, -1)
         index = indices.reshape(batch * steps, -1)
@@ -278,7 +291,7 @@ class BCModel(nn.Module):
         selected_mask = targets["selected_mask"]
         summary = self._selected_summary(entity_emb, indices, selected_mask)
         selection_logits = self._selection_logits(
-            entity_emb, state, ability_emb, kind_emb, indices, selected_mask, entity_mask
+            entity_emb, state, ability_emb, kind_emb, indices, selected_mask, entity_mask, pooled
         )
         flat_state = state.reshape(batch_size * steps, -1)
         flat_ability = ability_emb.reshape(batch_size * steps, -1)
