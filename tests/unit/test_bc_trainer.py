@@ -1,16 +1,26 @@
 import json
 import tempfile
+import torch
 import unittest
 from pathlib import Path
 
 from scv_star.data.bc_cache import build_cache
-from scv_star.training.bc import learning_rate_for, load_config, parse_lr_schedule, run_training
+from scv_star.models.bc import HEAD_NAMES, build_bc_model
+from scv_star.training.bc import (
+    evaluate_sequences,
+    learning_rate_for,
+    load_config,
+    parse_lr_schedule,
+    run_training,
+)
 from scv_star.training.checkpoint import assert_state_equal, load_checkpoint
 
 try:
     from tests.unit.test_bc_cache import CacheFixture, digest, write_apm
+    from tests.unit.test_bc_model import make_cache
 except ImportError:  # unittest discover puts tests/unit on sys.path
     from test_bc_cache import CacheFixture, digest, write_apm
+    from test_bc_model import make_cache
 
 
 def make_config(fixture, cache_document, cache_dir, root):
@@ -61,6 +71,46 @@ def make_config(fixture, cache_document, cache_dir, root):
             "delay": 0.25,
         },
     }
+
+
+def make_sequences(counts, length=4, entities=5):
+    """Synthetic cache-style sequences whose selection lengths differ per row."""
+    sequences = []
+    for index, count in enumerate(counts):
+        values = torch.zeros(length, entities, 27)
+        values[..., 0] = 18.0
+        values[..., 1] = 1.0
+        values[..., 2] = 1.0
+        values[..., 3:6] = 10.0
+        values[..., 7:9] = 100.0
+        selected = torch.zeros(length, count, dtype=torch.long)
+        selected_mask = torch.zeros(length, count, dtype=torch.bool)
+        for step in range(length):
+            selected[step, :count] = torch.arange(count) % entities
+            selected_mask[step, :] = True
+        sequences.append(
+            {
+                "key": ("replay", 0, f"seq{index}"),
+                "length": length,
+                "entities": values,
+                "entity_mask": torch.ones(length, entities, dtype=torch.bool),
+                "stale": torch.zeros(length, entities, dtype=torch.bool),
+                "scalars": torch.zeros(length, 9),
+                "ability": torch.zeros(length, dtype=torch.long),
+                "kind": torch.zeros(length, dtype=torch.long),
+                "selected_indices": selected,
+                "selected_mask": selected_mask,
+                "target_kind": torch.ones(length, dtype=torch.long),
+                "target_index": torch.zeros(length, dtype=torch.long),
+                "target_point": torch.zeros(length, 2),
+                "queue": torch.zeros(length, dtype=torch.long),
+                "queue_mask": torch.zeros(length, dtype=torch.bool),
+                "delay": torch.zeros(length),
+                "delay_mask": torch.zeros(length, dtype=torch.bool),
+                "map_size": (128, 128),
+            }
+        )
+    return sequences
 
 
 class TrainerTests(unittest.TestCase):
@@ -362,6 +412,20 @@ class TrainerTests(unittest.TestCase):
             report = json.loads((resumed / "report.json").read_text())
             self.assertEqual(report["lr_schedule"]["kind"], "cosine")
             self.assertLess(report["final_learning_rate"], loaded["learning_rate"])
+
+    def test_evaluation_loss_does_not_depend_on_batch_size(self):
+        # Reported losses must pool by active count: averaging per-batch means
+        # weights a batch by its size, and the selection head's active count per
+        # batch depends on the largest selection it happens to contain. Grouping
+        # the same sequences differently must therefore not move the numbers.
+        model = build_bc_model(make_cache(), {})
+        sequences = make_sequences([0, 1, 6, 2])
+        weights = {name: 1.0 for name in HEAD_NAMES}
+        two = evaluate_sequences(model, sequences, 2, "cpu", weights)
+        three = evaluate_sequences(model, sequences, 3, "cpu", weights)
+        for name in HEAD_NAMES:
+            self.assertAlmostEqual(two["loss"][name], three["loss"][name], places=5, msg=name)
+        self.assertAlmostEqual(two["loss"]["total"], three["loss"]["total"], places=5)
 
     def test_sampling_weights_require_apm_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:

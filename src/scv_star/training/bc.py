@@ -342,8 +342,8 @@ def _most_frequent_ability(sequences, ability_count):
 def evaluate_sequences(model, sequences, batch_size, device, weights, train_ability=None):
     model.eval()
     metrics = MetricsAccumulator()
-    losses = {name: 0.0 for name in (*HEAD_NAMES, "total")}
-    batches = 0
+    sums = {name: 0.0 for name in HEAD_NAMES}
+    counts = {name: 0 for name in HEAD_NAMES}
     with torch.no_grad():
         for start in range(0, len(sequences), batch_size):
             batch = collate_sequences(sequences[start : start + batch_size], device)
@@ -352,11 +352,17 @@ def evaluate_sequences(model, sequences, batch_size, device, weights, train_abil
             if not torch.isfinite(result["total"]):
                 raise ValueError("Non-finite evaluation loss")
             metrics.update(outputs, batch["targets"])
-            for name in (*HEAD_NAMES, "total"):
-                losses[name] += float(result[name].detach())
-            batches += 1
+            for name in HEAD_NAMES:
+                # Pool by active count: averaging per-batch means would weight a
+                # batch by its size and make the reported loss depend on how the
+                # sequences happen to be grouped (the selection head varies most).
+                count = int(result["counts"][name])
+                counts[name] += count
+                sums[name] += float(result[name].detach()) * count
     result = metrics.compute()
-    result["loss"] = {name: value / max(batches, 1) for name, value in losses.items()}
+    pooled = {name: sums[name] / max(counts[name], 1) for name in HEAD_NAMES}
+    pooled["total"] = sum(float(weights[name]) * pooled[name] for name in HEAD_NAMES)
+    result["loss"] = pooled
     if train_ability is not None:
         entry = result["ability"]["per_ability"].get(str(train_ability), {"target": 0})
         result["ability"]["most_frequent_baseline"] = entry["target"] / max(

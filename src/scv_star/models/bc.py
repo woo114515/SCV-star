@@ -217,9 +217,12 @@ class BCModel(nn.Module):
         weights = selected_mask.reshape(batch * steps, -1).float().unsqueeze(-1)
         return (gathered * weights).sum(1) / weights.sum(1).clamp(min=1.0)
 
-    def _selection_logits(self, entity_emb, state, ability_emb, kind_emb, indices, selected_mask):
+    def _selection_logits(
+        self, entity_emb, state, ability_emb, kind_emb, indices, selected_mask, entity_mask
+    ):
         batch, steps, count, width = entity_emb.shape
         flat = entity_emb.reshape(batch * steps, count, width)
+        flat_mask = entity_mask.reshape(batch * steps, count)
         flat_state = state.reshape(batch * steps, -1)
         flat_ability = ability_emb.reshape(batch * steps, -1)
         flat_kind = kind_emb.reshape(batch * steps, -1)
@@ -236,6 +239,10 @@ class BCModel(nn.Module):
                 torch.cat((previous, flat_ability, flat_kind), dim=-1), hidden
             )
             scores = torch.einsum("nw,new->ne", hidden, flat)
+            # Padded entity slots must not consume probability mass: without this
+            # the selection loss would depend on the batch's maximum entity count,
+            # and training would disagree with act(), which already masks them.
+            scores = scores.masked_fill(~flat_mask, torch.finfo(scores.dtype).min)
             stop = torch.einsum("nw,w->n", hidden, self.selection_stop)
             logits.append(torch.cat((scores, stop.unsqueeze(1)), dim=1))
             if step < maximum:
@@ -271,7 +278,7 @@ class BCModel(nn.Module):
         selected_mask = targets["selected_mask"]
         summary = self._selected_summary(entity_emb, indices, selected_mask)
         selection_logits = self._selection_logits(
-            entity_emb, state, ability_emb, kind_emb, indices, selected_mask
+            entity_emb, state, ability_emb, kind_emb, indices, selected_mask, entity_mask
         )
         flat_state = state.reshape(batch_size * steps, -1)
         flat_ability = ability_emb.reshape(batch_size * steps, -1)

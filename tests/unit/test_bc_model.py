@@ -95,6 +95,46 @@ class ModelTests(unittest.TestCase):
             if parameter.grad is not None:
                 self.assertTrue(torch.isfinite(parameter.grad).all())
 
+    def test_selection_loss_ignores_padded_entity_slots(self):
+        # Two batches that differ only in how many masked entity slots they carry
+        # must produce the same selection distribution: the pointer scores are
+        # masked, so padding cannot dilute the softmax or the loss.
+        torch.manual_seed(11)
+        model = build_bc_model(make_cache(), {})
+        model.eval()
+        batch = make_batch()
+        padded = copy.deepcopy(batch)
+        extra = 3
+
+        def with_extra_slots(values, dtype=None):
+            # Entity axis is dim 2 for both the 27-field tensors and the boolean masks.
+            pad_shape = values.shape[:2] + (extra,) + values.shape[3:]
+            pad = torch.zeros(pad_shape, dtype=dtype or values.dtype)
+            return torch.cat((values, pad), dim=2)
+
+        for key in ("entities", "stale", "entity_mask"):
+            padded[key] = with_extra_slots(padded[key])
+        with torch.no_grad():
+            base = model(batch)
+            wider = model(padded)
+            base_loss = bc_loss(base, batch["targets"])
+            wider_loss = bc_loss(wider, padded["targets"])
+        self.assertAlmostEqual(
+            float(base_loss["selection"]), float(wider_loss["selection"]), places=6
+        )
+        real = batch["entity_mask"].shape[-1]
+        for index, logits in enumerate(base["selection"]):
+            # The stop logit sits after the entity columns, which is a different
+            # index once the padded batch carries extra slots.
+            torch.testing.assert_close(
+                logits[:, :real], wider["selection"][index][:, :real], rtol=0, atol=1e-4
+            )
+            # The encoder may sum masked slots in a different order, so allow
+            # float noise on individual logits; the loss check above is strict.
+            torch.testing.assert_close(
+                logits[:, real:], wider["selection"][index][:, -1:], rtol=0, atol=1e-4
+            )
+
     def test_inference_returns_masked_actions(self):
         model = build_bc_model(make_cache(), {})
         model.eval()
