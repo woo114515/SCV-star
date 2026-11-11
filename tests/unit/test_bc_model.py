@@ -153,6 +153,19 @@ class ModelTests(unittest.TestCase):
         self.assertTrue(torch.isfinite(wide.selection_init.weight.grad).all())
         self.assertFalse(model_config_matches({"selection_uses_pooled": False}, wide.config))
 
+    def test_act_runs_with_the_selection_context_enabled(self):
+        # The pooled skip changes the decoder's input width. act() built the old
+        # width once and only training was smoke-tested, so assert the inference
+        # path here for both settings of the flag.
+        for enabled in (False, True):
+            model = build_bc_model(make_cache(), {"selection_uses_pooled": enabled})
+            batch = make_batch()
+            actions = model.act(batch)
+            self.assertEqual(tuple(actions["ability"].shape), (2, 4))
+            self.assertEqual(tuple(actions["selected_indices"].shape), (2, 4, 128))
+            self.assertTrue((actions["selected_indices"] < 5).all())
+            self.assertTrue((actions["target_unit"] < 5).all())
+
     def test_inference_returns_masked_actions(self):
         model = build_bc_model(make_cache(), {})
         model.eval()

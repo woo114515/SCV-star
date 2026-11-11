@@ -221,6 +221,17 @@ class BCModel(nn.Module):
         weights = selected_mask.reshape(batch * steps, -1).float().unsqueeze(-1)
         return (gathered * weights).sum(1) / weights.sum(1).clamp(min=1.0)
 
+    def _selection_init_input(self, flat_state, ability_emb, kind_emb, pooled):
+        """Decoder init input; the pooled skip is appended only when enabled.
+
+        forward() and act() both call this: they diverged once when the option
+        was added to the training path only, so the concat lives in one place.
+        """
+        parts = [flat_state, ability_emb, kind_emb]
+        if self.selection_context:
+            parts.append(pooled.reshape(flat_state.shape[0], self.entity_width))
+        return torch.cat(parts, dim=-1)
+
     def _selection_logits(
         self,
         entity_emb,
@@ -238,10 +249,11 @@ class BCModel(nn.Module):
         flat_state = state.reshape(batch * steps, -1)
         flat_ability = ability_emb.reshape(batch * steps, -1)
         flat_kind = kind_emb.reshape(batch * steps, -1)
-        init_input = torch.cat((flat_state, flat_ability, flat_kind), dim=-1)
-        if self.selection_context:
-            init_input = torch.cat((init_input, pooled.reshape(-1, self.entity_width)), dim=-1)
-        hidden = torch.tanh(self.selection_init(init_input))
+        hidden = torch.tanh(
+            self.selection_init(
+                self._selection_init_input(flat_state, flat_ability, flat_kind, pooled)
+            )
+        )
         previous = self.selection_start.expand(batch * steps, -1)
         selection_mask = selected_mask.reshape(batch * steps, -1)
         index = indices.reshape(batch * steps, -1)
@@ -343,7 +355,9 @@ class BCModel(nn.Module):
         kind = torch.distributions.Categorical(logits=kind_logits).sample()
         kind_emb = self.kind_embed(kind)
         hidden = torch.tanh(
-            self.selection_init(torch.cat((flat_state, ability_emb, kind_emb), dim=-1))
+            self.selection_init(
+                self._selection_init_input(flat_state, ability_emb, kind_emb, pooled)
+            )
         )
         previous = self.selection_start.expand(rows, -1)
         summary = torch.zeros(rows, self.entity_width, device=ability.device)
