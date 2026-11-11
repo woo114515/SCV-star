@@ -234,6 +234,7 @@ def collate_sequences(sequences, device):
         "delay": torch.zeros(batch, steps),
         "delay_mask": torch.zeros(batch, steps, dtype=torch.bool),
         "map_size": torch.zeros(batch, steps, 2),
+        "step_mask": torch.zeros(batch, steps, dtype=torch.bool),
     }
     for index, sequence in enumerate(sequences):
         length = int(sequence["length"])
@@ -255,6 +256,7 @@ def collate_sequences(sequences, device):
         fields["delay"][index, :length] = sequence["delay"]
         fields["delay_mask"][index, :length] = sequence["delay_mask"]
         fields["map_size"][index, :length] = torch.tensor(sequence["map_size"])
+        fields["step_mask"][index, :length] = True
     targets = {
         key: fields.pop(key)
         for key in (
@@ -270,6 +272,7 @@ def collate_sequences(sequences, device):
             "delay",
             "delay_mask",
             "map_size",
+            "step_mask",
         )
     }
     for key in fields:

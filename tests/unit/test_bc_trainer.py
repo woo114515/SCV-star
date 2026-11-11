@@ -73,10 +73,12 @@ def make_config(fixture, cache_document, cache_dir, root):
     }
 
 
-def make_sequences(counts, length=4, entities=5):
+def make_sequences(counts, length=4, entities=5, lengths=None):
     """Synthetic cache-style sequences whose selection lengths differ per row."""
     sequences = []
     for index, count in enumerate(counts):
+        if lengths is not None:
+            length = lengths[index]
         values = torch.zeros(length, entities, 27)
         values[..., 0] = 18.0
         values[..., 1] = 1.0
@@ -426,6 +428,36 @@ class TrainerTests(unittest.TestCase):
         for name in HEAD_NAMES:
             self.assertAlmostEqual(two["loss"][name], three["loss"][name], places=5, msg=name)
         self.assertAlmostEqual(two["loss"]["total"], three["loss"]["total"], places=5)
+
+    def test_padding_does_not_change_losses_or_metrics(self):
+        # Sequences of unequal length are padded to the batch maximum. Padded
+        # steps carry a zero label and the model predicts zero, so counting them
+        # inflated ability top-1 by 1.5 points on the real test split.
+        model = build_bc_model(make_cache(), {})
+        sequences = make_sequences([1, 3, 0], lengths=[4, 2, 3])
+        weights = {name: 1.0 for name in HEAD_NAMES}
+        alone = evaluate_sequences(model, sequences, 1, "cpu", weights)
+        grouped = evaluate_sequences(model, sequences, 3, "cpu", weights)
+        for name in HEAD_NAMES:
+            self.assertAlmostEqual(
+                alone["loss"][name], grouped["loss"][name], places=5, msg=f"loss {name}"
+            )
+        self.assertAlmostEqual(alone["loss"]["total"], grouped["loss"]["total"], places=5)
+        for head, keys in (
+            ("ability", ("top1", "top5")),
+            ("kind", ("accuracy",)),
+            ("selection", ("precision", "recall", "f1", "exact_match")),
+            ("target_kind", ("accuracy",)),
+            ("target_unit", ("accuracy",)),
+            ("target_point", ("mae",)),
+            ("delay", ("mae",)),
+        ):
+            for key in keys:
+                self.assertAlmostEqual(
+                    alone[head][key], grouped[head][key], places=5, msg=f"{head}.{key}"
+                )
+        self.assertEqual(alone["ability"]["rows"], grouped["ability"]["rows"])
+        self.assertEqual(alone["selection"]["rows"], grouped["selection"]["rows"])
 
     def test_sampling_weights_require_apm_manifest(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -457,14 +457,15 @@ def bc_loss(outputs, targets, weights=None):
     ability_logits = outputs["ability"]
     batch, steps = ability_logits.shape[:2]
     rows = batch * steps
+    step_active = targets["step_mask"].reshape(-1)
     ability_target = targets["ability"].reshape(-1)
     ability, ability_count = categorical_loss(
         ability_logits.reshape(rows, -1),
         ability_target,
-        torch.ones(rows, dtype=torch.bool, device=ability_target.device),
+        step_active,
     )
     kind_target = targets["kind"].reshape(-1)
-    kind_active = torch.ones(rows, dtype=torch.bool, device=kind_target.device)
+    kind_active = step_active
     kind_loss, kind_count = categorical_loss(
         outputs["kind"].reshape(rows, -1), kind_target, kind_active
     )
@@ -479,32 +480,32 @@ def bc_loss(outputs, targets, weights=None):
         stop = torch.full((rows,), entity_count, dtype=torch.long, device=ability_logits.device)
         if step < indices.shape[1]:
             stop = torch.where(step < selected_count, indices[:, step], stop)
-        active = step <= selected_count
+        active = (step <= selected_count) & step_active
         loss, count = categorical_loss(logits, stop, active)
         selection_total = selection_total + loss
         selection_active = selection_active + count
     selection = selection_total / selection_active.clamp(min=1)
     target_kind = targets["target_kind"].reshape(-1)
-    kind_active = torch.ones(rows, dtype=torch.bool, device=target_kind.device)
+    kind_active = step_active
     kind_loss, kind_count = categorical_loss(outputs["target_kind"], target_kind, kind_active)
     target_kind_loss = kind_loss / kind_count.clamp(min=1)
-    unit_active = target_kind == TARGET_KINDS.index("unit")
+    unit_active = (target_kind == TARGET_KINDS.index("unit")) & step_active
     unit_loss, unit_count = categorical_loss(
         outputs["target_unit"], targets["target_index"].reshape(-1), unit_active
     )
     target_unit_loss = unit_loss / unit_count.clamp(min=1)
-    point_active = target_kind == TARGET_KINDS.index("point")
+    point_active = (target_kind == TARGET_KINDS.index("point")) & step_active
     map_size = targets["map_size"].reshape(rows, 2).clamp(min=1.0)
     point_target = targets["target_point"].reshape(rows, 2) / map_size
     point_losses = ((outputs["target_point"] - point_target) ** 2).mean(-1)
     point_count = point_active.sum()
     target_point_loss = (point_losses * point_active).sum() / point_count.clamp(min=1)
-    queue_active = targets["queue_mask"].reshape(-1)
+    queue_active = targets["queue_mask"].reshape(-1) & step_active
     queue_loss, queue_count = categorical_loss(
         outputs["queue"], targets["queue"].reshape(-1), queue_active
     )
     queue = queue_loss / queue_count.clamp(min=1)
-    delay_active = targets["delay_mask"].reshape(-1)
+    delay_active = targets["delay_mask"].reshape(-1) & step_active
     delay_target = torch.log1p(targets["delay"].reshape(-1).clamp(min=0))
     delay_losses = (outputs["delay"] - delay_target) ** 2
     delay_count = delay_active.sum()

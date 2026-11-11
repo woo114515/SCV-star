@@ -32,6 +32,7 @@ def make_outputs_targets():
         "delay": torch.tensor([[5.0]]),
         "delay_mask": torch.tensor([[True]]),
         "map_size": torch.tensor([[[128.0, 128.0]]]),
+        "step_mask": torch.tensor([[True]]),
     }
     return outputs, targets
 

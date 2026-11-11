@@ -58,6 +58,7 @@ def make_batch(batch=2, steps=4, entities=5):
         "delay": torch.randint(0, 20, (batch, steps)).float(),
         "delay_mask": torch.rand(batch, steps) > 0.3,
         "map_size": torch.full((batch, steps, 2), 128.0),
+        "step_mask": torch.ones(batch, steps, dtype=torch.bool),
     }
     return {
         "entities": values,

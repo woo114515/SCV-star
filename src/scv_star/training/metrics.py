@@ -42,8 +42,12 @@ class MetricsAccumulator:
     def update(self, outputs, targets):
         ability_logits = outputs["ability"]
         rows, count = ability_logits.shape[0] * ability_logits.shape[1], ability_logits.shape[-1]
-        ability_logits = ability_logits.reshape(rows, count)
-        ability_target = targets["ability"].reshape(-1)
+        step_active = targets["step_mask"].reshape(-1)
+        # Padded steps carry a zero label and a zero prediction, so counting them
+        # would inflate accuracy by roughly the padding share (1.5 points on the
+        # test split). Every head below is restricted to real steps.
+        ability_logits = ability_logits.reshape(rows, count)[step_active]
+        ability_target = targets["ability"].reshape(-1)[step_active]
         if self.ability_target is None:
             self.ability_target = torch.zeros(count, dtype=torch.long, device=ability_target.device)
             self.ability_correct = torch.zeros(
@@ -61,8 +65,8 @@ class MetricsAccumulator:
         self.ability_target += torch.bincount(ability_target, minlength=count)
         self.ability_correct += torch.bincount(ability_target[correct], minlength=count)
 
-        kind_target = targets["kind"].reshape(-1)
-        kind_predicted = outputs["kind"].reshape(rows, -1).argmax(-1)
+        kind_target = targets["kind"].reshape(-1)[step_active]
+        kind_predicted = outputs["kind"].reshape(rows, -1).argmax(-1)[step_active]
         self.kind_rows += kind_target.numel()
         self.kind_correct += int((kind_predicted == kind_target).sum())
 
@@ -75,7 +79,7 @@ class MetricsAccumulator:
         for logits in selection_logits:
             choices = logits.argmax(-1)
             for row in range(rows):
-                if stopped[row]:
+                if stopped[row] or not bool(step_active[row]):
                     continue
                 choice = int(choices[row])
                 if choice == entity_count:
@@ -83,6 +87,8 @@ class MetricsAccumulator:
                 else:
                     predicted_selection[row].append(choice)
         for row in range(rows):
+            if not bool(step_active[row]):
+                continue
             target = [int(value) for value in indices[row][selection_mask[row]].tolist()]
             actual = predicted_selection[row]
             actual_set, target_set = set(actual), set(target)
@@ -92,34 +98,34 @@ class MetricsAccumulator:
             self.selection_exact += int(actual == target)
             self.selection_predicted += len(actual)
             self.selection_target += len(target)
-        self.selection_rows += rows
+        self.selection_rows += int(step_active.sum())
 
-        target_kind = targets["target_kind"].reshape(-1)
-        target_kind_predicted = outputs["target_kind"].argmax(-1)
+        target_kind = targets["target_kind"].reshape(-1)[step_active]
+        target_kind_predicted = outputs["target_kind"].argmax(-1)[step_active]
         self.target_kind_rows += target_kind.numel()
         self.target_kind_correct += int((target_kind_predicted == target_kind).sum())
 
         unit_active = target_kind == TARGET_KINDS.index("unit")
-        unit_predicted = outputs["target_unit"].argmax(-1)
-        unit_target = targets["target_index"].reshape(-1)
+        unit_predicted = outputs["target_unit"].argmax(-1)[step_active]
+        unit_target = targets["target_index"].reshape(-1)[step_active]
         self.target_unit_rows += int(unit_active.sum())
         self.target_unit_correct += int(((unit_predicted == unit_target) & unit_active).sum())
 
         point_active = target_kind == TARGET_KINDS.index("point")
-        point_target = targets["target_point"].reshape(-1, 2)
-        map_size = targets["map_size"].reshape(-1, 2).clamp(min=1.0)
-        point_predicted = outputs["target_point"] * map_size
+        point_target = targets["target_point"].reshape(-1, 2)[step_active]
+        map_size = targets["map_size"].reshape(-1, 2).clamp(min=1.0)[step_active]
+        point_predicted = outputs["target_point"].reshape(-1, 2)[step_active] * map_size
         point_error = (point_predicted - point_target).abs().mean(-1)
         self.point_rows += int(point_active.sum())
         self.point_abs += float((point_error * point_active).sum())
 
-        queue_active = targets["queue_mask"].reshape(-1)
+        queue_active = targets["queue_mask"].reshape(-1) & step_active
         queue_predicted = outputs["queue"].argmax(-1)
         queue_target = targets["queue"].reshape(-1)
         self.queue_rows += int(queue_active.sum())
         self.queue_correct += int(((queue_predicted == queue_target) & queue_active).sum())
 
-        delay_active = targets["delay_mask"].reshape(-1)
+        delay_active = targets["delay_mask"].reshape(-1) & step_active
         delay_actual = targets["delay"].reshape(-1)
         delay_predicted = torch.expm1(outputs["delay"]).clamp(min=0)
         delay_error = (delay_predicted - delay_actual).abs()
