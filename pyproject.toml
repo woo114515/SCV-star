@@ -29,6 +29,7 @@ scv-bc = "scv_star.training.bc:main"
 scv-bc-cache = "scv_star.data.bc_cache:main"
 scv-apm = "scv_star.data.bc_apm:main"
 scv-bc-probe = "scv_star.data.bc_probe:main"
+scv-bc-diagnose = "scv_star.training.bc_diagnose:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
