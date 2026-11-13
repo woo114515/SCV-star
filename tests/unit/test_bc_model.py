@@ -154,6 +154,33 @@ class ModelTests(unittest.TestCase):
         self.assertTrue(torch.isfinite(wide.selection_init.weight.grad).all())
         self.assertFalse(model_config_matches({"selection_uses_pooled": False}, wide.config))
 
+    def test_decode_is_deterministic_and_honours_stop_bias(self):
+        model = build_bc_model(make_cache(), {})
+        batch = make_batch()
+        first = model.decode(batch)
+        second = model.decode(batch)
+        torch.testing.assert_close(first["selected_mask"], second["selected_mask"])
+        torch.testing.assert_close(first["ability"], second["ability"])
+        early = model.decode(batch, stop_logit_bias=4.0)
+        late = model.decode(batch, stop_logit_bias=-4.0)
+        self.assertLessEqual(int(early["selected_mask"].sum()), int(late["selected_mask"].sum()))
+        self.assertLess(int(early["selected_mask"].sum()), int(batch["entity_mask"].sum()))
+
+    def test_decode_forces_ability_and_respects_allowed_entities(self):
+        model = build_bc_model(make_cache(), {})
+        batch = make_batch()
+        forced = torch.zeros(2, 4, dtype=torch.long)
+        allowed = torch.zeros_like(batch["entity_mask"])
+        allowed[..., :2] = True
+        kinds = torch.zeros(2, 4, dtype=torch.long)
+        actions = model.decode(batch, ability=forced, kind=kinds, allowed_entities=allowed)
+        torch.testing.assert_close(actions["ability"], forced)
+        self.assertTrue(bool((actions["selected_indices"][actions["selected_mask"]] < 2).all()))
+        stopped = model.decode(batch, forbid_immediate_stop=True)
+        counts = stopped["selected_mask"].sum(-1)
+        valid = batch["entity_mask"].sum(-1) > 0
+        self.assertTrue(bool((counts[valid] >= 1).all()))
+
     def test_act_runs_with_the_selection_context_enabled(self):
         # The pooled skip changes the decoder's input width. act() built the old
         # width once and only training was smoke-tested, so assert the inference

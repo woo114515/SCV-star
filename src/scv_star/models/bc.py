@@ -335,8 +335,25 @@ class BCModel(nn.Module):
         }
 
     @torch.no_grad()
-    def act(self, batch):
-        """Sample a full action from legal observations; not connected to SC2 here."""
+    def decode(
+        self,
+        batch,
+        *,
+        greedy=True,
+        ability=None,
+        kind=None,
+        selection=None,
+        allowed_entities=None,
+        forbid_immediate_stop=False,
+        stop_logit_bias=0.0,
+    ):
+        """Decode a full action, optionally with a forced prefix or legal masks.
+
+        ability/kind force those heads; selection is a (indices, mask) pair that
+        replaces the autoregressive selection loop; allowed_entities is a boolean
+        mask over (batch, steps, entities) of units that may be selected. With no
+        arguments this is the free-running decoder that act() samples from.
+        """
         self.eval()
         entities = batch["entities"]
         entity_mask = batch["entity_mask"]
@@ -348,75 +365,131 @@ class BCModel(nn.Module):
         flat_state = state.reshape(rows, -1)
         flat_entities = entity_emb.reshape(rows, count, self.entity_width)
         flat_mask = entity_mask.reshape(rows, count)
+
         ability_logits = self.ability_head(self._ability_input(state, pooled)).reshape(rows, -1)
-        ability = torch.distributions.Categorical(logits=ability_logits).sample()
+        if ability is None:
+            ability = (
+                ability_logits.argmax(-1)
+                if greedy
+                else torch.distributions.Categorical(logits=ability_logits).sample()
+            )
+        else:
+            ability = ability.reshape(-1)
         ability_emb = self.ability_embed(ability)
+
         kind_logits = self.kind_head(state).reshape(rows, -1)
-        kind = torch.distributions.Categorical(logits=kind_logits).sample()
+        if kind is None:
+            kind = (
+                kind_logits.argmax(-1)
+                if greedy
+                else torch.distributions.Categorical(logits=kind_logits).sample()
+            )
+        else:
+            kind = kind.reshape(-1)
         kind_emb = self.kind_embed(kind)
-        hidden = torch.tanh(
-            self.selection_init(
-                self._selection_init_input(flat_state, ability_emb, kind_emb, pooled)
+
+        if selection is not None:
+            selected, selected_mask = selection
+            selected = selected.reshape(rows, -1)
+            selected_mask = selected_mask.reshape(rows, -1)
+            summary = self._selected_summary(entity_emb, selected, selected_mask).reshape(
+                rows, self.entity_width
             )
-        )
-        previous = self.selection_start.expand(rows, -1)
-        summary = torch.zeros(rows, self.entity_width, device=ability.device)
-        counts = torch.zeros(rows, device=ability.device)
-        selected = torch.zeros(
-            rows,
-            self.config.max_selection_steps,
-            dtype=torch.long,
-            device=ability.device,
-        )
-        selected_mask = torch.zeros_like(selected, dtype=torch.bool)
-        blocked = torch.zeros(rows, count, dtype=torch.bool, device=ability.device)
-        active = torch.ones(rows, dtype=torch.bool, device=ability.device)
-        for step in range(self.config.max_selection_steps):
-            hidden = self.selection_gru(
-                torch.cat((previous, ability_emb, kind_emb), dim=-1), hidden
-            )
-            scores = torch.einsum("nw,new->ne", hidden, flat_entities)
-            stop = torch.einsum("nw,w->n", hidden, self.selection_stop)
-            logits = torch.cat((scores, stop.unsqueeze(1)), dim=1)
-            invalid = torch.cat((blocked | ~flat_mask, torch.zeros_like(active)[:, None]), dim=1)
-            logits = logits.masked_fill(invalid, torch.finfo(logits.dtype).min)
-            choice = torch.distributions.Categorical(logits=logits).sample()
-            is_stop = choice == count
-            taking = active & ~is_stop
-            if taking.any():
-                chosen = choice.clamp(max=count - 1)
-                selected[:, step] = torch.where(taking, chosen, selected[:, step])
-                selected_mask[:, step] = taking
-                row_index = torch.arange(rows, device=blocked.device)[taking]
-                blocked[row_index, chosen[taking]] = True
-                chosen_emb = torch.gather(
-                    flat_entities,
-                    1,
-                    chosen.view(-1, 1, 1).expand(-1, 1, self.entity_width),
-                ).squeeze(1)
-                summary = summary + chosen_emb * taking.float().unsqueeze(1)
-                counts = counts + taking.float()
-                previous = torch.where(
-                    taking.unsqueeze(1),
-                    chosen_emb,
-                    self.selection_start.expand(rows, self.entity_width),
+        else:
+            hidden = torch.tanh(
+                self.selection_init(
+                    self._selection_init_input(flat_state, ability_emb, kind_emb, pooled)
                 )
-            active = active & ~is_stop
-            if not active.any():
-                break
-        summary = summary / counts.clamp(min=1).unsqueeze(1)
+            )
+            previous = self.selection_start.expand(rows, -1)
+            summary = torch.zeros(rows, self.entity_width, device=ability.device)
+            counts = torch.zeros(rows, device=ability.device)
+            selected = torch.zeros(
+                rows, self.config.max_selection_steps, dtype=torch.long, device=ability.device
+            )
+            selected_mask = torch.zeros_like(selected, dtype=torch.bool)
+            blocked = torch.zeros(rows, count, dtype=torch.bool, device=ability.device)
+            if allowed_entities is not None:
+                allowed = allowed_entities.reshape(rows, count) & flat_mask
+            else:
+                allowed = flat_mask
+            active = torch.ones(rows, dtype=torch.bool, device=ability.device)
+            for step in range(self.config.max_selection_steps):
+                hidden = self.selection_gru(
+                    torch.cat((previous, ability_emb, kind_emb), dim=-1), hidden
+                )
+                scores = torch.einsum("nw,new->ne", hidden, flat_entities)
+                stop = torch.einsum("nw,w->n", hidden, self.selection_stop)
+                logits = torch.cat((scores, stop.unsqueeze(1)), dim=1)
+                invalid = torch.cat((blocked | ~allowed, torch.zeros_like(active)[:, None]), dim=1)
+                logits = logits.masked_fill(invalid, torch.finfo(logits.dtype).min)
+                if stop_logit_bias:
+                    # A negative bias makes the decoder keep selecting (the stop
+                    # logit is lowered), the cheapest test of under-selection.
+                    logits = torch.cat((logits[:, :-1], logits[:, -1:] + stop_logit_bias), dim=1)
+                if forbid_immediate_stop and step == 0:
+                    logits = torch.cat(
+                        (
+                            logits[:, :-1],
+                            torch.full_like(logits[:, -1:], torch.finfo(logits.dtype).min),
+                        ),
+                        dim=1,
+                    )
+                choice = (
+                    logits.argmax(-1)
+                    if greedy
+                    else torch.distributions.Categorical(logits=logits).sample()
+                )
+                is_stop = choice == count
+                taking = active & ~is_stop
+                if taking.any():
+                    chosen = choice.clamp(max=count - 1)
+                    selected[:, step] = torch.where(taking, chosen, selected[:, step])
+                    selected_mask[:, step] = taking
+                    row_index = torch.arange(rows, device=blocked.device)[taking]
+                    blocked[row_index, chosen[taking]] = True
+                    chosen_emb = torch.gather(
+                        flat_entities,
+                        1,
+                        chosen.view(-1, 1, 1).expand(-1, 1, self.entity_width),
+                    ).squeeze(1)
+                    summary = summary + chosen_emb * taking.float().unsqueeze(1)
+                    counts = counts + taking.float()
+                    previous = torch.where(
+                        taking.unsqueeze(1),
+                        chosen_emb,
+                        self.selection_start.expand(rows, self.entity_width),
+                    )
+                active = active & ~is_stop
+                if not active.any():
+                    break
+            summary = summary / counts.clamp(min=1).unsqueeze(1)
+
         target_kind_logits = self.target_kind_head(
             torch.cat((flat_state, ability_emb, summary, kind_emb), dim=-1)
         )
-        target_kind = torch.distributions.Categorical(logits=target_kind_logits).sample()
+        target_kind = (
+            target_kind_logits.argmax(-1)
+            if greedy
+            else torch.distributions.Categorical(logits=target_kind_logits).sample()
+        )
         autocast = kind == 1
         target_kind = torch.where(autocast, torch.zeros_like(target_kind), target_kind)
         target_kind_emb = self.target_kind_embed(target_kind)
         condition = torch.cat((flat_state, ability_emb, summary, kind_emb, target_kind_emb), dim=-1)
         unit_logits = self._pointer(self.target_unit_query(condition), flat_entities, flat_mask)
-        target_unit = torch.distributions.Categorical(logits=unit_logits).sample()
+        target_unit = (
+            unit_logits.argmax(-1)
+            if greedy
+            else torch.distributions.Categorical(logits=unit_logits).sample()
+        )
         target_point = torch.sigmoid(self.target_point_head(condition))
-        queue = torch.distributions.Categorical(logits=self.queue_head(condition)).sample()
+        queue_logits = self.queue_head(condition)
+        queue = (
+            queue_logits.argmax(-1)
+            if greedy
+            else torch.distributions.Categorical(logits=queue_logits).sample()
+        )
         queue = torch.where(autocast, torch.zeros_like(queue), queue)
         delay = torch.expm1(self.delay_head(condition).squeeze(-1)).clamp(min=0)
         return {
@@ -430,6 +503,11 @@ class BCModel(nn.Module):
             "queue": queue.reshape(batch_size, steps),
             "delay": delay.reshape(batch_size, steps),
         }
+
+    @torch.no_grad()
+    def act(self, batch):
+        """Sample a full action from legal observations; not connected to SC2 here."""
+        return self.decode(batch, greedy=False)
 
 
 def build_bc_model(cache, model_config):
